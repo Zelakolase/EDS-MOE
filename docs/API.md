@@ -6,13 +6,13 @@
 - text in red is a string / request or response body.
 - SAD means Submit A Document
 - All reqs are POST unless explicitly determined such as about
-- Login : /api.login
 
 ---
+### **Login : /api.login**
 
 ### **Request body**
 
-```
+```javascript
 {“user”:”x”,”pass”:”y”}
 ```
 
@@ -20,11 +20,11 @@
 
 ### **Response body**
 
-```bash
+```javascript
 {“status”:”failed”,”msg”:”b”} # if login failed
 ```
 
-```bash
+```javascript
 {“session_id”:”a”,”first_name”:”c”} # if login success
 ```
 
@@ -34,13 +34,13 @@
 
 Request body :
 
-```bash
+```javascript
 {“public_code”:”x”}
 ```
 
 Response body :
 
-```bash
+```javascript
 {“status”:”failed”,”msg”:”y”} # if there’s error
 ```
 
@@ -56,7 +56,7 @@ due to file upload, will use multipart-formdata with verify_code
 
 Response body :
 
-```
+```javascript
 {“msg”:”x”}
 ```
 
@@ -66,17 +66,17 @@ Response body :
 
 Request body :
 
-```
+```javascript
 {“public_code”:”x”}
 ```
 
 Response body :
 
-```
+```javascript
 {“document_name”:”a”,”verifier”:”b”,”writer”:”c”,”date_of_publication”:”d”}
 ```
 
-```
+```javascript
 {“status”:”failed”,”msg”:”y”}
 ```
 
@@ -88,7 +88,7 @@ No request as it’s GET
 
 Response body :
 
-```
+```javascript
 {“document_num”:”a”,”query_num”:”b”}
 ```
 
@@ -98,17 +98,17 @@ Response body :
 
 Request Body :
 
-```
+```javascript
 {“doc_name”:”x”,”date”:”y”,”writer”,”z”,”session_id”:”a”}
 ```
 
 Response body :
 
-```
+```javascript
 {“verify_code”:”b”}
 ```
 
-```bash
+```javascript
 {“status”:”failed”,”msg”,”c”} # if failed
 ```
 
@@ -122,11 +122,11 @@ Request body is multipart-formdata with hidden input tag of verify_code to be se
 
 Response body :
 
-```bash
+```javascript
 {“public_code”:”x”,”verify_code”:”y”}
 ```
 
-```json
+```javascript
 {“status”:”failed”,”msg”,”z”} # if failed
 ```
 
