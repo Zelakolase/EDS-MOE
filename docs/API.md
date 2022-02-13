@@ -3,9 +3,8 @@
 ### **NOTES**
 
 - x, y, z, a, b, c are placeholders.
-- text in red is a string / request or response body.
-- SAD means Submit A Document
-- All reqs are POST unless explicitly determined such as about
+- SAD means *Submit A Document*
+- All reqs are **POST** unless explicitly determined such as *about*
 
 ---
 ### **Login : /api.login**
@@ -112,7 +111,7 @@ Response body :
 {“status”:”failed”,”msg”,”c”} # if failed
 ```
 
-Redirect to SAD S.2 with the code in placeholder
+- Redirect to SAD S.2 with the code in placeholder
 
 ---
 
@@ -130,4 +129,4 @@ Response body :
 {“status”:”failed”,”msg”,”z”} # if failed
 ```
 
-Redirect to SAD S.3 with info in placeholders
+- Redirect to SAD S.3 with info in placeholders
