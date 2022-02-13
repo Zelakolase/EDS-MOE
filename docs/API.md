@@ -1,4 +1,4 @@
-﻿# API Documentation
+# API Documentation (NOT APPROVED)
 
 ### **NOTES**
 
@@ -25,7 +25,7 @@
 ```
 
 ```bash
-{“session\_id”:”a”,”first\_name”:”c”} # if login success
+{“session_id”:”a”,”first_name”:”c”} # if login success
 ```
 
 ---
@@ -35,7 +35,7 @@
 Request body :
 
 ```bash
-{“public\_code”:”x”}
+{“public_code”:”x”}
 ```
 
 Response body :
@@ -67,13 +67,13 @@ Response body :
 Request body :
 
 ```
-{“public\_code”:”x”}
+{“public_code”:”x”}
 ```
 
 Response body :
 
 ```
-{“document\_name”:”a”,”verifier”:”b”,”writer”:”c”,”date\_of\_publication”:”d”}
+{“document_name”:”a”,”verifier”:”b”,”writer”:”c”,”date_of_publication”:”d”}
 ```
 
 ```
@@ -89,7 +89,7 @@ No request as it’s GET
 Response body :
 
 ```
-{“document\_num”:”a”,”query\_num”:”b”}
+{“document_num”:”a”,”query_num”:”b”}
 ```
 
 ---
@@ -99,13 +99,13 @@ Response body :
 Request Body :
 
 ```
-{“doc\_name”:”x”,”date”:”y”,”writer”,”z”,”session\_id”:”a”}
+{“doc_name”:”x”,”date”:”y”,”writer”,”z”,”session_id”:”a”}
 ```
 
 Response body :
 
 ```
-{“verify\_code”:”b”}
+{“verify_code”:”b”}
 ```
 
 ```bash
@@ -123,10 +123,10 @@ Request body is multipart-formdata with hidden input tag of verify_code to be se
 Response body :
 
 ```bash
-{“public\_code”:”x”,”verify\_code”:”y”}
+{“public_code”:”x”,”verify_code”:”y”}
 ```
 
-```bash
+```json
 {“status”:”failed”,”msg”,”z”} # if failed
 ```
 
