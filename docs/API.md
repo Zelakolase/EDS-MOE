@@ -98,7 +98,7 @@ Response body :
 Request Body :
 
 ```javascript
-{“doc_name”:”x”,”date”:”y”,”writer”,”z”,”session_id”:”a”}
+{“doc_name”:”x”,”date”:”y”,”writer”:”z”,”session_id”:”a”}
 ```
 
 Response body :
@@ -108,7 +108,7 @@ Response body :
 ```
 
 ```javascript
-{“status”:”failed”,”msg”,”c”} # if failed
+{“status”:”failed”,”msg”:”c”} # if failed
 ```
 
 - Redirect to SAD S.2 with the code in placeholder
@@ -126,7 +126,7 @@ Response body :
 ```
 
 ```javascript
-{“status”:”failed”,”msg”,”z”} # if failed
+{“status”:”failed”,”msg”:”z”} # if failed
 ```
 
 - Redirect to SAD S.3 with info in placeholders
