@@ -1,4 +1,4 @@
-# API Documentation (NOT APPROVED)
+# API Documentation (APPROVED)
 
 ### **NOTES**
 
