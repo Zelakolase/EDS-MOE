@@ -1,17 +1,18 @@
-# API Documentation (APPROVED)
+﻿# API Documentation (APPROVED)
 
 ### **NOTES**
 
 - x, y, z, a, b, c are placeholders.
-- SAD means *Submit A Document*
-- All reqs are **POST** unless explicitly determined such as *about*
+- SAD means _Submit A Document_
+- All reqs are **POST** unless explicitly determined such as _about_
 
 ---
+
 ### **Login : /api.login**
 
 ### **Request body**
 
-```javascript
+```json
 {“user”:”x”,”pass”:”y”}
 ```
 
@@ -19,12 +20,12 @@
 
 ### **Response body**
 
-```javascript
-{“status”:”failed”,”msg”:”b”} # if login failed
+```json
+{“status”:”failed”,”msg”:”b”} // if login failed
 ```
 
-```javascript
-{“session_id”:”a”,”first_name”:”c”} # if login success
+```json
+{“session_id”:”a”,”first_name”:”c”} // if login success
 ```
 
 ---
@@ -33,14 +34,14 @@
 
 Request body :
 
-```javascript
+```json
 {“public_code”:”x”}
 ```
 
 Response body :
 
-```javascript
-{“status”:”failed”,”msg”:”y”} # if there’s error
+```json
+{“status”:”failed”,”msg”:”y”} // if there’s error
 ```
 
 [pdf file] → pdf file in binary to download dialog inbrowser
@@ -55,7 +56,7 @@ due to file upload, will use multipart-formdata with verify_code
 
 Response body :
 
-```javascript
+```json
 {“msg”:”x”}
 ```
 
@@ -65,17 +66,17 @@ Response body :
 
 Request body :
 
-```javascript
+```json
 {“public_code”:”x”}
 ```
 
 Response body :
 
-```javascript
+```json
 {“document_name”:”a”,”verifier”:”b”,”writer”:”c”,”date_of_publication”:”d”}
 ```
 
-```javascript
+```json
 {“status”:”failed”,”msg”:”y”}
 ```
 
@@ -87,7 +88,7 @@ No request as it’s GET
 
 Response body :
 
-```javascript
+```json
 {“document_num”:”a”,”query_num”:”b”}
 ```
 
@@ -97,18 +98,18 @@ Response body :
 
 Request Body :
 
-```javascript
+```json
 {“doc_name”:”x”,”date”:”y”,”writer”:”z”,”session_id”:”a”}
 ```
 
 Response body :
 
-```javascript
+```json
 {“verify_code”:”b”}
 ```
 
-```javascript
-{“status”:”failed”,”msg”:”c”} # if failed
+```json
+{“status”:”failed”,”msg”:”c”} // if failed
 ```
 
 - Redirect to SAD S.2 with the code in placeholder
@@ -121,12 +122,12 @@ Request body is multipart-formdata with hidden input tag of verify_code to be se
 
 Response body :
 
-```javascript
+```json
 {“public_code”:”x”,”verify_code”:”y”}
 ```
 
-```javascript
-{“status”:”failed”,”msg”:”z”} # if failed
+```json
+{“status”:”failed”,”msg”:”z”} // if failed
 ```
 
 - Redirect to SAD S.3 with info in placeholders
