@@ -3,7 +3,7 @@
 
 ## Progress
 - [x] API documentation
-- [ ] Security check for API
+- [x] Security check for API
 - [ ] Frontend publish
 - [ ] Backend publish
 - [ ] Source code review and security check for backend
