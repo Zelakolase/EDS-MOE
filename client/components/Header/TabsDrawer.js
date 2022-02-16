@@ -47,8 +47,9 @@ export function TabsDrawer({
 
 					<DrawerBody>
 						<Stack>
-							{tabs.map((tab) => (
+							{tabs.map((tab, index) => (
 								<Button
+									key={index}
 									leftIcon={tab.icon}
 									variant={"ghost"}
 									w='full'

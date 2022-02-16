@@ -32,6 +32,7 @@ export function Header() {
 					tabs.map((tab, index) => (
 						<Button
 							variant='ghost'
+							key={index}
 							size='sm'
 							textTransform='capitalize'
 							leftIcon={tab.icon}
