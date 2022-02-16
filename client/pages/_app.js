@@ -1,7 +1,23 @@
-import '../styles/globals.css'
+import { PageLayout } from "@Layout/PageLayout";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { StepsStyleConfig as Steps } from "chakra-ui-steps";
+
+const theme = extendTheme({
+	components: {
+		Steps,
+	},
+});
+
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+	return (
+		<ChakraProvider>
+			<PageLayout theme={theme}>
+				<Component {...pageProps} />
+			</PageLayout>
+		</ChakraProvider>
+	);
 }
 
-export default MyApp
+export default MyApp;

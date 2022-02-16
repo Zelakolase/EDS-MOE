@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@Context/*": ["context/*"],
+			"@Context": ["context"],
+			"@Components/*": ["components/*"],
+			"@Components": ["components"],
+			"@Pages/*": ["pages/*"],
+			"@Pages": ["pages"],
+			"@Layout/*": ["layout/*"],
+			"@Layout": ["layout"],
+			"@Redux/*": ["redux/*"],
+			"@Redux": ["redux"],
+			"@Util/*": ["util/*"],
+			"@Util": ["util"],
+			"@Assests": ["assests"],
+			"@Assests/": ["assests/"],
+			"@CONSTANTS": ["constants"]
+		}
+	}
+}
