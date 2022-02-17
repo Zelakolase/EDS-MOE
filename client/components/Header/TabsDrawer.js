@@ -11,11 +11,14 @@ import {
 	IconButton,
 	Button,
 	useDisclosure,
+	useColorMode,
 	Stack,
+	HStack,
 } from "@chakra-ui/react";
+import { useTheme } from "@Theme";
 
 import { HiMenuAlt3 } from "react-icons/hi";
-
+import { BsSun, BiMoon } from "react-icons/bs";
 export function TabsDrawer({
 	tabs = [
 		/* 
@@ -29,6 +32,8 @@ export function TabsDrawer({
 	],
 }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { toggleColorMode } = useColorMode();
+	const { bg, color, bgHover } = useTheme();
 
 	return (
 		<>
@@ -46,18 +51,41 @@ export function TabsDrawer({
 					<DrawerHeader>Navigation</DrawerHeader>
 
 					<DrawerBody>
-						<Stack>
-							{tabs.map((tab, index) => (
+						<Stack h='full' justify='space-between'>
+							<Stack>
+								{tabs.map((tab, index) => (
+									<Button
+										key={index}
+										leftIcon={tab.icon}
+										variant={"ghost"}
+										w='full'
+										textTransform='capitalize'
+										onClick={() => Router.push(tab.path)}>
+										{tab.label}
+									</Button>
+								))}
+							</Stack>
+							<HStack w='full'>
 								<Button
-									key={index}
-									leftIcon={tab.icon}
-									variant={"ghost"}
 									w='full'
-									textTransform='capitalize'
-									onClick={() => Router.push(tab.path)}>
-									{tab.label}
+									alignItems='center'
+									bgColor={bg}
+									color={color}
+									_hover={{ bgColor: bgHover }}
+									onClick={() => Router.push("/login")}
+									size='sm'>
+									Login
 								</Button>
-							))}
+								<IconButton
+									onClick={toggleColorMode}
+									size='sm'
+									bgColor={bg}
+									color={color}
+									_hover={{ bgColor: bgHover }}
+									colorScheme='gray'
+									icon={<BsSun size='1.2em' />}
+								/>
+							</HStack>
 						</Stack>
 					</DrawerBody>
 

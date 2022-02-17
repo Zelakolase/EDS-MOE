@@ -16,7 +16,8 @@
 			"@Util": ["util"],
 			"@Assests": ["assests"],
 			"@Assests/": ["assests/"],
-			"@CONSTANTS": ["constants"]
+			"@CONSTANTS": ["constants"],
+			"@Theme": ["theme.js"]
 		}
 	}
 }
