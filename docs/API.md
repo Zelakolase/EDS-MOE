@@ -12,20 +12,20 @@
 
 ### **Request body**
 
-```json
-{“user”:”x”,”pass”:”y”}
+```jsonc
+{"user":"x","pass":"y"}
 ```
 
 ---
 
 ### **Response body**
 
-```json
-{“status”:”failed”,”msg”:”b”} // if login failed
+```jsonc
+{"status":"failed","msg":"b"} // if login failed
 ```
 
-```json
-{“session_id”:”a”,”first_name”:”c”} // if login success
+```jsonc
+{"session_id":"a","first_name":"c"} // if login success
 ```
 
 ---
@@ -34,14 +34,14 @@
 
 Request body :
 
-```json
-{“public_code”:”x”}
+```jsonc
+{"public_code":"x"}
 ```
 
 Response body :
 
-```json
-{“status”:”failed”,”msg”:”y”} // if there’s error
+```jsonc
+{"status":"failed","msg":"y"} // if there’s error
 ```
 
 [pdf file] → pdf file in binary to download dialog inbrowser
@@ -56,8 +56,8 @@ due to file upload, will use multipart-formdata with verify_code
 
 Response body :
 
-```json
-{“msg”:”x”}
+```jsonc
+{"msg":"x"}
 ```
 
 ---
@@ -66,18 +66,18 @@ Response body :
 
 Request body :
 
-```json
-{“public_code”:”x”}
+```jsonc
+{"public_code":"x"}
 ```
 
 Response body :
 
-```json
-{“document_name”:”a”,”verifier”:”b”,”writer”:”c”,”date_of_publication”:”d”}
+```jsonc
+{"document_name":"a","verifier":"b","writer":"c","date_of_publication":"d"}
 ```
 
-```json
-{“status”:”failed”,”msg”:”y”}
+```jsonc
+{"status":"failed","msg":"y"}
 ```
 
 ---
@@ -88,8 +88,8 @@ No request as it’s GET
 
 Response body :
 
-```json
-{“document_num”:”a”,”query_num”:”b”}
+```jsonc
+{"document_num":"a","query_num":"b"}
 ```
 
 ---
@@ -98,18 +98,18 @@ Response body :
 
 Request Body :
 
-```json
-{“doc_name”:”x”,”date”:”y”,”writer”:”z”,”session_id”:”a”}
+```jsonc
+{"doc_name":"x","date":"y","writer":"z","session_id":"a"}
 ```
 
 Response body :
 
-```json
-{“verify_code”:”b”}
+```jsonc
+{"verify_code":"b"}
 ```
 
-```json
-{“status”:”failed”,”msg”:”c”} // if failed
+```jsonc
+{"status":"failed","msg":"c"} // if failed
 ```
 
 - Redirect to SAD S.2 with the code in placeholder
@@ -122,12 +122,20 @@ Request body is multipart-formdata with hidden input tag of verify_code to be se
 
 Response body :
 
-```json
-{“public_code”:”x”,”verify_code”:”y”}
+```jsonc
+{"public_code":"x","verify_code":"y"}
 ```
 
-```json
-{“status”:”failed”,”msg”:”z”} // if failed
+```jsonc
+{"status":"failed","msg":"z"} // if failed
 ```
 
 - Redirect to SAD S.3 with info in placeholders
+
+### **School name : /api.name**
+
+Request is GET
+
+Response body :
+```jsonc
+{"name":"x"}
