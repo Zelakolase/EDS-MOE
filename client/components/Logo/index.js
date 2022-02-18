@@ -2,7 +2,6 @@ import { TEAM_NAME } from "@CONSTANTS";
 import { useTheme } from "@Theme";
 import { SimpleGrid, Center, Box, Button, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-
 export function Logo({
 	animationDuration = 6 /* For normal cases */,
 	delayAnimationDuration = 0,
@@ -12,11 +11,13 @@ export function Logo({
 	const { bg, color, bgHover } = useTheme();
 
 	return (
-		<SimpleGrid columns={inline ? 4 : 2} spacing={1}>
+		<SimpleGrid w='max-content' columns={inline ? 4 : 2} spacing={1}>
 			{TEAM_NAME.split("").map((c, index) => (
 				<Center key={index} position='relative'>
 					<motion.div
-						animate={isAnimated && { rotate: 360 * (index % 2 ? 1 : -1) }}
+						animate={
+							isAnimated ? { rotate: 360 * (index % 2 ? 1 : -1) } : false
+						}
 						transition={{
 							duration: animationDuration,
 							repeat: Infinity,

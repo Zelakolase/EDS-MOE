@@ -1,3 +1,5 @@
+import { css, jsx } from "@emotion/react";
+
 import Router from "next/router";
 import { useTheme } from "@Theme";
 import { useWindowSize } from "rooks";
@@ -7,8 +9,11 @@ import {
 	Text,
 	Heading,
 	useColorMode,
-	useColorModeValue,
 	IconButton,
+	Box,
+	Flex,
+	SimpleGrid,
+	GridItem,
 } from "@chakra-ui/react";
 
 import { Logo } from "@Components";
@@ -36,51 +41,61 @@ export function Header() {
 		},
 	];
 	return (
-		<HStack justify={"space-between"} w='full' px={4} py={6}>
-			{innerWidth < 768 && <div />}
-			<HStack w='max-content'>
-				<Logo delayAnimationDuration={2} />
+		<Flex justify={"space-between"} w='full' px={4} py={6}>
+			<HStack w='max-content' spacing={2}>
+				<Logo />
 				<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
 			</HStack>
 			<HStack spacing={4}>
 				{innerWidth > 768 ? (
-					<>
-						{tabs.map((tab, index) => (
-							<Button
-								variant='ghost'
-								key={index}
-								size='sm'
-								textTransform='capitalize'
-								leftIcon={tab.icon}
-								onClick={() => Router.push(tab.path)}>
-								{tab.label}
-							</Button>
-						))}
-						<HStack>
-							<Button
-								alignItems='center'
-								bgColor={bg}
-								color={color}
-								_hover={{ bgColor: bgHover }}
-								onClick={() => Router.push("/login")}
-								size='sm'>
-								Login
-							</Button>
-							<IconButton
-								onClick={toggleColorMode}
-								size='sm'
-								bgColor={bg}
-								color={color}
-								_hover={{ bgColor: bgHover }}
-								colorScheme='gray'
-								icon={<BsSun size='1.2em' />}
-							/>
-						</HStack>
-					</>
+					<Toolbar tabs={tabs} />
 				) : (
 					<TabsDrawer tabs={tabs} />
 				)}
 			</HStack>
-		</HStack>
+		</Flex>
+	);
+}
+
+function Toolbar({ tabs }) {
+	const { toggleColorMode } = useColorMode();
+
+	const { bg, color, bgHover } = useTheme();
+	return (
+		<>
+			{tabs.map((tab, index) => (
+				<Button
+					variant='ghost'
+					key={index}
+					size='sm'
+					textTransform='capitalize'
+					leftIcon={tab.icon}
+					onClick={() => Router.push(tab.path)}>
+					{tab.label}
+				</Button>
+			))}
+			<HStack spacing={1}>
+				<Button
+					alignItems='center'
+					bgColor={bg}
+					color={color}
+					_hover={{ bgColor: bgHover }}
+					mr={1}
+					onClick={() => Router.push("/login")}
+					size='sm'>
+					Login
+				</Button>
+				<IconButton
+					maxW={20}
+					onClick={toggleColorMode}
+					size='sm'
+					bgColor={bg}
+					color={color}
+					_hover={{ bgColor: bgHover }}
+					colorScheme='gray'
+					icon={<BsSun size='1.4em' />}
+				/>
+			</HStack>
+		</>
 	);
 }

@@ -21,10 +21,9 @@ export function PageLayout({ children, isLoading }) {
 			animate='enter' // Animated state to variants.enter
 			exit='exit' // Exit state (used later) to variants.exit
 			transition={{ type: "linear" }} // Set the transition to linear
-			className='w-full overflow-x-auto'>
+		>
 			<Stack align='center' w='full'>
 				<Header />
-				klk
 				{children}
 			</Stack>
 		</motion.div>

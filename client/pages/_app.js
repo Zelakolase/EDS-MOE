@@ -12,8 +12,8 @@ import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }) {
 	return (
-		<ChakraProvider>
-			<PageLayout theme={theme}>
+		<ChakraProvider theme={theme}>
+			<PageLayout>
 				<Component {...pageProps} />
 			</PageLayout>
 		</ChakraProvider>
