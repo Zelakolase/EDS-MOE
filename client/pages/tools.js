@@ -125,13 +125,20 @@ function DownloadDocumentComponent() {
 
 function VerifyDocumentComponent() {
 	const [file, setFile] = useState();
+	const [verifyCode, setVerifyCode] = useState("");
 
 	return (
 		<>
 			<Stack w='full' spacing={8} align={"center"}>
 				<Stack>
 					<Heading size='xs'>Verification Code</Heading>
-					<Input size={"md"} variant={"filled"} placeholder='Code' />
+					<Input
+						size={"md"}
+						variant={"filled"}
+						placeholder='Code'
+						value={verifyCode}
+						onChange={(e) => setVerifyCode(e.target.value)}
+					/>
 					<HStack justify={"end"}>
 						{file && (
 							<Tooltip placement='top' hasArrow label={file?.name ?? ""}>
@@ -179,6 +186,7 @@ function VerifyDocumentComponent() {
 
 function SearchDocumentComponent() {
 	const [publicCode, setPublicCode] = useState("");
+
 	return (
 		<>
 			<Stack w='full' spacing={5} align={"center"}>
