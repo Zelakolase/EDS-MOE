@@ -47,7 +47,7 @@ export function Header() {
 				<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
 			</HStack>
 			<HStack spacing={4}>
-				{innerWidth > 768 ? (
+				{innerWidth > 801 ? (
 					<Toolbar tabs={tabs} />
 				) : (
 					<TabsDrawer tabs={tabs} />

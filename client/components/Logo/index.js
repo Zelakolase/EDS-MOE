@@ -1,6 +1,13 @@
 import { TEAM_NAME } from "@CONSTANTS";
 import { useTheme } from "@Theme";
-import { SimpleGrid, Center, Box, Button, Flex } from "@chakra-ui/react";
+import {
+	SimpleGrid,
+	Center,
+	Box,
+	Button,
+	Flex,
+	Heading,
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
 export function Logo({
 	animationDuration = 6 /* For normal cases */,
@@ -25,17 +32,22 @@ export function Logo({
 							repeatDelay: delayAnimationDuration,
 						}}>
 						<Box
-							h={6}
-							w={6}
+							h={8}
+							w={8}
 							borderRadius={6}
 							bgColor={bg}
 							transitionDuration='.2s'
 							_hover={{ bgColor: bgHover }}
 						/>
 					</motion.div>
-					<Box pt={1} color={color} position='absolute' userSelect='none'>
+					<Heading
+						pt={1}
+						size='md'
+						color={color}
+						position='absolute'
+						userSelect='none'>
 						{c}
-					</Box>
+					</Heading>
 				</Center>
 			))}
 		</SimpleGrid>
