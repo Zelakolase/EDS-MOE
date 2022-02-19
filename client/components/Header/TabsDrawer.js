@@ -18,7 +18,8 @@ import {
 import { useTheme } from "@Theme";
 
 import { HiMenuAlt3 } from "react-icons/hi";
-import { BsSun, BiMoon } from "react-icons/bs";
+import { BsSun } from "react-icons/bs";
+import { BiMoon } from "react-icons/bi";
 export function TabsDrawer({
 	tabs = [
 		/* 
@@ -32,7 +33,7 @@ export function TabsDrawer({
 	],
 }) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const { toggleColorMode } = useColorMode();
+	const { toggleColorMode, colorMode } = useColorMode();
 	const { bg, color, bgHover } = useTheme();
 
 	return (
@@ -44,7 +45,7 @@ export function TabsDrawer({
 				size='sm'
 			/>
 
-			<Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+			<Drawer size={"xs"} isOpen={isOpen} placement='right' onClose={onClose}>
 				<DrawerOverlay />
 				<DrawerContent>
 					<DrawerCloseButton />
@@ -60,7 +61,10 @@ export function TabsDrawer({
 										variant={"ghost"}
 										w='full'
 										textTransform='capitalize'
-										onClick={() => Router.push(tab.path)}>
+										onClick={() => {
+											Router.push(tab.path);
+											onClose();
+										}}>
 										{tab.label}
 									</Button>
 								))}
@@ -83,7 +87,13 @@ export function TabsDrawer({
 									color={color}
 									_hover={{ bgColor: bgHover }}
 									colorScheme='gray'
-									icon={<BsSun size='1.2em' />}
+									icon={
+										colorMode === "light" ? (
+											<BiMoon size='1.2em' />
+										) : (
+											<BsSun size='1.2em' />
+										)
+									}
 								/>
 							</HStack>
 						</Stack>

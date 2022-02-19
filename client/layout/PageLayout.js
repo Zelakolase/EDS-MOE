@@ -23,7 +23,7 @@ export function PageLayout({ children, isLoading }) {
 			exit='exit' // Exit state (used later) to variants.exit
 			transition={{ type: "linear" }} // Set the transition to linear
 		>
-			<Stack align='center' h='full'>
+			<Stack align='center' px={4} h='full'>
 				<Header />
 				{children}
 			</Stack>

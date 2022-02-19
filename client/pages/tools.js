@@ -128,59 +128,54 @@ function VerifyDocumentComponent() {
 	const [verifyCode, setVerifyCode] = useState("");
 
 	return (
-		<>
-			<Stack w='full' spacing={8} align={"center"}>
-				<Stack>
-					<Heading size='xs'>Verification Code</Heading>
-					<Input
-						size={"md"}
-						variant={"filled"}
-						placeholder='Code'
-						value={verifyCode}
-						onChange={(e) => setVerifyCode(e.target.value)}
-					/>
-					<HStack justify={"end"}>
-						{file && (
-							<Tooltip placement='top' hasArrow label={file?.name ?? ""}>
-								<IconButton
-									size='sm'
-									icon={<RiFolderInfoLine size='1.4em' />}
-								/>
-							</Tooltip>
-						)}
-						<Tooltip
-							hasArrow
-							placement='top'
-							label='Import the document which you need to verify'>
-							<Box position='relative' w={"max-content"}>
-								<Button
-									size='sm'
-									rightIcon={<HiOutlineDocumentDownload size='1.4em' />}>
-									Import File
-								</Button>
-								<Input
-									w='full'
-									type={"file"}
-									left={0}
-									onChange={(e) => setFile(e.target.files[0])}
-									top={0}
-									cursor={"pointer"}
-									position={"absolute"}
-									opacity={0}
-									w='full'
-									h='full'
-								/>
-							</Box>
+		<Stack w='full' spacing={8} align={"center"}>
+			<Stack>
+				<Heading size='xs'>Verification Code</Heading>
+				<Input
+					size={"md"}
+					variant={"filled"}
+					placeholder='Code'
+					value={verifyCode}
+					onChange={(e) => setVerifyCode(e.target.value)}
+				/>
+				<HStack justify={"end"}>
+					{file && (
+						<Tooltip placement='top' hasArrow label={file?.name ?? ""}>
+							<IconButton size='sm' icon={<RiFolderInfoLine size='1.4em' />} />
 						</Tooltip>
-					</HStack>
-				</Stack>
-				<Button
-					maxW={"min-content"}
-					rightIcon={<MdOutlineVerified size='1.4em' />}>
-					Verify
-				</Button>
+					)}
+					<Tooltip
+						hasArrow
+						placement='top'
+						label='Import the document which you need to verify'>
+						<Box position='relative' w={"max-content"}>
+							<Button
+								size='sm'
+								rightIcon={<HiOutlineDocumentDownload size='1.4em' />}>
+								Import File
+							</Button>
+							<Input
+								w='full'
+								type={"file"}
+								left={0}
+								onChange={(e) => setFile(e.target.files[0])}
+								top={0}
+								cursor={"pointer"}
+								position={"absolute"}
+								opacity={0}
+								w='full'
+								h='full'
+							/>
+						</Box>
+					</Tooltip>
+				</HStack>
 			</Stack>
-		</>
+			<Button
+				maxW={"min-content"}
+				rightIcon={<MdOutlineVerified size='1.4em' />}>
+				Verify
+			</Button>
+		</Stack>
 	);
 }
 

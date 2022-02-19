@@ -20,12 +20,11 @@ import { Logo } from "@Components";
 import { TabsDrawer } from "./TabsDrawer";
 
 import { MdSupportAgent } from "react-icons/md";
-import { BiHomeAlt, BiInfoCircle } from "react-icons/bi";
-import { BsSun, BiMoon } from "react-icons/bs";
+import { BiHomeAlt, BiInfoCircle, BiMoon } from "react-icons/bi";
+import { BsSun } from "react-icons/bs";
 import { AiOutlineTool } from "react-icons/ai";
 
 export function Header() {
-	const { toggleColorMode } = useColorMode();
 	const { innerWidth } = useWindowSize();
 
 	const { bg, color, bgHover } = useTheme();
@@ -41,7 +40,7 @@ export function Header() {
 		},
 	];
 	return (
-		<Flex justify={"space-between"} w='full' px={4} py={6}>
+		<Flex justify={"space-between"} w='full' px={2} py={6}>
 			<HStack w='max-content' spacing={2}>
 				<Logo />
 				<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
@@ -58,7 +57,7 @@ export function Header() {
 }
 
 function Toolbar({ tabs }) {
-	const { toggleColorMode } = useColorMode();
+	const { toggleColorMode, colorMode } = useColorMode();
 
 	const { bg, color, bgHover } = useTheme();
 	return (
@@ -93,7 +92,13 @@ function Toolbar({ tabs }) {
 					color={color}
 					_hover={{ bgColor: bgHover }}
 					colorScheme='gray'
-					icon={<BsSun size='1.4em' />}
+					icon={
+						colorMode === "light" ? (
+							<BiMoon size='1.5em' />
+						) : (
+							<BsSun size='1.5em' />
+						)
+					}
 				/>
 			</HStack>
 		</>
