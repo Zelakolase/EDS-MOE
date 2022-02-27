@@ -10,15 +10,15 @@
 
 ### **Login : /api.login**
 
-### **Request body**
+Request body
 
 ```jsonc
 {"user":"x","pass":"y"}
 ```
 
 ---
-
-### **Response body**
+ 
+Response body
 
 ```jsonc
 {"status":"failed","msg":"b"} // if login failed
