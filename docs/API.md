@@ -132,7 +132,7 @@ Response body :
 
 - Redirect to SAD S.3 with info in placeholders
 
-### **School name : /api.name**
+### **School name : /api.name** [DONE]
 
 Request is GET
 
