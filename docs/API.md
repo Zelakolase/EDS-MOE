@@ -82,7 +82,7 @@ Response body :
 
 ---
 
-### **About : /api.about**
+### **About : /api.about** [DONE]
 
 No request as it’s GET
 
