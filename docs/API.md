@@ -94,7 +94,7 @@ Response body :
 
 ---
 
-### **Generate code (SAD S.1) : /api.generate**
+### **Generate code (SAD S.1) : /api.generate** DONE
 
 Request Body :
 
