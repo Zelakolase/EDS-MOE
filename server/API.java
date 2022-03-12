@@ -278,7 +278,7 @@ public class API {
 				// BODY is file
 				String path = "./docs/"+RandomGenerator.getSaltString() +"."+ extension; // ./docs/a7akmigjdfigjdo.pdf
 				new File(path).createNewFile();
-				IO.write(path, BODY, false);
+				IO.write(path, AES.encrypt(BODY, ENCRYPTION_KEY), false);
 				// then put path into db
 				SparkDB db = new SparkDB();
 				db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
