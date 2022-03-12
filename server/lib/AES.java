@@ -35,7 +35,31 @@ public class AES {
         	return "ERR.ERR.ERR";
         }
        }
+    public static byte[] encrypt(byte[] strToEncrypt, String secret) throws Exception {
+        try {
+            setKey(secret);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(Arrays.copyOf(key, 16)));
+        return Base64.getEncoder().encode(cipher.doFinal(strToEncrypt));
+        }catch(Exception e) {
+        	return "ERR.ERR.ERR".getBytes();
+        }
+       }
 
+    public static byte[] decrypt(byte[] strToDecrypt, String secret) throws Exception {
+        try {
+            setKey(secret);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(Arrays.copyOf(key, 16)));
+            return
+            		cipher.doFinal(
+            				Base64.getDecoder()
+            				.decode(strToDecrypt));
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	return "ERR.ERR.ERR".getBytes();
+        }
+    }
     public static String decrypt(String strToDecrypt, String secret) throws Exception {
         try {
             setKey(secret);

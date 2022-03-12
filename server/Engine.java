@@ -1,3 +1,5 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class Engine extends Server {
 	}
 
 	@Override
-	HashMap<String, byte[]> main(List<byte[]> aLm) {
+	HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS) {
 		try {
 			HashMap<String, String> headers = HeaderToHashmap.convert(new String(aLm.get(0))); // headers
 			HashMap<String, byte[]> response = new HashMap<>(); // content, mime, code
@@ -52,12 +54,15 @@ public class Engine extends Server {
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
 				if (ser.equals("login") || ser.equals("dac") || ser.equals("vad") || ser.equals("sfad") || ser.equals("generate") || ser.equals("doc")) {
-					Elshanta.put("body", PostRequestMerge.merge(aLm));
+					Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers));
 				}
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("session_ids", SESSION_IDS);
 				Elshanta.put("users_db", users);
+				if(headers.containsKey("verify_code")) Elshanta.put("verify_code", headers.get("verify_code"));
+				if(headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
+				if(headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, byte[]> res = API.redirector(Elshanta); // type, body
 				response.put("content", res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());

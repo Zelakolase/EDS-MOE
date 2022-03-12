@@ -122,7 +122,7 @@ public abstract class Server {
 					/*
 					 * Dynamic Mode
 					 */
-					Reply = main(ALm);
+					Reply = main(ALm, DIS, DOS);
 
 					Network.write(DOS,
 							Reply.get("content"),
@@ -140,5 +140,5 @@ public abstract class Server {
 
 	}
 
-	abstract HashMap<String, byte[]> main(List<byte[]> aLm);
+	abstract HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS);
 }
