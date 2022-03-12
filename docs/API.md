@@ -8,7 +8,7 @@
 
 ---
 
-### **Login : /api.login**
+### **Login : /api.login** DONE
 
 Request body
 
@@ -30,7 +30,7 @@ Response body
 
 ---
 
-### **Download a document : /api.dac**
+### **Download a document : /api.dac** DONE
 
 Request body :
 
@@ -62,7 +62,7 @@ Response body :
 
 ---
 
-### **Search for a document : /api.sfad**
+### **Search for a document : /api.sfad** DONE
 
 Request body :
 
