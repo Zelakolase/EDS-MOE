@@ -118,7 +118,7 @@ Response body :
 
 ### **SAD S.2 : /api.doc**
 
-Request body is multipart-formdata with hidden input tag of verify_code to be sent and session id
+Request body is multipart-formdata with hidden input tag of 'verify_code' to be sent and 'session_id' and 'extension'
 
 Response body :
 
