@@ -5,7 +5,7 @@
 - [x] API documentation
 - [x] Security check for API
 - [ ] Frontend publish
-- [ ] Backend publish
+- [x] Backend publish
 - [ ] Source code review and security check for backend
 - [ ] compile to native image (exe + elf)
 - [ ] android application
