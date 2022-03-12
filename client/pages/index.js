@@ -12,7 +12,7 @@ export default function Home() {
 				<Heading size='sm'>Welcome to</Heading>
 				<Heading textAlign={"center"}>Electronic Document System</Heading>
 			</Stack>
-			<Button maxW={100}>Templete</Button>
+			<Button maxW={100}>Template</Button>
 		</Stack>
 	);
 }

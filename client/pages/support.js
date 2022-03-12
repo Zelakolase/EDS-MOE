@@ -78,7 +78,7 @@ export default function Support() {
 					</Heading>
 				</Stack>
 				<Stack align={"center"}>
-					<Heading size='xs'>Contect with us by</Heading>
+					<Heading size='xs'>Contact with us by</Heading>
 					<Tooltip hasArrow label='Our Facebook Page'>
 						<Link
 							isExternal

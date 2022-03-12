@@ -1,0 +1,28 @@
+name: Build client side
+on:
+  push:
+    branches:
+      - main
+jobs:
+  run:
+    name: Building
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - name: Install dependencies
+        run: yarn install
+      - name: Build
+        run: yarn build
+      - name: Save output files
+        uses: actions/upload-artifact@v3
+        with:
+          name: out
+          path: client/out
