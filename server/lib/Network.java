@@ -75,7 +75,6 @@ public class Network {
 					byteCounter++;
 				}
 			} while (DIS.available() > 0);
-
 		} catch (IOException e) {
 			log.e(e, Network.class.getName(), "read");
 		}

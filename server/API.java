@@ -22,7 +22,7 @@ public class API {
 	static String code = HTTPCode.OK;
 
 	public static HashMap<String, byte[]> redirector(HashMap<String, Object> Elshanta_temp) {
-		HashMap<String, byte[]> res = new HashMap<String, byte[]>();
+		HashMap<String, byte[]> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		if(Elshanta_temp.containsKey("body")) BODY = (byte[]) Elshanta_temp.get("body");
 		SESSION_IDS = (HashMap<String, String>) Elshanta_temp.get(Elshanta_temp);
@@ -213,8 +213,8 @@ public class API {
 					ver_code, // verify code
 					"", // path
 					in.get("doc_name"), //  document name
-					in.get("verifier"), // verifier
-					SESSION_IDS.get(in.get("session_id")), // writer
+					SESSION_IDS.get(in.get("session_id")), // verifier
+					in.get("writer"), // writer
 					timeStamp, // date
 			});
 			new JSON();

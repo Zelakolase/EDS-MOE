@@ -55,11 +55,11 @@ public abstract class Server {
 			Arrays.fill(keyStorePassword, '0');
 			while (true) {
 				/*
-				 * Max 5 retries (1ms delay between each) for every request to process if
+				 * Max 10,000 retries (1ms delay between each) for every request to process if
 				 * MaxConcurrentReqs is reached
 				 */
 				int tries = 0; // current tries
-				inner: while (tries < 6) {
+				inner: while (tries < 10001) {
 					if (tries > 0) Thread.sleep(1);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
 						Socket S = SS.accept();
@@ -133,7 +133,9 @@ public abstract class Server {
 				DOS.close();
 			} catch (Exception e) {
 				log.e(e, Engine.class.getName(), "run");
+				this.interrupt();
 			}
+			CurrentConcurrentRequests--;
 		}
 
 	}

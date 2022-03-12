@@ -13,7 +13,7 @@ public class FileProcess {
 		add("index.html");
 	}};
 	public static HashMap<String, byte[]> redirector(String in) {
-		HashMap<String, byte[]> res = new HashMap<String, byte[]>();
+		HashMap<String, byte[]> res = new HashMap<>();
 		if(files.contains(in)) {
 			if(new File("./www/"+in).exists()) {
 				res.put("body", IO.read("./www/"+in));

@@ -14,8 +14,6 @@ public class main {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		MemMonitor MM = new MemMonitor();
-		MM.start();
 		Scanner s = new Scanner(System.in);
 		// Stage 1
 		ArrayList<String> FrontendFiles = new ArrayList<>() {

@@ -24,10 +24,12 @@ public class Engine extends Server {
 
 	public void run() {
 		try {
+		MemMonitor MM = new MemMonitor();
+		MM.start();
 		MIME.readfromfile("mime.db");
 		users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
-		this.setMaximumConcurrentRequests(10000);
-		this.setMaximumRequestSizeInKB(100000);
+		this.setMaximumConcurrentRequests(1500);
+		this.setMaximumRequestSizeInKB(100000); // 100MB
 		this.setGZip(false);
 		this.setBacklog(10000);
 		this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
@@ -80,6 +82,7 @@ public class Engine extends Server {
 					put("mime", "text/html".getBytes());
 				}
 			};
+			
 		}
 	}
 }
