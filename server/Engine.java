@@ -71,10 +71,12 @@ public class Engine extends Server {
 				/**
 				 * Static file request detected
 				 */
-				HashMap<String, byte[]> static_res = FileProcess.redirector(headers.get("path").substring(1));
+				String path = headers.get("path");
+				if(path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")) path += ".html";
+				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1));
 				response.put("content", static_res.get("body"));
 				response.put("code", static_res.get("code"));
-				String[] pathSplit = headers.get("path").split("\\.");
+				String[] pathSplit = path.split("\\.");
 				response.put("mime", MIME.get("extension", pathSplit[pathSplit.length - 1], "mime").getBytes());
 			}
 			return response;

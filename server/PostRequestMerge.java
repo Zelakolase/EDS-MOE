@@ -22,10 +22,8 @@ public class PostRequestMerge {
 		if(headers.containsKey("Content-Length")) {
 			int num = Integer.parseInt(headers.get("Content-Length")); // num. of bytes in body only
 			if(whole.size() < num) {
-				// "We're in deep shit, na7n fe karb 3azeem" - Amr Diab or Adib idc
+				// S L O W
 				whole.write(Network.ManRead(DIS, num - whole.size()));
-			}else {
-				// Phew, we got the whole request without TLS record shit
 			}
 		}
 		return whole.toByteArray();
