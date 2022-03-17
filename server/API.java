@@ -1,6 +1,6 @@
 import java.io.File;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -96,15 +96,13 @@ public class API {
 	 */
 	static String about() {
 		try {
-			String res = "";
 			HashMap<String, String> data = new HashMap<>();
 			SparkDB db = new SparkDB();
 			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			data.put("document_num", String.valueOf(db.num_queries));
 			data.put("query_num", new String(IO.read("./conf/queries.txt")));
 
-			res = JSON.HMQ(data);
-			return res;
+			return JSON.HMQ(data);
 		} catch (Exception e) {
 			code = HTTPCode.INTERNAL_SERVER_ERROR;
 			return "error";
@@ -121,7 +119,7 @@ public class API {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (users.get("user", in.get("user"), "password").equals(in.get("pass"))) {
-				String random = RandomGenerator.getSaltString();
+				String random = RandomGenerator.getSaltString(50, 0); // Session ID
 				SESSION_IDS.put(random, users.get("user", in.get("user"), "full_name"));
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{
@@ -213,8 +211,14 @@ public class API {
 			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if(SESSION_IDS.containsKey(in.get("session_id"))) {
-			String ver_code = RandomGenerator.getSaltString();
-			String pub_code = RandomGenerator.getSaltString();
+			String ver_code = "";
+			String pub_code = "";
+			do {
+				ver_code = RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1);
+			}while(db.Mapper.get("verify_code").contains(ver_code));
+			do {
+				pub_code =  RandomGenerator.getSaltString(3,2)+"-"+RandomGenerator.getSaltString(3,2)+"-"+RandomGenerator.getSaltString(3,2);
+			}while(db.Mapper.get("pub_code").contains(pub_code));
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
 			db.add(new String[] {
 					pub_code, // public_code
@@ -224,11 +228,15 @@ public class API {
 					SESSION_IDS.get(in.get("session_id")), // verifier
 					in.get("writer"), // writer
 					timeStamp, // date
+					"" // sha
 			});
 			new JSON();
-			res = JSON.HMQ(new HashMap<String, String>() {{
-				put("verify_code", ver_code);
-			}});
+			/*
+			 * Bug Fix : Local variable ver_code defined in an enclosing scope must be final or effectively final.
+			 */
+			HashMap<String, String> temp = new HashMap<>();
+			temp.put("verify_code", ver_code);
+			res = JSON.HMQ(temp);
 			}else {
 				new JSON();
 				res = JSON.HMQ(new HashMap<String, String>() {{
@@ -253,9 +261,8 @@ public class API {
 			// BODY is post req body compared to path in db
 			SparkDB db = new SparkDB();
 			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
-			byte[] original = AES.decrypt(IO.read(db.get("verify_code", verify_code, "path")), ENCRYPTION_KEY);
-			// compare original to BODY
-			boolean compare = Arrays.compare(original, BODY) == 0; // if zero, then identical
+			// compare original sha to BODY sha
+			boolean compare = db.get("verify_code", verify_code, "sha").equals(new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
 			String msg = compare? "The file is identical with the verify code":"The file isn't identical with the verify code";
 			res = JSON.HMQ(new HashMap<String, String>() {{
 				put("msg",msg);
@@ -276,13 +283,14 @@ public class API {
 		try {
 			if(SESSION_IDS.containsValue(session_id)) {
 				// BODY is file
-				String path = "./docs/"+RandomGenerator.getSaltString() +"."+ extension; // ./docs/a7akmigjdfigjdo.pdf
+				String path = "./docs/"+RandomGenerator.getSaltString(20,0) +"."+ extension; // ./docs/aakmigjdfigjdo.pdf
 				new File(path).createNewFile();
 				IO.write(path, AES.encrypt(BODY, ENCRYPTION_KEY), false);
 				// then put path into db
 				SparkDB db = new SparkDB();
 				db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 				db.change("verify_code", verify_code, "path", path);
+				db.change("verify_code", verify_code, "sha", new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
 				// then construct the response
 				res = JSON.HMQ(new HashMap<String, String>() {{
 					put("public_code", db.get("verify_code", verify_code, "pub_code"));

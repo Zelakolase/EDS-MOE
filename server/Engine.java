@@ -1,9 +1,11 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import lib.AES;
+import lib.FileToAL;
 import lib.HTTPCode;
 import lib.HeaderToHashmap;
 import lib.IO;
@@ -18,6 +20,7 @@ public class Engine extends Server {
 	static SparkDB MIME = new SparkDB();
 	static HashMap<String, String> SESSION_IDS = new HashMap<>(); // id, username
 	static SparkDB users = new SparkDB();
+	static ArrayList<String> WWWFiles = new ArrayList<>();
 	// Here goes the constant objects that never removed after request process
 
 	Engine(String ENC) {
@@ -30,6 +33,7 @@ public class Engine extends Server {
 		MM.start();
 		MIME.readfromfile("mime.db");
 		users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
+		WWWFiles = FileToAL.convert("WWWFiles.db");
 		this.setMaximumConcurrentRequests(1500);
 		this.setMaximumRequestSizeInKB(100000); // 100MB
 		this.setGZip(false);
@@ -73,7 +77,7 @@ public class Engine extends Server {
 				 */
 				String path = headers.get("path");
 				if(path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")) path += ".html";
-				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1));
+				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1),WWWFiles);
 				response.put("content", static_res.get("body"));
 				response.put("code", static_res.get("code"));
 				String[] pathSplit = path.split("\\.");
@@ -89,7 +93,7 @@ public class Engine extends Server {
 					put("mime", "text/html".getBytes());
 				}
 			};
-			
+
 		}
 	}
 }
