@@ -31,7 +31,10 @@ public class main {
 		boolean UserDB = new File("./conf/users.db").exists();
 		boolean DocsDB = new File("./conf/docs.db").exists();
 		boolean InfoDB = new File("./conf/info.txt").exists();
-		if (ServerKey && UserDB && DocsDB && InfoDB) {
+		boolean Queries = new File("./conf/queries.txt").exists();
+		boolean mime = new File("./conf/mime.db").exists();
+		boolean www = new File("./conf/WWWFiles.db").exists();
+		if (ServerKey && UserDB && DocsDB && InfoDB && Queries && www && mime) {
 			// Good to go
 			System.out.print("Enter the server key: ");
 			String k = s.nextLine();
@@ -43,7 +46,7 @@ public class main {
 			} else {
 				log.e("Encryption key is not correct");
 			}
-		} else if (!ServerKey && !UserDB && !DocsDB && !InfoDB) {
+		} else if (!ServerKey && !UserDB && !DocsDB && !InfoDB && !Queries && !www && !mime) {
 			// New user
 			new File("./conf/server.key").createNewFile();
 			new File("./conf/users.db").createNewFile();
