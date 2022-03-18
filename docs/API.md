@@ -39,7 +39,8 @@ Request body :
 Response body :
 ```jsonc
 {"status":"c"}
-```Where 'c' is either `failed` or `success
+```
+Where 'c' is either `failed` or `success`
 
 ---
 
