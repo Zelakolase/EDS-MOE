@@ -22,16 +22,18 @@ public class API {
 	static String code = HTTPCode.OK;
 	static String verify_code , session_id = "";
 	static String extension = "";
+	static SparkDB docs = new SparkDB();
 
-	public static HashMap<String, byte[]> redirector(HashMap<String, Object> Elshanta_temp) {
-		HashMap<String, byte[]> res = new HashMap<>();
+	public static HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) {
+		HashMap<String, Object> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		if(Elshanta_temp.containsKey("body")) BODY = (byte[]) Elshanta_temp.get("body");
 		SESSION_IDS = (HashMap<String, String>) Elshanta_temp.get(Elshanta_temp);
-		if(Elshanta_temp.containsKey("users_db")) users = (SparkDB) Elshanta_temp.get("users_db");
+		users = (SparkDB) Elshanta_temp.get("users_db");
 		if(Elshanta_temp.containsKey("verify_code")) verify_code = (String) Elshanta_temp.get("verify_code");
 		if(Elshanta_temp.containsKey("session_id")) session_id = (String) Elshanta_temp.get("session_id");
 		if(Elshanta_temp.containsKey("extension")) extension = (String) Elshanta_temp.get("extension");
+		docs = (SparkDB) Elshanta_temp.get("docs_db");
 		IO.write("./conf/queries.txt", String.valueOf(Integer.parseInt(new String(IO.read("./conf/queries.txt"))) + 1), false); // increase query by one
 		String in = (String) Elshanta_temp.get("api");
 		if (in.equals("name")) {
@@ -61,6 +63,9 @@ public class API {
 		else if(in.equals("vad")) {
 			res.put("body", vad().getBytes()); // verify a document
 			res.put("code", code.getBytes());
+		} else if(in.equals("logout")) {
+			res.put("body", logout().getBytes()); // verify a document
+			res.put("code", code.getBytes());
 		}
 		 else {
 			res.put("body", JSON.HMQ(new HashMap<String, String>() {{
@@ -70,7 +75,30 @@ public class API {
 			code = HTTPCode.BAD_REQUEST;
 			res.put("code", code.getBytes());
 		}
+		res.put("session_ids", SESSION_IDS);
+		res.put("docs", docs);
+		res.put("users", users);
 		return res;
+	}
+	/**
+	 * Log out
+	 * req : {"session_id":"a","pass":"b"}
+	 * res : {"status":"c"} Where 'c' is either failed or success
+	 */
+	static String logout() {
+		HashMap<String, String> in = JSON.QHM(new String(BODY));
+
+		if(SESSION_IDS.containsKey(in.get("session_id"))) {
+			String password = users.get("user", in.get("session_id"), "password");
+			if(password.equals(in.get("pass"))) {
+				return JSON.HMQ(new HashMap<String, String>() {{
+					put("status","success");
+				}});
+			}
+		}
+		return JSON.HMQ(new HashMap<String, String>() {{
+			put("status","failed");
+		}});
 	}
 	/**
 	 * This function tells the name of the school
@@ -150,15 +178,13 @@ public class API {
 	static String sfad() {
 		try {
 			String res = "";
-			SparkDB db = new SparkDB();
-			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
-			if(db.Mapper.get("pub_code").contains(in.get("public_code"))) {
+			if(docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
 				res = JSON.HMQ(new HashMap<String, String>() {{
-					put("document_name", db.get("pub_code", in.get("public_code"), "doc_name"));
-					put("verifier", db.get("pub_code", in.get("public_code"), "verifier"));
-					put("writer", db.get("pub_code", in.get("public_code"), "writer"));
-					put("date_of_publication", db.get("pub_code", in.get("public_code"), "date"));
+					put("document_name", docs.get("pub_code", in.get("public_code"), "doc_name"));
+					put("verifier", docs.get("pub_code", in.get("public_code"), "verifier"));
+					put("writer", docs.get("pub_code", in.get("public_code"), "writer"));
+					put("date_of_publication", docs.get("pub_code", in.get("public_code"), "date"));
 				}});
 			}else {
 				res = JSON.HMQ(new HashMap<String, String>() {{
@@ -181,11 +207,9 @@ public class API {
 	static byte[] dac() {
 		try {
 			byte[] res = null;
-			SparkDB db = new SparkDB();
-			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
-			if(db.Mapper.get("pub_code").contains(in.get("public_code"))) {
-				res = IO.read(db.get("pub_code", in.get("public_code"), "path"));
+			if(docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
+				res = IO.read(docs.get("pub_code", in.get("public_code"), "path"));
 			}else {
 				res = JSON.HMQ(new HashMap<String, String>() {{
 					put("status","failed");
@@ -207,20 +231,18 @@ public class API {
 	static String generate() {
 		try {
 			String res = "";
-			SparkDB db = new SparkDB();
-			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if(SESSION_IDS.containsKey(in.get("session_id"))) {
 			String ver_code = "";
 			String pub_code = "";
 			do {
 				ver_code = RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1)+"-"+RandomGenerator.getSaltString(4,1);
-			}while(db.Mapper.get("verify_code").contains(ver_code));
+			}while(docs.Mapper.get("verify_code").contains(ver_code));
 			do {
 				pub_code =  RandomGenerator.getSaltString(3,2)+"-"+RandomGenerator.getSaltString(3,2)+"-"+RandomGenerator.getSaltString(3,2);
-			}while(db.Mapper.get("pub_code").contains(pub_code));
+			}while(docs.Mapper.get("pub_code").contains(pub_code));
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-			db.add(new String[] {
+			docs.add(new String[] {
 					pub_code, // public_code
 					ver_code, // verify code
 					"", // path
@@ -230,6 +252,7 @@ public class API {
 					timeStamp, // date
 					"" // sha
 			});
+			IO.write("./conf/docs.db", AES.encrypt(docs.print(), ENCRYPTION_KEY), false);
 			new JSON();
 			/*
 			 * Bug Fix : Local variable ver_code defined in an enclosing scope must be final or effectively final.
@@ -258,11 +281,9 @@ public class API {
 	static String vad() {
 		String res = "";
 		try {
-			// BODY is post req body compared to path in db
-			SparkDB db = new SparkDB();
-			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
+			// BODY is post req body compared to path in db docs
 			// compare original sha to BODY sha
-			boolean compare = db.get("verify_code", verify_code, "sha").equals(new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
+			boolean compare = docs.get("verify_code", verify_code, "sha").equals(new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
 			String msg = compare? "The file is identical with the verify code":"The file isn't identical with the verify code";
 			res = JSON.HMQ(new HashMap<String, String>() {{
 				put("msg",msg);
@@ -286,14 +307,12 @@ public class API {
 				String path = "./docs/"+RandomGenerator.getSaltString(20,0) +"."+ extension; // ./docs/aakmigjdfigjdo.pdf
 				new File(path).createNewFile();
 				IO.write(path, AES.encrypt(BODY, ENCRYPTION_KEY), false);
-				// then put path into db
-				SparkDB db = new SparkDB();
-				db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
-				db.change("verify_code", verify_code, "path", path);
-				db.change("verify_code", verify_code, "sha", new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
+				docs.change("verify_code", verify_code, "path", path);
+				docs.change("verify_code", verify_code, "sha", new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
+				IO.write("./conf/docs.db", AES.encrypt(docs.print(), ENCRYPTION_KEY), false);
 				// then construct the response
 				res = JSON.HMQ(new HashMap<String, String>() {{
-					put("public_code", db.get("verify_code", verify_code, "pub_code"));
+					put("public_code", docs.get("verify_code", verify_code, "pub_code"));
 					put("verify_code",verify_code);
 				}});
 			}else {

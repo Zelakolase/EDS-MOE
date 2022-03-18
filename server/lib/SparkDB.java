@@ -7,10 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SparkDB {
-	public HashMap<String, ArrayList<String>> Mapper = new HashMap<>();
+	public ConcurrentHashMap<String, ArrayList<String>> Mapper = new ConcurrentHashMap<>();
 	public ArrayList<String> Headers = new ArrayList<>();
 	public int num_queries = 0;
 	public int num_header = 0;
@@ -212,7 +212,7 @@ public class SparkDB {
 	void zero() {
 		num_queries = 0;
 		num_header = 0;
-		Mapper = new HashMap<>();
+		Mapper = new ConcurrentHashMap<>();
 		Headers = new ArrayList<>();
 	}
 }

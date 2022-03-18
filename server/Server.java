@@ -117,7 +117,7 @@ public abstract class Server {
 
 				ArrayList<Byte> RequestInAL = Network.read(DIS, MAX_REQ_SIZE);
 				byte[] Request = toPrimitives(RequestInAL.toArray(Byte[]::new));
-				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 });
+				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 					HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
 					/*
 					 * Dynamic Mode
@@ -133,9 +133,10 @@ public abstract class Server {
 				DOS.close();
 			} catch (Exception e) {
 				log.e(e, Engine.class.getName(), "run");
-				this.interrupt();
-			}
+			} finally {
 			CurrentConcurrentRequests--;
+			}
+			this.interrupt();
 		}
 
 	}
