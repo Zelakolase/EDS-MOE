@@ -29,6 +29,19 @@ Response body
 ```
 
 ---
+### *Logout : /api.logout*
+
+Request body :
+```jsonc
+{"session_id":"a","pass":"b"}
+```
+
+Response body :
+```jsonc
+{"status":"c"}
+```Where 'c' is either `failed` or `success
+
+---
 
 ### **Download a document : /api.dac** DONE
 
