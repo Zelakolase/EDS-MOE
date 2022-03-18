@@ -1,8 +1,10 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -11,6 +13,7 @@ import lib.FileToAL;
 import lib.HTTPCode;
 import lib.HeaderToHashmap;
 import lib.IO;
+import lib.MaxSizeHashMap;
 import lib.MemMonitor;
 import lib.PostRequestMerge;
 import lib.SparkDB;
@@ -22,7 +25,7 @@ public class Engine extends Server {
 	 */
 	static String ENCRYPTION_KEY;
 	static SparkDB MIME = new SparkDB();
-	static ConcurrentHashMap<String, String> SESSION_IDS = new ConcurrentHashMap<>(); // id, username
+	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
 	static SparkDB users = new SparkDB();
 	static SparkDB docs = new SparkDB();
 	static ArrayList<String> WWWFiles = new ArrayList<>();
@@ -96,7 +99,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.e(e, "Engine", "main");
 			return new HashMap<>() {
 				{
 					put("content", "Server error".getBytes());
