@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import lib.AES;
 import lib.FileToAL;
 import lib.HTTPCode;
 import lib.HeaderToHashmap;
 import lib.IO;
+import lib.MemMonitor;
+import lib.PostRequestMerge;
 import lib.SparkDB;
 import lib.log;
 
@@ -60,27 +63,22 @@ public class Engine extends Server {
 				 * API request detected
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
-				if (ser.equals("login") || 
-						ser.equals("dac") ||
-						ser.equals("vad") || 
-						ser.equals("sfad") || 
-						ser.equals("generate") ||
-						ser.equals("doc") || 
-						ser.equals("logout")) {
-					Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers));
-				}
+				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
-				Elshanta.put("session_ids", SESSION_IDS);
-				Elshanta.put("users_db", users);
-				Elshanta.put("docs_db", docs);
+				if(ser.equals("login") || ser.equals("logout")) {
+					Elshanta.put("session_ids", SESSION_IDS);
+					Elshanta.put("users_db", users);
+				}
+				if(ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", users);
+				if(Stream.of("about","sfad","dac","generate","vad","doc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
 				if(headers.containsKey("verify_code")) Elshanta.put("verify_code", headers.get("verify_code"));
 				if(headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
 				if(headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res = API.redirector(Elshanta); // Elshanta reply
-				SESSION_IDS = (ConcurrentHashMap<String, String>) res.get("session_ids");
-				users = (SparkDB) res.get("users");
-				docs = (SparkDB) res.get("docs");
+				if(res.containsKey("session_ids")) SESSION_IDS = (ConcurrentHashMap<String, String>) res.get("session_ids");
+				if(res.containsKey("users")) users = (SparkDB) res.get("users");
+				if(res.containsKey("docs")) docs = (SparkDB) res.get("docs");
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", "application/json".getBytes());

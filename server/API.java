@@ -28,12 +28,12 @@ public class API {
 		HashMap<String, Object> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		if(Elshanta_temp.containsKey("body")) BODY = (byte[]) Elshanta_temp.get("body");
-		SESSION_IDS = (HashMap<String, String>) Elshanta_temp.get(Elshanta_temp);
-		users = (SparkDB) Elshanta_temp.get("users_db");
+		if(Elshanta_temp.containsKey("session_ids")) SESSION_IDS = (HashMap<String, String>) Elshanta_temp.get("session_ids");
+		if(Elshanta_temp.containsKey("users_db")) users = (SparkDB) Elshanta_temp.get("users_db");
 		if(Elshanta_temp.containsKey("verify_code")) verify_code = (String) Elshanta_temp.get("verify_code");
 		if(Elshanta_temp.containsKey("session_id")) session_id = (String) Elshanta_temp.get("session_id");
 		if(Elshanta_temp.containsKey("extension")) extension = (String) Elshanta_temp.get("extension");
-		docs = (SparkDB) Elshanta_temp.get("docs_db");
+		if(Elshanta_temp.containsKey("docs_db")) docs = (SparkDB) Elshanta_temp.get("docs_db");
 		IO.write("./conf/queries.txt", String.valueOf(Integer.parseInt(new String(IO.read("./conf/queries.txt"))) + 1), false); // increase query by one
 		String in = (String) Elshanta_temp.get("api");
 		if (in.equals("name")) {
@@ -75,9 +75,9 @@ public class API {
 			code = HTTPCode.BAD_REQUEST;
 			res.put("code", code.getBytes());
 		}
-		res.put("session_ids", SESSION_IDS);
-		res.put("docs", docs);
-		res.put("users", users);
+		if(Elshanta_temp.containsKey("session_ids")) res.put("session_ids", SESSION_IDS);
+		if(Elshanta_temp.containsKey("docs_db")) res.put("docs", docs);
+		if(Elshanta_temp.containsKey("users_db"))res.put("users", users);
 		return res;
 	}
 	/**
