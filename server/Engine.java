@@ -51,7 +51,6 @@ public class Engine extends Server {
 		this.setBacklog(this.MaxConcurrentRequests * 5);
 		this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 				+ "X-Content-Type-Options: nosniff\r\n";
-		this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		/**
 		 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
 		 * From StackOverflow.
@@ -61,6 +60,7 @@ public class Engine extends Server {
 			  String ip = socket.getLocalAddress().getHostAddress();
 			  log.s("Server is running, Device local IP Address: "+ip);
 			}
+		this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		}catch(Exception e) {
 			log.e(e, "Engine", "run()");
 		}
