@@ -70,9 +70,7 @@ export default function Login() {
 					/>
 				</Box>
 			</Stack>
-			<Button maxW={28} rightIcon={<BiLogIn size='1.4em' />}>
-				Login
-			</Button>
+			<Button rightIcon={<BiLogIn size='1.4em' />}>Login</Button>
 		</Stack>
 	);
 }

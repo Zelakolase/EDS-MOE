@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTheme } from "@Theme";
 import { css } from "@emotion/react";
 
+import { FileInfo } from "@Components";
+
 import {
 	Button,
 	Menu,
@@ -139,11 +141,7 @@ function VerifyDocumentComponent() {
 					onChange={(e) => setVerifyCode(e.target.value)}
 				/>
 				<HStack justify={"end"}>
-					{file && (
-						<Tooltip placement='top' hasArrow label={file?.name ?? ""}>
-							<IconButton size='sm' icon={<RiFolderInfoLine size='1.4em' />} />
-						</Tooltip>
-					)}
+					{file && <FileInfo file={file} />}
 					<Tooltip
 						hasArrow
 						placement='top'

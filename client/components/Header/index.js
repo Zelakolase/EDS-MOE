@@ -1,6 +1,6 @@
 import { css, jsx } from "@emotion/react";
 
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useTheme } from "@Theme";
 import { LOGIN_PATHNAME } from "@CONSTANTS";
 import { useWindowSize } from "rooks";
@@ -27,7 +27,7 @@ import { AiOutlineTool } from "react-icons/ai";
 
 export function Header() {
 	const { innerWidth } = useWindowSize();
-
+	const router = useRouter();
 	const { bg, color, bgHover } = useTheme();
 
 	const tabs = [
@@ -43,7 +43,7 @@ export function Header() {
 	return (
 		<Flex justify={"space-between"} w='full' px={2} py={6}>
 			<HStack w='max-content' spacing={2}>
-				{Router.pathname !== LOGIN_PATHNAME && (
+				{router.pathname !== LOGIN_PATHNAME && (
 					<>
 						<Logo />
 						<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
