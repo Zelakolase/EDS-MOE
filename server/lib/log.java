@@ -4,10 +4,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class log {
-	public static final String RESET = "\u001B[0m";
-	public static final String RED = "\u001B[31m";
-	public static final String GREEN = "\u001B[32m";
-	public static final String CYAN = "\u001B[36m";
+	static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+	public static final String RESET = isWindows ? "\033[0;37m":"\u001B[0m";
+	public static final String RED = isWindows ? "\033[0;31m":"\u001B[31m";
+	public static final String GREEN = isWindows ? "\033[0;32m":"\u001B[32m";
+	public static final String CYAN = isWindows ? "\033[0;36m":"\u001B[36m";
 
 	/**
 	 * Display error msg

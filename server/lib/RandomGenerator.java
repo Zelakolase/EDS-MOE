@@ -3,6 +3,9 @@ package lib;
 import java.util.Random;
 
 public class RandomGenerator {
+	/**
+	 * From StackOverflow, modified
+	 */
 	public static String getSaltString(int num, int mode) {
         String SALTCHARS = "";
         if(mode == 0) SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890qwertyuiopasdfghjklzxcvbnm";

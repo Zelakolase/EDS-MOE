@@ -1,5 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +52,15 @@ public class Engine extends Server {
 		this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 				+ "X-Content-Type-Options: nosniff\r\n";
 		this.HTTPSStart(443, "./keystore.jks", "SWSTest");
+		/**
+		 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
+		 * From StackOverflow.
+		 */
+		try(final DatagramSocket socket = new DatagramSocket()){
+			  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+			  String ip = socket.getLocalAddress().getHostAddress();
+			  log.s("Server is running, Device local IP Address: "+ip);
+			}
 		}catch(Exception e) {
 			log.e(e, "Engine", "run()");
 		}
