@@ -119,23 +119,23 @@ public abstract class Server {
 				ArrayList<Byte> RequestInAL = Network.read(DIS, MAX_REQ_SIZE);
 				byte[] Request = toPrimitives(RequestInAL.toArray(Byte[]::new));
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
-					HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
-					/*
-					 * Dynamic Mode
-					 */
-					Reply = main(ALm, DIS, DOS);
+				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
+				/*
+				 * Dynamic Mode
+				 */
+				Reply = main(ALm, DIS, DOS);
 
-					Network.write(DOS,
-							Reply.get("content"),
-							new String(Reply.get("mime")),
-							new String(Reply.get("code")),
-							GZip, AddedResponseHeaders);
+				Network.write(DOS,
+						Reply.get("content"),
+						new String(Reply.get("mime")),
+						new String(Reply.get("code")),
+						GZip, AddedResponseHeaders);
 				DIS.close();
 				DOS.close();
 			} catch (Exception e) {
 				log.e(e, Engine.class.getName(), "run");
 			} finally {
-			CurrentConcurrentRequests--;
+				CurrentConcurrentRequests--;
 			}
 			this.interrupt();
 		}

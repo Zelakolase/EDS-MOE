@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import lib.AES;
@@ -39,28 +38,28 @@ public class Engine extends Server {
 
 	public void run() {
 		try {
-		MemMonitor MM = new MemMonitor();
-		MM.start();
-		MIME.readfromfile("mime.db");
-		users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
-		docs.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
-		WWWFiles = FileToAL.convert("WWWFiles.db");
-		this.setMaximumConcurrentRequests(2500);
-		this.setMaximumRequestSizeInKB(100000); // 100MB
-		this.setGZip(false);
-		this.setBacklog(this.MaxConcurrentRequests * 5);
-		this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
-				+ "X-Content-Type-Options: nosniff\r\n";
-		/**
-		 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
-		 * From StackOverflow.
-		 */
-		try(final DatagramSocket socket = new DatagramSocket()){
-			  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-			  String ip = socket.getLocalAddress().getHostAddress();
-			  log.s("Server is running, Device local IP Address: "+ip);
+			MemMonitor MM = new MemMonitor();
+			MM.start();
+			MIME.readfromfile("mime.db");
+			users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
+			docs.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
+			WWWFiles = FileToAL.convert("WWWFiles.db");
+			this.setMaximumConcurrentRequests(2500);
+			this.setMaximumRequestSizeInKB(100000); // 100MB
+			this.setGZip(false);
+			this.setBacklog(this.MaxConcurrentRequests * 5);
+			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
+					+ "X-Content-Type-Options: nosniff\r\n";
+			/**
+			 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
+			 * From StackOverflow.
+			 */
+			try(final DatagramSocket socket = new DatagramSocket()){
+				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+				String ip = socket.getLocalAddress().getHostAddress();
+				log.s("Server is running, Device local IP Address: "+ip);
 			}
-		this.HTTPSStart(443, "./keystore.jks", "SWSTest");
+			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		}catch(Exception e) {
 			log.e(e, "Engine", "run()");
 		}
@@ -77,6 +76,7 @@ public class Engine extends Server {
 				 * API request detected
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
+				log.i(ser+" is requested.");
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);

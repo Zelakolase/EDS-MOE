@@ -90,14 +90,15 @@ public class API {
 	}
 
 	/**
-	 * Log out req : {"session_id":"a","pass":"b"} res : {"status":"c"} Where 'c' is
-	 * either failed or success
+	 * Log out 
+	 * req : {"session_id":"a","pass":"b"}
+	 * res : {"status":"c"} Where 'c' is either failed or success
 	 */
 	static String logout() {
 		HashMap<String, String> in = JSON.QHM(new String(BODY));
 
 		if (SESSION_IDS.containsKey(in.get("session_id"))) {
-			String password = users.get("user", in.get("session_id"), "password");
+			String password = users.get("user", SESSION_IDS.get(in.get("session_id")), "password");
 			if (password.equals(in.get("pass"))) {
 				return JSON.HMQ(new HashMap<String, String>() {
 					{
@@ -114,8 +115,9 @@ public class API {
 	}
 
 	/**
-	 * This function tells the name of the school req : GET Request res :
-	 * {"name":"x"}
+	 * This function tells the name of the school
+	 * req : GET Request 
+	 * res : {"name":"x"}
 	 */
 	static String name() {
 		try {
@@ -152,14 +154,16 @@ public class API {
 	}
 
 	/**
-	 * Login functionality req : {"user":"a","pass":"b"} res0 :
-	 * {"status":"failed","msg":"c"} res1 : {"session_id":"a","first_name":"b"}
+	 * Login functionality 
+	 * req : {"user":"a","pass":"b"} 
+	 * res0 : {"status":"failed","msg":"c"} 
+	 * res1 : {"session_id":"a","first_name":"b"}
 	 */
 	static String login() {
 		try {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
-			if (users.get("user", in.get("user"), "password").equals(in.get("pass"))) {
+			if (users.Mapper.get("user").contains(in.get("user")) && users.get("user", in.get("user"), "password").equals(in.get("pass"))) {
 				String random = RandomGenerator.getSaltString(50, 0); // Session ID
 				SESSION_IDS.put(random, users.get("user", in.get("user"), "full_name"));
 				res = JSON.HMQ(new HashMap<String, String>() {
@@ -185,9 +189,10 @@ public class API {
 	}
 
 	/**
-	 * Search for a document req : {"public_code":"a"} res0 :
-	 * {"status":"failed","msg":"b"} res1 :
-	 * {"document_name":"c","verifier":"d","writer":"e","date_of_publication":"f"}
+	 * Search for a document 
+	 * req : {"public_code":"a"} 
+	 * res0 : {"status":"failed","msg":"b"} 
+	 * res1 : {"document_name":"c","verifier":"d","writer":"e","date_of_publication":"f"}
 	 */
 	static String sfad() {
 		try {
@@ -219,15 +224,17 @@ public class API {
 	}
 
 	/**
-	 * Download a document req : {"public_code":"a"} res0 :
-	 * {"status":"failed","msg":"b"} res1 : File byte[]
+	 * Download a document 
+	 * req : {"public_code":"a"} 
+	 * res0 : {"status":"failed","msg":"b"} 
+	 * res1 : File byte[]
 	 */
 	static byte[] dac() {
 		try {
 			byte[] res = null;
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
-				res = IO.read(docs.get("pub_code", in.get("public_code"), "path"));
+				res = AES.decrypt(IO.read(docs.get("pub_code", in.get("public_code"), "path")), ENCRYPTION_KEY);
 			} else {
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{
@@ -245,9 +252,10 @@ public class API {
 	}
 
 	/**
-	 * Generate verification code req :
-	 * {"doc_name":"a","date":"b","writer":"c","session_id":"d"} res0 :
-	 * {"verify_code":"e"} res1 : {"status":"failed","msg":"f"}
+	 * Generate verification code 
+	 * req : {"doc_name":"a","date":"b","writer":"c","session_id":"d"} 
+	 * res0 : {"verify_code":"e"} 
+	 * res1 : {"status":"failed","msg":"f"}
 	 */
 	static String generate() {
 		try {
@@ -301,8 +309,9 @@ public class API {
 	}
 
 	/**
-	 * Verify a document using file upload and verify code in headers req : file as
-	 * binary in body and verify code in header res : {"msg":"a"}
+	 * Verify a document using file upload and verify code in headers 
+	 * req : file as binary in body and verify code in header 
+	 * res : {"msg":"a"}
 	 */
 	static String vad() {
 		String res = "";
@@ -327,15 +336,16 @@ public class API {
 	}
 
 	/**
-	 * Submit a document using verify code and session id and file res0 :
-	 * {"public_code":"a","verify_code":"b"} res1 : {"status":"failed","msg":"c"}
+	 * Submit a document using verify code and session id and file 
+	 * res0 : {"public_code":"a","verify_code":"b"} 
+	 * res1 : {"status":"failed","msg":"c"}
 	 */
 	static String doc() {
 		String res = "";
 		try {
 			if (SESSION_IDS.containsValue(session_id)) {
 				// BODY is file
-				String path = "./docs/" + RandomGenerator.getSaltString(20, 0) + "." + extension; // ./docs/aakmigjdfigjdo.pdf
+				String path = "./docs/" + RandomGenerator.getSaltString(20, 0) + "." + extension; // ./docs/aakF5igjdfigjdo.pdf
 				new File(path).createNewFile();
 				IO.write(path, AES.encrypt(BODY, ENCRYPTION_KEY), false);
 				docs.change("verify_code", verify_code, "path", path);
