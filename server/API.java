@@ -3,6 +3,7 @@ import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 import lib.AES;
 import lib.HTTPCode;
@@ -17,7 +18,7 @@ public class API {
 	 */
 	static String ENCRYPTION_KEY = "";
 	static byte[] BODY = null; // HTTPS Body
-	static HashMap<String, String> SESSION_IDS = new HashMap<>(); // id, full name
+	static Map<String, String> SESSION_IDS; // id, full name
 	static SparkDB users = new SparkDB();
 	static String code = HTTPCode.OK;
 	static String verify_code , session_id = "";
@@ -28,7 +29,7 @@ public class API {
 		HashMap<String, Object> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		if(Elshanta_temp.containsKey("body")) BODY = (byte[]) Elshanta_temp.get("body");
-		if(Elshanta_temp.containsKey("session_ids")) SESSION_IDS = (HashMap<String, String>) Elshanta_temp.get("session_ids");
+		if(Elshanta_temp.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) Elshanta_temp.get("session_ids");
 		if(Elshanta_temp.containsKey("users_db")) users = (SparkDB) Elshanta_temp.get("users_db");
 		if(Elshanta_temp.containsKey("verify_code")) verify_code = (String) Elshanta_temp.get("verify_code");
 		if(Elshanta_temp.containsKey("session_id")) session_id = (String) Elshanta_temp.get("session_id");
