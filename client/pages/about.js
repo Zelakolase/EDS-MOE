@@ -40,7 +40,7 @@ export default function About() {
 					processed.
 				</Text>
 			</Stack>
-			<Stack spacing={"-0.5"} alignSelf={"start"}>
+			<Stack alignSelf={"start"}>
 				<Heading size='md' textTransform={"capitalize"}>
 					team members
 				</Heading>

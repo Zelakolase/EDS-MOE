@@ -2,6 +2,7 @@ import { css, jsx } from "@emotion/react";
 
 import Router from "next/router";
 import { useTheme } from "@Theme";
+import { LOGIN_PATHNAME } from "@CONSTANTS";
 import { useWindowSize } from "rooks";
 import {
 	HStack,
@@ -42,8 +43,12 @@ export function Header() {
 	return (
 		<Flex justify={"space-between"} w='full' px={2} py={6}>
 			<HStack w='max-content' spacing={2}>
-				<Logo />
-				<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
+				{Router.pathname !== LOGIN_PATHNAME && (
+					<>
+						<Logo />
+						<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
+					</>
+				)}
 			</HStack>
 			<HStack spacing={4}>
 				{innerWidth > 801 ? (
@@ -80,7 +85,7 @@ function Toolbar({ tabs }) {
 					color={color}
 					_hover={{ bgColor: bgHover }}
 					mr={1}
-					onClick={() => Router.push("/login")}
+					onClick={() => Router.push(LOGIN_PATHNAME)}
 					size='sm'>
 					Login
 				</Button>

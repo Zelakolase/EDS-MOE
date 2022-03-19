@@ -6,4 +6,6 @@ const TEAM_MEMBERS = [
 	"Mustafa Anwar",
 ];
 
-export { TEAM_NAME, TEAM_MEMBERS };
+const LOGIN_PATHNAME = "/auth/login";
+
+export { TEAM_NAME, TEAM_MEMBERS, LOGIN_PATHNAME };

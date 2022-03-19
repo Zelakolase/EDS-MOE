@@ -1,5 +1,5 @@
 import Router from "next/router";
-
+import { LOGIN_PATHNAME } from "@CONSTANTS";
 import {
 	Drawer,
 	DrawerBody,
@@ -76,7 +76,7 @@ export function TabsDrawer({
 									bgColor={bg}
 									color={color}
 									_hover={{ bgColor: bgHover }}
-									onClick={() => Router.push("/login")}
+									onClick={() => Router.push(LOGIN_PATHNAME)}
 									size='sm'>
 									Login
 								</Button>
