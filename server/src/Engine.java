@@ -90,7 +90,7 @@ public class Engine extends Server {
 				if(headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
 				if(headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res = API.redirector(Elshanta); // Elshanta reply
-				if(res.containsKey("session_ids")) SESSION_IDS = (ConcurrentHashMap<String, String>) res.get("session_ids");
+				if(res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if(res.containsKey("users")) users = (SparkDB) res.get("users");
 				if(res.containsKey("docs")) docs = (SparkDB) res.get("docs");
 				response.put("content", (byte[]) res.get("body"));
