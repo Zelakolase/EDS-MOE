@@ -17,7 +17,9 @@
 			"@Assests": ["assests"],
 			"@Assests/": ["assests/"],
 			"@CONSTANTS": ["constants"],
-			"@Theme": ["theme.js"]
+			"@Theme": ["theme.js"],
+			"@API": ["api"],
+			"@API/": ["api/*"]
 		}
 	}
 }

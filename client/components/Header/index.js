@@ -1,5 +1,5 @@
-import { css, jsx } from "@emotion/react";
-
+import { getDataFromAPI } from "@API";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useTheme, MINI_WIDTH_SCREEN } from "@Theme";
 import { LOGIN_PATHNAME } from "@CONSTANTS";
@@ -24,10 +24,13 @@ import { MdSupportAgent } from "react-icons/md";
 import { BiHomeAlt, BiInfoCircle, BiMoon } from "react-icons/bi";
 import { BsSun } from "react-icons/bs";
 import { AiOutlineTool } from "react-icons/ai";
+import { useState } from "react";
 
 export function Header() {
-	const { innerWidth } = useWindowSize();
+	const [bannerName, setBannerName] = useState("Electronic Document System");
+
 	const router = useRouter();
+	const { innerWidth } = useWindowSize();
 	const { bg, color, bgHover } = useTheme();
 
 	const tabs = [
@@ -40,13 +43,23 @@ export function Header() {
 			icon: <MdSupportAgent size='1.4em' />,
 		},
 	];
+	useEffect(async () => {
+		try {
+			setBannerName((await getDataFromAPI("name"))?.name);
+		} catch (err) {
+			console.log(err);
+		}
+	});
+
 	return (
 		<Flex justify={"space-between"} w='full' px={2} py={6}>
-			<HStack w='max-content' spacing={2}>
+			<HStack w='max-content' spacing={6}>
 				{router.pathname !== LOGIN_PATHNAME && (
 					<>
 						<Logo />
-						<Heading size='xs'>Omar ElFarouk G.L.S</Heading>
+						<Heading maxW={"120px"} size='md'>
+							{bannerName ?? "Electronic Document System"}
+						</Heading>
 					</>
 				)}
 			</HStack>
