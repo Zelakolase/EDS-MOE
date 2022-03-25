@@ -1,7 +1,7 @@
 import { css, jsx } from "@emotion/react";
 
 import { useRouter } from "next/router";
-import { useTheme } from "@Theme";
+import { useTheme, MINI_WIDTH_SCREEN } from "@Theme";
 import { LOGIN_PATHNAME } from "@CONSTANTS";
 import { useWindowSize } from "rooks";
 import {
@@ -51,7 +51,7 @@ export function Header() {
 				)}
 			</HStack>
 			<HStack spacing={4}>
-				{innerWidth > 801 ? (
+				{innerWidth > MINI_WIDTH_SCREEN ? (
 					<Toolbar tabs={tabs} />
 				) : (
 					<TabsDrawer tabs={tabs} />

@@ -18,7 +18,7 @@ import {
 import { RiFolderInfoLine } from "react-icons/ri";
 import { FiHardDrive } from "react-icons/fi";
 import { AiOutlineFile } from "react-icons/ai";
-export function FileInfo({ file = { name, type, size } }) {
+export function FileInfo({ file = { name: null, size: null } }) {
 	return (
 		<>
 			<Popover>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-
+import { useWindowSize } from "rooks";
+import { MINI_WIDTH_SCREEN } from "@Theme";
 import { Logo, FileInfo } from "@Components";
 import {
 	Stack,
@@ -12,11 +13,14 @@ import {
 	Text,
 	IconButton,
 	Tooltip,
+	Divider,
+	useBreakpointValue,
 } from "@chakra-ui/react";
 import { Step, Steps, useSteps } from "chakra-ui-steps";
 import { AiOutlineArrowRight, AiOutlineUpload } from "react-icons/ai";
 import { RiFolderInfoLine } from "react-icons/ri";
 export default function Login() {
+	const { innerWidth } = useWindowSize();
 	const router = useRouter();
 	const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
 		initialStep: 0,
@@ -37,9 +41,8 @@ export default function Login() {
 		},
 	];
 
-	function isLastStep() {
-		return activeStep === steps.length - 1;
-	}
+	const isLastStep = activeStep === steps.length - 1;
+	const isFirstStep = activeStep === 0;
 
 	return (
 		<Stack
@@ -50,28 +53,31 @@ export default function Login() {
 			justify='space-around'
 			align='center'>
 			<Heading>Welcome, Username</Heading>
-			<Box w='full'>
+			<Stack w='full' h='full'>
 				<Steps activeStep={activeStep} labelOrientation={"vertical"}>
 					{steps.map(({ label, component }) => (
-						<Step alignSelf={"center"} label={label}>
-							<Box
-								display={"flex"}
-								alignContent='center'
-								justifyContent={"center"}
-								h='full'
-								w='full'>
+						<Step
+							alignSelf={innerWidth > MINI_WIDTH_SCREEN ? "center" : "auto"}
+							label={label}>
+							<Stack w='full' h='full' align='center' justify='center'>
 								{component}
-							</Box>
+							</Stack>
 						</Step>
 					))}
 				</Steps>
-			</Box>
-			<Button
-				size='sm'
-				onClick={() => (isLastStep() ? router.push("/") : nextStep())}
-				alignSelf='end'>
-				{activeStep === steps.length - 1 ? "Finish" : "Next"}
-			</Button>
+			</Stack>
+			<HStack alignSelf={"end"}>
+				{!isFirstStep && (
+					<Button onClick={prevStep} variant={"ghost"} size='sm'>
+						Previous
+					</Button>
+				)}
+				<Button
+					size='sm'
+					onClick={() => (isLastStep ? router.push("/") : nextStep())}>
+					{activeStep === steps.length - 1 ? "Finish" : "Next"}
+				</Button>
+			</HStack>
 		</Stack>
 	);
 }
@@ -108,12 +114,12 @@ function GenerateDocument() {
 			</Stack>
 			<Stack>
 				<HStack align='end'>
-					<Heading fontSize={13}>Document Name</Heading>
+					<Heading fontSize={13}>Writer</Heading>
 				</HStack>
 				<Input
 					variant={"filled"}
-					value={info.documentName}
-					onChange={(e) => setInfo({ ...info, documentName: e.target.value })}
+					value={info.writer}
+					onChange={(e) => setInfo({ ...info, writer: e.target.value })}
 				/>
 			</Stack>
 		</Stack>
@@ -121,6 +127,10 @@ function GenerateDocument() {
 }
 
 function Upload() {
+	const buttonSize = useBreakpointValue({
+		xs: "sm",
+		md: "lg",
+	});
 	const [file, setFile] = useState();
 	const [verifyCode, setVerifyCode] = useState("");
 
@@ -136,7 +146,9 @@ function Upload() {
 					placement='top'
 					label='Import the document which you need to verify'>
 					<Box position='relative' w={"max-content"}>
-						<Button size='md' rightIcon={<AiOutlineUpload size='1.4em' />}>
+						<Button
+							size={buttonSize}
+							rightIcon={<AiOutlineUpload size='1.4em' />}>
 							Upload File
 						</Button>
 						<Input
@@ -165,6 +177,7 @@ function Done() {
 	return (
 		<Stack align={"center"}>
 			<Text fontSize={18}>The document is uploaded successfully !</Text>
+			<Divider />
 			<Stack>
 				<Stack spacing={0}>
 					<Heading fontSize={12}>Public code</Heading>
