@@ -63,7 +63,7 @@ export function Header() {
 
 function Toolbar({ tabs }) {
 	const { toggleColorMode, colorMode } = useColorMode();
-
+	const router = useRouter();
 	const { bg, color, bgHover } = useTheme();
 	return (
 		<>
@@ -74,7 +74,7 @@ function Toolbar({ tabs }) {
 					size='sm'
 					textTransform='capitalize'
 					leftIcon={tab.icon}
-					onClick={() => Router.push(tab.path)}>
+					onClick={() => router.push(tab.path)}>
 					{tab.label}
 				</Button>
 			))}
@@ -85,7 +85,7 @@ function Toolbar({ tabs }) {
 					color={color}
 					_hover={{ bgColor: bgHover }}
 					mr={1}
-					onClick={() => Router.push(LOGIN_PATHNAME)}
+					onClick={() => router.push(LOGIN_PATHNAME)}
 					size='sm'>
 					Login
 				</Button>

@@ -12,7 +12,7 @@ const theme = extendTheme({
 
 import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }) {
+function App({ Component, pageProps }) {
 	return (
 		<ChakraProvider theme={theme}>
 			<PageLayout>
@@ -22,4 +22,4 @@ function MyApp({ Component, pageProps }) {
 	);
 }
 
-export default MyApp;
+export default App;
