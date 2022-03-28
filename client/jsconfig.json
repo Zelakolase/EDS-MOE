@@ -19,7 +19,8 @@
 			"@CONSTANTS": ["constants"],
 			"@Theme": ["theme.js"],
 			"@API": ["api"],
-			"@API/": ["api/*"]
+			"@API/": ["api/*"],
+			"@Auth": ["auth"]
 		}
 	}
 }

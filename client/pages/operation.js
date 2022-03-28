@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useAuth } from "auth";
+import { useAuth } from "@Auth";
 
 import { useWindowSize } from "rooks";
 import { MINI_WIDTH_SCREEN } from "@Theme";
