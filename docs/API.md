@@ -153,3 +153,4 @@ Request is GET
 Response body :
 ```jsonc
 {"name":"x"}
+```

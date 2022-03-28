@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "auth";
+
 import { useWindowSize } from "rooks";
 import { MINI_WIDTH_SCREEN } from "@Theme";
 import { Logo, FileInfo } from "@Components";
@@ -20,8 +22,10 @@ import { Step, Steps, useSteps } from "chakra-ui-steps";
 import { AiOutlineArrowRight, AiOutlineUpload } from "react-icons/ai";
 import { RiFolderInfoLine } from "react-icons/ri";
 export default function Login() {
-	const { innerWidth } = useWindowSize();
+	const { isSignedIn, username } = useAuth();
 	const router = useRouter();
+
+	const { innerWidth } = useWindowSize();
 	const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
 		initialStep: 0,
 	});
@@ -44,22 +48,34 @@ export default function Login() {
 	const isLastStep = activeStep === steps.length - 1;
 	const isFirstStep = activeStep === 0;
 
+	useEffect(() => {
+		if (!isSignedIn) router.replace("/auth/login");
+	});
+
 	return (
 		<Stack
-			w='full'
-			h='full'
+			w="full"
+			h="full"
 			spacing={6}
 			padding={4}
-			justify='space-around'
-			align='center'>
-			<Heading>Welcome, Username</Heading>
-			<Stack w='full' h='full'>
+			justify="space-around"
+			align="center">
+			<Heading>Welcome, {username}</Heading>
+			<Stack w="full" h="full">
 				<Steps activeStep={activeStep} labelOrientation={"vertical"}>
 					{steps.map(({ label, component }) => (
 						<Step
-							alignSelf={innerWidth > MINI_WIDTH_SCREEN ? "center" : "auto"}
+							alignSelf={
+								innerWidth > MINI_WIDTH_SCREEN
+									? "center"
+									: "auto"
+							}
 							label={label}>
-							<Stack w='full' h='full' align='center' justify='center'>
+							<Stack
+								w="full"
+								h="full"
+								align="center"
+								justify="center">
 								{component}
 							</Stack>
 						</Step>
@@ -68,13 +84,15 @@ export default function Login() {
 			</Stack>
 			<HStack alignSelf={"end"}>
 				{!isFirstStep && (
-					<Button onClick={prevStep} variant={"ghost"} size='sm'>
+					<Button onClick={prevStep} variant={"ghost"} size="sm">
 						Previous
 					</Button>
 				)}
 				<Button
-					size='sm'
-					onClick={() => (isLastStep ? router.push("/") : nextStep())}>
+					size="sm"
+					onClick={() =>
+						isLastStep ? router.push("/") : nextStep()
+					}>
 					{activeStep === steps.length - 1 ? "Finish" : "Next"}
 				</Button>
 			</HStack>
@@ -83,43 +101,51 @@ export default function Login() {
 }
 
 function GenerateDocument() {
-	const [info, setInfo] = useState({ documentName: "", date: "", writer: "" });
+	const [info, setInfo] = useState({
+		documentName: "",
+		date: "",
+		writer: "",
+	});
 	return (
 		<Stack spacing={6} my={6} maxW={80}>
-			<Stack w='full' spacing={1}>
-				<HStack align='end'>
+			<Stack w="full" spacing={1}>
+				<HStack align="end">
 					<Heading fontSize={13}>Document Name</Heading>
 				</HStack>
 				<Input
 					variant={"filled"}
 					value={info.documentName}
-					onChange={(e) => setInfo({ ...info, documentName: e.target.value })}
+					onChange={e =>
+						setInfo({ ...info, documentName: e.target.value })
+					}
 				/>
 			</Stack>
-			<Stack w='full' spacing={1}>
-				<HStack align='end'>
+			<Stack w="full" spacing={1}>
+				<HStack align="end">
 					<Heading fontSize={13}>Date of publication</Heading>
 				</HStack>
 				<Box
 					position={"relative"}
-					w='full'
+					w="full"
 					display={"flex"}
-					alignContent='center'>
+					alignContent="center">
 					<Input
 						variant={"filled"}
 						value={info.date}
-						onChange={(e) => setInfo({ ...info, date: e.target.value })}
+						onChange={e =>
+							setInfo({ ...info, date: e.target.value })
+						}
 					/>
 				</Box>
 			</Stack>
 			<Stack>
-				<HStack align='end'>
+				<HStack align="end">
 					<Heading fontSize={13}>Writer</Heading>
 				</HStack>
 				<Input
 					variant={"filled"}
 					value={info.writer}
-					onChange={(e) => setInfo({ ...info, writer: e.target.value })}
+					onChange={e => setInfo({ ...info, writer: e.target.value })}
 				/>
 			</Stack>
 		</Stack>
@@ -135,37 +161,37 @@ function Upload() {
 	const [verifyCode, setVerifyCode] = useState("");
 
 	return (
-		<Stack w='full' h='full' spacing={2} justify='center' align={"center"}>
+		<Stack w="full" h="full" spacing={2} justify="center" align={"center"}>
 			<Text>
-				Please, Insert Verification code inside the document, then upload it
-				below.
+				Please, Insert Verification code inside the document, then
+				upload it below.
 			</Text>
 			<Stack>
 				<Tooltip
 					hasArrow
-					placement='top'
-					label='Import the document which you need to verify'>
-					<Box position='relative' w={"max-content"}>
+					placement="top"
+					label="Import the document which you need to verify">
+					<Box position="relative" w={"max-content"}>
 						<Button
 							size={buttonSize}
-							rightIcon={<AiOutlineUpload size='1.4em' />}>
+							rightIcon={<AiOutlineUpload size="1.4em" />}>
 							Upload File
 						</Button>
 						<Input
-							w='full'
+							w="full"
 							type={"file"}
 							left={0}
-							onChange={(e) => setFile(e.target.files[0])}
+							onChange={e => setFile(e.target.files[0])}
 							top={0}
 							cursor={"pointer"}
 							position={"absolute"}
 							opacity={0}
-							w='full'
-							h='full'
+							w="full"
+							h="full"
 						/>
 					</Box>
 				</Tooltip>
-				<HStack justify={"end"} align='end' w='full'>
+				<HStack justify={"end"} align="end" w="full">
 					{file && <FileInfo file={file} />}
 				</HStack>
 			</Stack>

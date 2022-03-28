@@ -1,6 +1,6 @@
+import { getDataFromAPI } from "@API";
 import { useState } from "react";
 import { useTheme } from "@Theme";
-import { css } from "@emotion/react";
 
 import { FileInfo } from "@Components";
 
@@ -56,7 +56,7 @@ function Tools() {
 	const { bg, color, bgHover } = useTheme();
 
 	return (
-		<Stack align='center' spacing={10} justify='center' h='full'>
+		<Stack align="center" spacing={10} justify="center" h="full">
 			<ToolsMenu
 				tools={tools}
 				currentTool={currentTool}
@@ -76,20 +76,22 @@ function ToolsMenu({ tools = [], setCurrentTool, currentTool = 0 }) {
 		<>
 			<Menu>
 				<MenuButton
-					alignItems='center'
+					alignItems="center"
 					bgColor={bg}
-					size='lg'
+					size="lg"
 					color={color}
 					_hover={{ bgColor: bgHover }}
 					_expanded={{ bgColor: bgHover }}
 					_focus={{ boxShadow: "outline" }}
 					as={Button}
-					rightIcon={<AiOutlineArrowDown size='1.4em' />}>
+					rightIcon={<AiOutlineArrowDown size="1.4em" />}>
 					{tools[currentTool] ? tools[currentTool].label : "Tools"}
 				</MenuButton>
 				<MenuList>
 					{tools.map((tool, index) => (
-						<MenuItem onClick={() => setCurrentTool(index)} key={index}>
+						<MenuItem
+							onClick={() => setCurrentTool(index)}
+							key={index}>
 							{tool.label}
 						</MenuItem>
 					))}
@@ -104,20 +106,20 @@ function DownloadDocumentComponent() {
 
 	return (
 		<>
-			<Stack w='full' spacing={5} align={"center"}>
+			<Stack w="full" spacing={5} align={"center"}>
 				<Stack>
-					<Heading size='xs'>Public Code</Heading>
+					<Heading size="xs">Public Code</Heading>
 					<Input
 						value={publicCode}
-						onChange={(e) => setPublicCode(e.target.kvalue)}
+						onChange={e => setPublicCode(e.target.kvalue)}
 						size={"md"}
 						variant={"filled"}
-						placeholder='Code'
+						placeholder="Code"
 					/>
 				</Stack>
 				<Button
 					maxW={"min-content"}
-					rightIcon={<AiOutlineDownload size='1.4em' />}>
+					rightIcon={<AiOutlineDownload size="1.4em" />}>
 					Download
 				</Button>
 			</Stack>
@@ -130,39 +132,41 @@ function VerifyDocumentComponent() {
 	const [verifyCode, setVerifyCode] = useState("");
 
 	return (
-		<Stack w='full' spacing={8} align={"center"}>
+		<Stack w="full" spacing={8} align={"center"}>
 			<Stack>
-				<Heading size='xs'>Verification Code</Heading>
+				<Heading size="xs">Verification Code</Heading>
 				<Input
 					size={"md"}
 					variant={"filled"}
-					placeholder='Code'
+					placeholder="Code"
 					value={verifyCode}
-					onChange={(e) => setVerifyCode(e.target.value)}
+					onChange={e => setVerifyCode(e.target.value)}
 				/>
 				<HStack justify={"end"}>
 					{file && <FileInfo file={file} />}
 					<Tooltip
 						hasArrow
-						placement='top'
-						label='Import the document which you need to verify'>
-						<Box position='relative' w={"max-content"}>
+						placement="top"
+						label="Import the document which you need to verify">
+						<Box position="relative" w={"max-content"}>
 							<Button
-								size='sm'
-								rightIcon={<HiOutlineDocumentDownload size='1.4em' />}>
+								size="sm"
+								rightIcon={
+									<HiOutlineDocumentDownload size="1.4em" />
+								}>
 								Import File
 							</Button>
 							<Input
-								w='full'
+								w="full"
 								type={"file"}
 								left={0}
-								onChange={(e) => setFile(e.target.files[0])}
+								onChange={e => setFile(e.target.files[0])}
 								top={0}
 								cursor={"pointer"}
 								position={"absolute"}
 								opacity={0}
-								w='full'
-								h='full'
+								w="full"
+								h="full"
 							/>
 						</Box>
 					</Tooltip>
@@ -170,7 +174,7 @@ function VerifyDocumentComponent() {
 			</Stack>
 			<Button
 				maxW={"min-content"}
-				rightIcon={<MdOutlineVerified size='1.4em' />}>
+				rightIcon={<MdOutlineVerified size="1.4em" />}>
 				Verify
 			</Button>
 		</Stack>
@@ -179,23 +183,27 @@ function VerifyDocumentComponent() {
 
 function SearchDocumentComponent() {
 	const [publicCode, setPublicCode] = useState("");
-
+	function searchHandler() {
+		const data = getDataFromAPI("sfad", {}, { public_code: publicCode });
+		if (data?.status === "field") {
+		}
+	}
 	return (
 		<>
-			<Stack w='full' spacing={5} align={"center"}>
+			<Stack w="full" spacing={5} align={"center"}>
 				<Stack>
-					<Heading size='xs'>Public Code</Heading>
+					<Heading size="xs">Public Code</Heading>
 					<Input
 						value={publicCode}
-						onChange={(e) => setPublicCode(e.target.value)}
+						onChange={e => setPublicCode(e.target.value)}
 						size={"md"}
 						variant={"filled"}
-						placeholder='Code'
+						placeholder="Code"
 					/>
 				</Stack>
 				<Button
 					maxW={"min-content"}
-					rightIcon={<AiOutlineSearch size='1.4em' />}>
+					rightIcon={<AiOutlineSearch size="1.4em" />}>
 					Search
 				</Button>
 			</Stack>
