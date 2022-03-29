@@ -8,7 +8,7 @@
 
 ---
 
-### **Login : /api.login** DONE
+### **Login : /api.login** Server: Done , Client : Done
 
 Request body
 
@@ -29,7 +29,7 @@ Response body
 ```
 
 ---
-### *Logout : /api.logout*
+### *Logout : /api.logout* Server: Done, Client : -
 
 Request body :
 ```jsonc
@@ -44,7 +44,7 @@ Where 'c' is either `failed` or `success`
 
 ---
 
-### **Download a document : /api.dac** DONE
+### **Download a document : /api.dac** Server : Done , Client : -
 
 Request body :
 
@@ -62,11 +62,11 @@ Response body :
 
 ---
 
-### **Verify a document : /api.vad**
+### **Verify a document : /api.vad** Server : Done , Client : -
 
 Request body :
 
-due to file upload, will use multipart-formdata with verify_code
+File in request body with 'verify_code' as header
 
 Response body :
 
@@ -76,7 +76,7 @@ Response body :
 
 ---
 
-### **Search for a document : /api.sfad** DONE
+### **Search for a document : /api.sfad** Server : Done , Client : -
 
 Request body :
 
@@ -96,7 +96,7 @@ Response body :
 
 ---
 
-### **About : /api.about** [DONE]
+### **About : /api.about** Server : Done , Client : Done
 
 No request as it’s GET
 
@@ -108,7 +108,7 @@ Response body :
 
 ---
 
-### **Generate code (SAD S.1) : /api.generate** DONE
+### **Generate code (SAD S.1) : /api.generate** Server : Done , Client : -
 
 Request Body :
 
@@ -130,9 +130,9 @@ Response body :
 
 ---
 
-### **SAD S.2 : /api.doc**
+### **SAD S.2 : /api.doc** Server : Done , Client : -
 
-Request body is multipart-formdata with hidden input tag of 'verify_code' to be sent and 'session_id' and 'extension'
+Request body is request body with 'verify_code', 'extension', 'session_id' as headers
 
 Response body :
 
@@ -146,7 +146,7 @@ Response body :
 
 - Redirect to SAD S.3 with info in placeholders
 
-### **School name : /api.name** [DONE]
+### **School name : /api.name** Server : Done , Client : Done
 
 Request is GET
 
