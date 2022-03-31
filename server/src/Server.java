@@ -118,12 +118,13 @@ public abstract class Server {
 
 				ArrayList<Byte> RequestInAL = Network.read(DIS, MAX_REQ_SIZE);
 				byte[] Request = toPrimitives(RequestInAL.toArray(Byte[]::new));
+
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
 				/*
 				 * Dynamic Mode
 				 */
-				Reply = main(ALm, DIS, DOS);
+				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE*1000) - Request.length);
 
 				Network.write(DOS,
 						Reply.get("content"),
@@ -142,5 +143,5 @@ public abstract class Server {
 
 	}
 
-	abstract HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS);
+	abstract HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS, int max_size);
 }

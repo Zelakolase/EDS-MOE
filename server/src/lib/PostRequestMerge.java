@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PostRequestMerge {
-	public static byte[] merge(List<byte[]> aLm, DataInputStream DIS, HashMap<String, String> headers) throws IOException {
+	public static byte[] merge(List<byte[]> aLm, DataInputStream DIS, HashMap<String, String> headers, int max_bytes) throws IOException {
 		ByteArrayOutputStream whole = new ByteArrayOutputStream();
 		if(aLm.size() >= 2) {
 		whole.write(aLm.get(1));
@@ -23,7 +23,8 @@ public class PostRequestMerge {
 			int num = Integer.parseInt(headers.get("Content-Length")); // num. of bytes in body only
 			if(whole.size() < num) {
 				// S L O W
-				whole.write(Network.ManRead(DIS, num - whole.size()));
+				int to_read = num - whole.size();
+				whole.write(Network.ManRead(DIS, to_read>max_bytes? max_bytes : to_read));
 			}
 		}
 		}else {

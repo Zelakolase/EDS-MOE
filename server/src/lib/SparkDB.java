@@ -117,7 +117,7 @@ public class SparkDB {
 
 	public void change(String FromCol, String ColVal, String ColToFind, String replacement) {
 		try {
-			int indextotarget = Mapper.get(FromCol).indexOf(ColVal); 
+			int indextotarget = Mapper.get(FromCol).indexOf(ColVal);
 			Mapper.get(ColToFind).set(indextotarget, replacement);
 		} catch (Exception e) {
 			log.e(e, SparkDB.class.getName(), "get");
@@ -202,8 +202,7 @@ public class SparkDB {
 				out += Mapper.get(ColToFind).get(i) + ",";
 			}
 		}
-		out = out.substring(0, out.length() - 1);
-		return out;
+		return out.substring(0, out.length() - 1);
 	}
 
 	/*

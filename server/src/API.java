@@ -1,4 +1,7 @@
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,22 +14,22 @@ import lib.IO;
 import lib.JSON;
 import lib.RandomGenerator;
 import lib.SparkDB;
-import lib.log;
 
 public class API {
 	/**
 	 * API Processing class
 	 */
 	static String ENCRYPTION_KEY = "";
-	static byte[] BODY = null; // HTTPS Body
 	static Map<String, String> SESSION_IDS; // id, full name
 	static SparkDB users = new SparkDB();
-	static String code = HTTPCode.OK;
-	static String verify_code, session_id = "";
-	static String extension = "";
 	static SparkDB docs = new SparkDB();
 
 	public static HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) {
+		String code = HTTPCode.OK;
+		String verify_code = "", session_id = "";
+		String extension = "";
+		byte[] BODY = null; // HTTPS Body
+
 		HashMap<String, Object> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		if (Elshanta_temp.containsKey("body"))
@@ -53,24 +56,28 @@ public class API {
 			res.put("body", about().getBytes()); // about
 			res.put("code", code.getBytes());
 		} else if (in.equals("login")) {
-			res.put("body", login().getBytes()); // login
+			res.put("body", login(BODY).getBytes()); // login
 			res.put("code", code.getBytes());
 		} else if (in.equals("sfad")) {
-			res.put("body", sfad().getBytes()); // search for a document
+			res.put("body", sfad(BODY).getBytes()); // search for a document
 			res.put("code", code.getBytes());
 		} else if (in.equals("dac")) {
-			res.put("body", dac()); // download a document
+			res.put("body", dac(BODY)); // download a document
 			res.put("code", code.getBytes());
 		} else if (in.equals("generate")) {
-			res.put("body", generate().getBytes()); // generate verification code
+			res.put("body", generate(BODY).getBytes()); // generate verification code
 			res.put("code", code.getBytes());
 		} else if (in.equals("vad")) {
-			res.put("body", vad().getBytes()); // verify a document
+			res.put("body", vad(BODY, verify_code).getBytes()); // verify a document
 			res.put("code", code.getBytes());
 		} else if (in.equals("logout")) {
-			res.put("body", logout().getBytes()); // verify a document
+			res.put("body", logout(BODY).getBytes()); // verify a document
 			res.put("code", code.getBytes());
-		} else {
+		} else if(in.equals("doc")) {
+			res.put("body", doc(BODY, session_id, verify_code, extension).getBytes()); // SAD S.2
+			res.put("code", code.getBytes());
+		}
+		else {
 			res.put("body", JSON.HMQ(new HashMap<String, String>() {
 				{
 					put("status", "failed");
@@ -80,25 +87,27 @@ public class API {
 			code = HTTPCode.BAD_REQUEST;
 			res.put("code", code.getBytes());
 		}
+		if(res.get("body").equals("error")) 	code = HTTPCode.INTERNAL_SERVER_ERROR;
 		if (Elshanta_temp.containsKey("session_ids"))
 			res.put("session_ids", SESSION_IDS);
 		if (Elshanta_temp.containsKey("docs_db"))
 			res.put("docs", docs);
 		if (Elshanta_temp.containsKey("users_db"))
 			res.put("users", users);
+		System.out.println("["+in+"]"+new String(BODY)+" --> "+new String((byte[])res.get("body"))+" | "+new String((byte[])res.get("code"))); // For experimental purposes, to be deleted
 		return res;
 	}
 
 	/**
-	 * Log out 
+	 * Log out
 	 * req : {"session_id":"a","pass":"b"}
 	 * res : {"status":"c"} Where 'c' is either failed or success
 	 */
-	static String logout() {
+	static String logout(byte[] BODY) {
+		try {
 		HashMap<String, String> in = JSON.QHM(new String(BODY));
-
 		if (SESSION_IDS.containsKey(in.get("session_id"))) {
-			String password = users.get("user", SESSION_IDS.get(in.get("session_id")), "password");
+			String password = users.get("full_name", SESSION_IDS.get(in.get("session_id")), "password");
 			if (password.equals(in.get("pass"))) {
 				return JSON.HMQ(new HashMap<String, String>() {
 					{
@@ -112,11 +121,15 @@ public class API {
 				put("status", "failed");
 			}
 		});
+		}catch(Exception e) {
+			err(e);
+			return "error";
+		}
 	}
 
 	/**
 	 * This function tells the name of the school
-	 * req : GET Request 
+	 * req : GET Request
 	 * res : {"name":"x"}
 	 */
 	static String name() {
@@ -127,8 +140,7 @@ public class API {
 				}
 			});
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error";
 		}
 	}
@@ -147,19 +159,18 @@ public class API {
 
 			return JSON.HMQ(data);
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error";
 		}
 	}
 
 	/**
-	 * Login functionality 
-	 * req : {"user":"a","pass":"b"} 
-	 * res0 : {"status":"failed","msg":"c"} 
+	 * Login functionality
+	 * req : {"user":"a","pass":"b"}
+	 * res0 : {"status":"failed","msg":"c"}
 	 * res1 : {"session_id":"a","first_name":"b"}
 	 */
-	static String login() {
+	static String login(byte[] BODY) {
 		try {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
@@ -182,19 +193,18 @@ public class API {
 			}
 			return res;
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error";
 		}
 	}
 
 	/**
-	 * Search for a document 
-	 * req : {"public_code":"a"} 
-	 * res0 : {"status":"failed","msg":"b"} 
+	 * Search for a document
+	 * req : {"public_code":"a"}
+	 * res0 : {"status":"failed","msg":"b"}
 	 * res1 : {"document_name":"c","verifier":"d","writer":"e","date_of_publication":"f"}
 	 */
-	static String sfad() {
+	static String sfad(byte[] BODY) {
 		try {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
@@ -217,19 +227,18 @@ public class API {
 			}
 			return res;
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error";
 		}
 	}
 
 	/**
-	 * Download a document 
-	 * req : {"public_code":"a"} 
-	 * res0 : {"status":"failed","msg":"b"} 
+	 * Download a document
+	 * req : {"public_code":"a"}
+	 * res0 : {"status":"failed","msg":"b"}
 	 * res1 : File byte[]
 	 */
-	static byte[] dac() {
+	static byte[] dac(byte[] BODY) {
 		try {
 			byte[] res = null;
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
@@ -245,19 +254,18 @@ public class API {
 			}
 			return res;
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error".getBytes();
 		}
 	}
 
 	/**
-	 * Generate verification code 
-	 * req : {"doc_name":"a","date":"b","writer":"c","session_id":"d"} 
-	 * res0 : {"verify_code":"e"} 
+	 * Generate verification code
+	 * req : {"doc_name":"a","date":"b","writer":"c","session_id":"d"}
+	 * res0 : {"verify_code":"e"}
 	 * res1 : {"status":"failed","msg":"f"}
 	 */
-	static String generate() {
+	static String generate(byte[] BODY) {
 		try {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
@@ -272,7 +280,7 @@ public class API {
 					pub_code = RandomGenerator.getSaltString(3, 2) + "-" + RandomGenerator.getSaltString(3, 2) + "-"
 							+ RandomGenerator.getSaltString(3, 2);
 				} while (docs.Mapper.get("pub_code").contains(pub_code));
-				String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
+				String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
 				docs.add(new String[] { pub_code, // public_code
 						ver_code, // verify code
 						"", // path
@@ -302,18 +310,17 @@ public class API {
 			}
 			return res;
 		} catch (Exception e) {
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 			return "error";
 		}
 	}
 
 	/**
-	 * Verify a document using file upload and verify code in headers 
-	 * req : file as binary in body and verify code in header 
+	 * Verify a document using file upload and verify code in headers
+	 * req : file as binary in body and verify code in header
 	 * res : {"msg":"a"}
 	 */
-	static String vad() {
+	static String vad(byte[] BODY, String verify_code) {
 		String res = "";
 		try {
 			// BODY is post req body compared to path in db docs
@@ -329,18 +336,17 @@ public class API {
 			});
 		} catch (Exception e) {
 			res = "error";
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 		}
 		return res;
 	}
 
 	/**
-	 * Submit a document using verify code and session id and file 
-	 * res0 : {"public_code":"a","verify_code":"b"} 
+	 * Submit a document using verify code and session id and file
+	 * res0 : {"public_code":"a","verify_code":"b"}
 	 * res1 : {"status":"failed","msg":"c"}
 	 */
-	static String doc() {
+	static String doc(byte[] BODY, String session_id, String verify_code, String extension) {
 		String res = "";
 		try {
 			if (SESSION_IDS.containsValue(session_id)) {
@@ -369,9 +375,21 @@ public class API {
 			}
 		} catch (Exception e) {
 			res = "error";
-			code = HTTPCode.INTERNAL_SERVER_ERROR;
-			log.e(e, "api", "");
+			err(e);
 		}
 		return res;
+	}
+	public static void err(Exception e) {
+		if(! new File("./error.log").exists())
+			try {
+				new File("./error.log").createNewFile();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		IO.write("./error.log", "["+timeStamp+"]@API "+sw+"\n\n-----------------\n\n", true);
 	}
 }

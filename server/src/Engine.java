@@ -44,12 +44,12 @@ public class Engine extends Server {
 			users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
 			docs.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
-			this.setMaximumConcurrentRequests(2500);
+			this.setMaximumConcurrentRequests(5);
 			this.setMaximumRequestSizeInKB(100000); // 100MB
 			this.setGZip(false);
-			this.setBacklog(this.MaxConcurrentRequests * 5);
+			this.setBacklog(this.MaxConcurrentRequests * 10);
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
-					+ "X-Content-Type-Options: nosniff\r\n";
+					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
 			/**
 			 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
 			 * From StackOverflow.
@@ -66,7 +66,7 @@ public class Engine extends Server {
 	}
 
 	@Override
-	HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS) {
+	HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS, int max_size) {
 		try {
 			HashMap<String, String> headers = HeaderToHashmap.convert(new String(aLm.get(0))); // headers
 			HashMap<String, byte[]> response = new HashMap<>(); // content, mime, code
@@ -76,8 +76,7 @@ public class Engine extends Server {
 				 * API request detected
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
-				log.i(ser+" is requested.");
-				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers));
+				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				if(ser.equals("login") || ser.equals("logout")) {
@@ -110,7 +109,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			log.e(e, "Engine", "main");
+			API.err(e);
 			return new HashMap<>() {
 				{
 					put("content", "Server error".getBytes());
