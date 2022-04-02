@@ -1,5 +1,8 @@
 package lib;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -13,7 +16,8 @@ public class IO {
 	 */
 	public static byte[] read(String filename) {
 		try {
-			return Files.readAllBytes(Paths.get(filename));
+			BufferedInputStream inputStream2 = new BufferedInputStream(new FileInputStream(new File(filename)));
+			return inputStream2.readAllBytes();
 		} catch (Exception e) {
 			log.e(e, IO.class.getName(), "read");
 			return null;
@@ -30,12 +34,7 @@ public class IO {
 	public static void write(String filename, String content, boolean append) {
 
 		try {
-			StandardOpenOption set = null;
-			if (append)
-				set = StandardOpenOption.APPEND;
-			if (!append)
-				set = StandardOpenOption.WRITE;
-			Files.write(Paths.get(filename), content.getBytes(), set);
+			write(filename, content.getBytes(), append);
 		} catch (Exception e) {
 			log.e(e, IO.class.getName(), "write");
 		}

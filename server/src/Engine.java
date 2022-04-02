@@ -44,10 +44,10 @@ public class Engine extends Server {
 			users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
 			docs.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
-			this.setMaximumConcurrentRequests(5);
-			this.setMaximumRequestSizeInKB(100000); // 100MB
+			this.setMaximumConcurrentRequests(1000);
+			this.setMaximumRequestSizeInKB(50000); // 50MB
 			this.setGZip(false);
-			this.setBacklog(this.MaxConcurrentRequests * 10);
+			this.setBacklog(10000);
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
 			/**
@@ -64,7 +64,9 @@ public class Engine extends Server {
 			log.e(e, "Engine", "run()");
 		}
 	}
-
+	/**
+	 * Dynamic Engine Entry point
+	 */
 	@Override
 	HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS, int max_size) {
 		try {
