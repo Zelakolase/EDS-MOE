@@ -1,10 +1,11 @@
 # Electronic Document System - Version 1.0
 
 ## Configuration
-- Maximum Request Size : 100MB
-- Maximum Concurrent Requests : 2500
+- Maximum Request Size : 50MB
+- Maximum Concurrent Requests : 1000
 - R.A.M Maximum usage before GC : 512MB
 - Maximum Session IDs : 100
+- Backlog Size : 10000
 
 ## Stages
 - First Stage (main.java) : Check Frontend files

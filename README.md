@@ -7,8 +7,8 @@
 - [ ] Frontend publish
 - [x] Backend publish
 - [ ] Source code review and security check for backend
-- [ ] compile to native image (exe + elf)
 - [ ] android application
+- [ ] compile to native image (exe + elf)
 
 ## Universal principles to be applied in frontend, backend, and android
 - [Keep it simple stupid](http://principles-wiki.net/principles:keep_it_simple_stupid)
