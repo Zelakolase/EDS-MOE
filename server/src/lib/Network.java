@@ -54,7 +54,6 @@ public class Network {
 			DOS.write(("Content-Length: " + ResponseData.length + "\r\n\r\n").getBytes());
 			DOS.write(ResponseData);
 			DOS.flush();
-			DOS.close();
 		} catch (Exception e) {
 			log.e(e, Network.class.getName(), "write");
 		}

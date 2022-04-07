@@ -63,8 +63,7 @@ public abstract class Server {
 				inner: while (tries < 10001) {
 					if (tries > 0) Thread.sleep(1);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
-						Socket S = SS.accept();
-						Engine e = new Engine(S);
+						Engine e = new Engine(SS.accept());
 						e.start();
 						CurrentConcurrentRequests++;
 						break inner;
@@ -131,8 +130,7 @@ public abstract class Server {
 						new String(Reply.get("mime")),
 						new String(Reply.get("code")),
 						GZip, AddedResponseHeaders);
-				DIS.close();
-				DOS.close();
+				S.close();
 			} catch (Exception e) {
 				log.e(e, Engine.class.getName(), "run");
 			} finally {
