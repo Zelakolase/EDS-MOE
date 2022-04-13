@@ -59,14 +59,17 @@ function Tools() {
 	function stateSetter(q) {
 		let query = q.split(".").map(e => e.trim());
 
-		return value =>
+		return value => {
 			setState({
 				...state,
 				[query[0]]: {
-					...[query[0]],
+					...state[query[0]],
 					[query[1]]: value,
 				},
 			});
+
+			console.log(state);
+		};
 	}
 
 	const tools = [
@@ -134,9 +137,40 @@ function ToolsMenu({ tools = [], setCurrentTool, currentTool = 0 }) {
 }
 
 function DownloadDocumentComponent() {
+	const toast = useToast();
+	const [loading, setLoading] = useState(false);
+
 	const { downloadDocument, stateSetter } = useContext(ToolsContext);
 	const { publicCode } = downloadDocument;
 
+	// async
+	async function downloadHandler() {
+		setLoading(true);
+		try {
+			const response = await request(
+				"post",
+				"dac"
+			)({
+				public_code: publicCode,
+			});
+			if (response?.data.status === "failed") throw response.data.msg;
+			if (response?.data === "error")
+				throw "Something wrong, Please contact with support to solve this problem.";
+			// console.log(data);
+			setResult(data.data);
+			onOpen();
+		} catch (err) {
+			toast({
+				title: "Search failed.",
+				description: err.toString(),
+				status: "error",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
+		setLoading(false);
+	}
 	return (
 		<>
 			<Stack w="full" spacing={5} align={"center"}>
@@ -155,6 +189,11 @@ function DownloadDocumentComponent() {
 					/>
 				</Stack>
 				<Button
+					isDisabled={!publicCode}
+					isLoading={loading}
+					onClick={async () => {
+						await downloadHandler();
+					}}
 					maxW={"min-content"}
 					rightIcon={<AiOutlineDownload size="1.4em" />}>
 					Download
@@ -179,9 +218,12 @@ function VerifyDocumentComponent() {
 					variant={"filled"}
 					placeholder="Code"
 					value={verifyCode}
-					onChange={e =>
-						stateSetter("verifyDocument.verifyCode")(e.target.value)
-					}
+					onChange={e => {
+						stateSetter("verifyDocument.verifyCode")(
+							e.target.value
+						);
+						// console.log(verifyCode);
+					}}
 				/>
 				<HStack justify={"end"}>
 					{file && <FileInfo file={file} />}
@@ -201,11 +243,12 @@ function VerifyDocumentComponent() {
 								w="full"
 								type={"file"}
 								left={0}
-								onChange={e =>
+								onChange={e => {
 									stateSetter("verifyDocument.file")(
 										e.target.files[0]
-									)
-								}
+									);
+									// console.log(verifyDocument);
+								}}
 								top={0}
 								cursor={"pointer"}
 								position={"absolute"}
@@ -218,6 +261,7 @@ function VerifyDocumentComponent() {
 				</HStack>
 			</Stack>
 			<Button
+				isDisabled={!file || !verifyCode}
 				maxW={"min-content"}
 				rightIcon={<MdOutlineVerified size="1.4em" />}>
 				Verify
@@ -241,17 +285,15 @@ function SearchDocumentComponent() {
 	async function searchHandler() {
 		setLoading(true);
 		try {
-			const data = await request("post", "login")(
-				{
-					public_code: publicCode,
-				},
-				{
-					"Content-Type": "application/json",
-				}
-			);
-			if (data?.status === "failed") throw data.msg;
-
-			setResult(data);
+			const response = await request(
+				"post",
+				"sfad"
+			)({
+				public_code: publicCode,
+			});
+			if (response?.data?.status === "failed") throw response?.data?.msg;
+			// console.log(response);
+			setResult(response?.data);
 			onOpen();
 		} catch (err) {
 			toast({
@@ -272,18 +314,18 @@ function SearchDocumentComponent() {
 					<Heading size="xs">Public Code</Heading>
 					<Input
 						value={publicCode}
-						onChange={e => {
+						onChange={e =>
 							stateSetter("searchDocument.publicCode")(
 								e.target.value
-							);
-							console.log(publicCode);
-						}}
+							)
+						}
 						size={"md"}
 						variant={"filled"}
 						placeholder="Code"
 					/>
 				</Stack>
 				<Button
+					isDisabled={!publicCode}
 					isLoading={loading}
 					onClick={async () => {
 						await searchHandler();

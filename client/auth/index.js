@@ -13,8 +13,6 @@ export default function AuthProvider({ children }) {
 	const toast = useToast();
 
 	useEffect(() => {
-		console.log("check");
-		console.log(isSignedIn);
 		if (
 			typeof cookie.get("username") !== "undefined" &&
 			typeof cookie.get("session_id") !== "undefined"
@@ -26,15 +24,13 @@ export default function AuthProvider({ children }) {
 	});
 
 	async function signin({ user, pass }) {
-		const response = await request("post", "login")(
-			{
-				user,
-				pass,
-			},
-			{
-				"Content-Type": "application/json",
-			}
-		);
+		const response = await request(
+			"post",
+			"login"
+		)({
+			user,
+			pass,
+		});
 		const data = response.data;
 		if (data?.status === "failed") {
 			toast({
@@ -43,6 +39,7 @@ export default function AuthProvider({ children }) {
 				description: data?.msg,
 				status: "error",
 				duration: 9000,
+				isClosable: true,
 			});
 			return;
 		}
