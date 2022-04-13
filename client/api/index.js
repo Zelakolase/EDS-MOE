@@ -10,7 +10,7 @@ const DefaultHeaders = {
 
 export function request(method, route) {
 	return async (body, headers) => {
-		console.log(body, headers);
+		// console.log(body, headers);
 		return await axios[method](`${API_URL}.${route}`, body, {
 			headers: { ...DefaultHeaders, ...headers },
 		});

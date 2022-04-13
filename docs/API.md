@@ -13,33 +13,37 @@
 Request body
 
 ```jsonc
-{"user":"x","pass":"y"}
+{ "user": "x", "pass": "y" }
 ```
 
 ---
- 
+
 Response body
 
 ```jsonc
-{"status":"failed","msg":"b"} // if login failed
+{ "status": "failed", "msg": "b" } // if login failed
 ```
 
 ```jsonc
-{"session_id":"a","first_name":"c"} // if login success
+{ "session_id": "a", "first_name": "c" } // if login success
 ```
 
 ---
-### *Logout : /api.logout* Server: Done, Client : -
+
+### _Logout : /api.logout_ Server: Done, Client : -
 
 Request body :
+
 ```jsonc
-{"session_id":"a","pass":"b"}
+{ "session_id": "a", "pass": "b" }
 ```
 
 Response body :
+
 ```jsonc
-{"status":"c"}
+{ "status": "c" }
 ```
+
 Where 'c' is either `failed` or `success`
 
 ---
@@ -49,13 +53,13 @@ Where 'c' is either `failed` or `success`
 Request body :
 
 ```jsonc
-{"public_code":"x"}
+{ "public_code": "x" }
 ```
 
 Response body :
 
 ```jsonc
-{"status":"failed","msg":"y"} // if there’s error
+{ "status": "failed", "msg": "y" } // if there’s error
 ```
 
 [pdf file] → pdf file in binary to download dialog inbrowser
@@ -71,27 +75,32 @@ File in request body with 'verify_code' as header
 Response body :
 
 ```jsonc
-{"msg":"x"}
+{ "msg": "x" }
 ```
 
 ---
 
-### **Search for a document : /api.sfad** Server : Done , Client : -
+### **Search for a document : /api.sfad** Server : Done , Client : Done
 
 Request body :
 
 ```jsonc
-{"public_code":"x"}
+{ "public_code": "x" }
 ```
 
 Response body :
 
 ```jsonc
-{"document_name":"a","verifier":"b","writer":"c","date_of_publication":"d"}
+{
+	"document_name": "a",
+	"verifier": "b",
+	"writer": "c",
+	"date_of_publication": "d"
+}
 ```
 
 ```jsonc
-{"status":"failed","msg":"y"}
+{ "status": "failed", "msg": "y" }
 ```
 
 ---
@@ -103,7 +112,7 @@ No request as it’s GET
 Response body :
 
 ```jsonc
-{"document_num":"a","query_num":"b"}
+{ "document_num": "a", "query_num": "b" }
 ```
 
 ---
@@ -113,17 +122,17 @@ Response body :
 Request Body :
 
 ```jsonc
-{"doc_name":"x","date":"y","writer":"z","session_id":"a"}
+{ "doc_name": "x", "date": "y", "writer": "z", "session_id": "a" }
 ```
 
 Response body :
 
 ```jsonc
-{"verify_code":"b"}
+{ "verify_code": "b" }
 ```
 
 ```jsonc
-{"status":"failed","msg":"c"} // if failed
+{ "status": "failed", "msg": "c" } // if failed
 ```
 
 - Redirect to SAD S.2 with the code in placeholder
@@ -137,11 +146,11 @@ Request body is request body with 'verify_code', 'extension', 'session_id' as he
 Response body :
 
 ```jsonc
-{"public_code":"x","verify_code":"y"}
+{ "public_code": "x", "verify_code": "y" }
 ```
 
 ```jsonc
-{"status":"failed","msg":"z"} // if failed
+{ "status": "failed", "msg": "z" } // if failed
 ```
 
 - Redirect to SAD S.3 with info in placeholders
@@ -151,6 +160,7 @@ Response body :
 Request is GET
 
 Response body :
+
 ```jsonc
-{"name":"x"}
+{ "name": "x" }
 ```

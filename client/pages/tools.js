@@ -1,8 +1,8 @@
-import { getDataFromAPI } from "@API";
-import { useState } from "react";
+import { request } from "@API";
+import { useState, useContext, createContext } from "react";
 import { useTheme } from "@Theme";
 
-import { FileInfo } from "@Components";
+import { FileInfo, Modal } from "@Components";
 
 import {
 	Button,
@@ -25,6 +25,10 @@ import {
 	Tooltip,
 	HStack,
 	IconButton,
+	useDisclosure,
+	useToast,
+	Divider,
+	Text,
 } from "@chakra-ui/react";
 
 import {
@@ -36,7 +40,35 @@ import { MdOutlineVerified } from "react-icons/md";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
 import { RiFolderInfoLine } from "react-icons/ri";
 
+const ToolsContext = createContext();
+
 function Tools() {
+	const [state, setState] = useState({
+		downloadDocument: {
+			publicCode: "",
+		},
+		verifyDocument: {
+			file: "",
+			verifyCode: "",
+		},
+		searchDocument: {
+			publicCode: "",
+		},
+	});
+
+	function stateSetter(q) {
+		let query = q.split(".").map(e => e.trim());
+
+		return value =>
+			setState({
+				...state,
+				[query[0]]: {
+					...[query[0]],
+					[query[1]]: value,
+				},
+			});
+	}
+
 	const tools = [
 		{
 			label: "Download a document",
@@ -56,18 +88,18 @@ function Tools() {
 	const { bg, color, bgHover } = useTheme();
 
 	return (
-		<Stack align="center" spacing={10} justify="center" h="full">
-			<ToolsMenu
-				tools={tools}
-				currentTool={currentTool}
-				setCurrentTool={setCurrentTool}
-			/>
-			{tools[currentTool] && tools[currentTool]?.component}
-		</Stack>
+		<ToolsContext.Provider value={{ ...state, stateSetter }}>
+			<Stack align="center" spacing={10} justify="center" h="full">
+				<ToolsMenu
+					tools={tools}
+					currentTool={currentTool}
+					setCurrentTool={setCurrentTool}
+				/>
+				{tools[currentTool] && tools[currentTool]?.component}
+			</Stack>
+		</ToolsContext.Provider>
 	);
 }
-
-export default Tools;
 
 function ToolsMenu({ tools = [], setCurrentTool, currentTool = 0 }) {
 	const { bg, color, bgHover } = useTheme();
@@ -102,7 +134,8 @@ function ToolsMenu({ tools = [], setCurrentTool, currentTool = 0 }) {
 }
 
 function DownloadDocumentComponent() {
-	const [publicCode, setPublicCode] = useState("");
+	const { downloadDocument, stateSetter } = useContext(ToolsContext);
+	const { publicCode } = downloadDocument;
 
 	return (
 		<>
@@ -111,7 +144,11 @@ function DownloadDocumentComponent() {
 					<Heading size="xs">Public Code</Heading>
 					<Input
 						value={publicCode}
-						onChange={e => setPublicCode(e.target.kvalue)}
+						onChange={e =>
+							stateSetter("downloadDocument.publicCode")(
+								e.target.value
+							)
+						}
 						size={"md"}
 						variant={"filled"}
 						placeholder="Code"
@@ -128,9 +165,11 @@ function DownloadDocumentComponent() {
 }
 
 function VerifyDocumentComponent() {
-	const [file, setFile] = useState();
-	const [verifyCode, setVerifyCode] = useState("");
+	// const [file, setFile] = useState();
+	// const [verifyCode, setVerifyCode] = useState("");
 
+	const { verifyDocument, stateSetter } = useContext(ToolsContext);
+	const { verifyCode, file } = verifyDocument;
 	return (
 		<Stack w="full" spacing={8} align={"center"}>
 			<Stack>
@@ -140,7 +179,9 @@ function VerifyDocumentComponent() {
 					variant={"filled"}
 					placeholder="Code"
 					value={verifyCode}
-					onChange={e => setVerifyCode(e.target.value)}
+					onChange={e =>
+						stateSetter("verifyDocument.verifyCode")(e.target.value)
+					}
 				/>
 				<HStack justify={"end"}>
 					{file && <FileInfo file={file} />}
@@ -160,7 +201,11 @@ function VerifyDocumentComponent() {
 								w="full"
 								type={"file"}
 								left={0}
-								onChange={e => setFile(e.target.files[0])}
+								onChange={e =>
+									stateSetter("verifyDocument.file")(
+										e.target.files[0]
+									)
+								}
 								top={0}
 								cursor={"pointer"}
 								position={"absolute"}
@@ -182,11 +227,43 @@ function VerifyDocumentComponent() {
 }
 
 function SearchDocumentComponent() {
-	const [publicCode, setPublicCode] = useState("");
-	function searchHandler() {
-		const data = getDataFromAPI("sfad", {}, { public_code: publicCode });
-		if (data?.status === "field") {
+	const [result, setResult] = useState(null);
+
+	const [loading, setLoading] = useState(false);
+	const toast = useToast();
+
+	const disclosure = useDisclosure();
+	const { onOpen, onClose } = disclosure;
+
+	const { searchDocument, stateSetter } = useContext(ToolsContext);
+	const { publicCode } = searchDocument;
+
+	async function searchHandler() {
+		setLoading(true);
+		try {
+			const data = await request("post", "login")(
+				{
+					public_code: publicCode,
+				},
+				{
+					"Content-Type": "application/json",
+				}
+			);
+			if (data?.status === "failed") throw data.msg;
+
+			setResult(data);
+			onOpen();
+		} catch (err) {
+			toast({
+				title: "Search failed.",
+				description: err.toString(),
+				status: "error",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
 		}
+		setLoading(false);
 	}
 	return (
 		<>
@@ -195,18 +272,60 @@ function SearchDocumentComponent() {
 					<Heading size="xs">Public Code</Heading>
 					<Input
 						value={publicCode}
-						onChange={e => setPublicCode(e.target.value)}
+						onChange={e => {
+							stateSetter("searchDocument.publicCode")(
+								e.target.value
+							);
+							console.log(publicCode);
+						}}
 						size={"md"}
 						variant={"filled"}
 						placeholder="Code"
 					/>
 				</Stack>
 				<Button
+					isLoading={loading}
+					onClick={async () => {
+						await searchHandler();
+					}}
 					maxW={"min-content"}
 					rightIcon={<AiOutlineSearch size="1.4em" />}>
 					Search
 				</Button>
 			</Stack>
+			<Modal
+				{...disclosure}
+				header={`Search result `}
+				footer={<Button onClick={onClose}>Close</Button>}>
+				<Stack>
+					<Divider />
+					<Stack spacing={2}>
+						<Stack spacing={0}>
+							<Heading fontSize={12}>Document name</Heading>
+							<Text>
+								{result?.document_name ?? "[Document name]"}
+							</Text>
+						</Stack>
+						<Stack spacing={0}>
+							<Heading fontSize={12}>Verifier</Heading>
+							<Text>{result?.verifier ?? "[Verifier]"}</Text>
+						</Stack>
+						<Stack spacing={0}>
+							<Heading fontSize={12}>Writer</Heading>
+							<Text>{result?.writer ?? "[Writer]"}</Text>
+						</Stack>
+						<Stack spacing={0}>
+							<Heading fontSize={12}>Date of publication</Heading>
+							<Text>
+								{result?.date_of_publication ??
+									"[date_of_publication]"}
+							</Text>
+						</Stack>
+					</Stack>
+				</Stack>
+			</Modal>
 		</>
 	);
 }
+
+export default Tools;
