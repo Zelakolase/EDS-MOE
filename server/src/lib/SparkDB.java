@@ -111,7 +111,7 @@ public class SparkDB {
 			return Mapper.get(ColToFind).get(Mapper.get(FromCol).indexOf(ColVal));
 		} catch (Exception e) {
 			log.e(e, SparkDB.class.getName(), "get");
-			return null;
+			return "ERR/ERR";
 		}
 	}
 
@@ -123,6 +123,7 @@ public class SparkDB {
 			log.e(e, SparkDB.class.getName(), "get");
 		}
 	}
+
 	/*
 	 * Add a new item
 	 */

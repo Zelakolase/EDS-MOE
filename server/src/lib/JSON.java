@@ -21,7 +21,8 @@ public class JSON {
 
 		int iter = 0;
 		for (Map.Entry<String, String> entry : HM.entrySet()) {
-			StringBuilder E = new StringBuilder("\"").append(entry.getKey()).append("\":").append("\"").append(entry.getValue()).append("\"");
+			StringBuilder E = new StringBuilder("\"").append(entry.getKey()).append("\":").append("\"")
+					.append(entry.getValue()).append("\"");
 			iter++;
 			if (!(iter + 1 > HM.size())) {
 				E.append(",");

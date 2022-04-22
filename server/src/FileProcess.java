@@ -11,15 +11,15 @@ public class FileProcess {
 	 */
 	public static HashMap<String, byte[]> redirector(String in, ArrayList<String> files) {
 		HashMap<String, byte[]> res = new HashMap<>();
-		if(files.contains(in)) {
-			if(new File("./www/"+in).exists()) {
-				res.put("body", IO.read("./www/"+in));
+		if (files.contains(in)) {
+			if (new File("./www/" + in).exists()) {
+				res.put("body", IO.read("./www/" + in));
 				res.put("code", HTTPCode.OK.getBytes());
-			}else {
+			} else {
 				res.put("body", "Not found".getBytes());
 				res.put("code", HTTPCode.NOT_FOUND.getBytes());
 			}
-		}else {
+		} else {
 			res.put("body", "Not permitted".getBytes());
 			res.put("code", HTTPCode.FORBIDDEN.getBytes());
 		}

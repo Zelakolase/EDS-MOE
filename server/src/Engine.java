@@ -26,7 +26,8 @@ public class Engine extends Server {
 	 */
 	static String ENCRYPTION_KEY;
 	static SparkDB MIME = new SparkDB();
-	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
+	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id,
+																													// username
 	static SparkDB users = new SparkDB();
 	static SparkDB docs = new SparkDB();
 	static ArrayList<String> WWWFiles = new ArrayList<>();
@@ -50,20 +51,21 @@ public class Engine extends Server {
 			this.setBacklog(10000);
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
-			/**
-			 * Get the local IP address of the preferred network interface, Google DNS reachability won't affect the function.
-			 * From StackOverflow.
-			 */
-			try(final DatagramSocket socket = new DatagramSocket()){
+					/**
+					 * Get the local IP address of the preferred network interface, Google DNS
+					 * reachability won't affect the function. From StackOverflow.
+					 */
+					try (final DatagramSocket socket = new DatagramSocket()) {
 				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 				String ip = socket.getLocalAddress().getHostAddress();
-				log.s("Server is running, Device local IP Address: "+ip);
+				log.s("Server is running, Device local IP Address: " + ip);
 			}
 			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
-		}catch(Exception e) {
+		} catch (Exception e) {
 			log.e(e, "Engine", "run()");
 		}
 	}
+
 	/**
 	 * Dynamic Engine Entry point
 	 */
@@ -81,19 +83,27 @@ public class Engine extends Server {
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
-				if(ser.equals("login") || ser.equals("logout")) {
+				if (ser.equals("login") || ser.equals("logout")) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
-				if(ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", users);
-				if(Stream.of("about","sfad","dac","generate","vad","doc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
-				if(headers.containsKey("verify_code")) Elshanta.put("verify_code", headers.get("verify_code"));
-				if(headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
-				if(headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
+				if (ser.equals("generate") || ser.equals("doc"))
+					Elshanta.put("session_ids", users);
+				if (Stream.of("about", "sfad", "dac", "generate", "vad", "doc").anyMatch(ser::equals))
+					Elshanta.put("docs_db", docs);
+				if (headers.containsKey("verify_code"))
+					Elshanta.put("verify_code", headers.get("verify_code"));
+				if (headers.containsKey("session_id"))
+					Elshanta.put("session_id", headers.get("session_id"));
+				if (headers.containsKey("extension"))
+					Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res = API.redirector(Elshanta); // Elshanta reply
-				if(res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
-				if(res.containsKey("users")) users = (SparkDB) res.get("users");
-				if(res.containsKey("docs")) docs = (SparkDB) res.get("docs");
+				if (res.containsKey("session_ids"))
+					SESSION_IDS = (Map<String, String>) res.get("session_ids");
+				if (res.containsKey("users"))
+					users = (SparkDB) res.get("users");
+				if (res.containsKey("docs"))
+					docs = (SparkDB) res.get("docs");
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", "application/json".getBytes());
@@ -102,8 +112,10 @@ public class Engine extends Server {
 				 * Static file request detected
 				 */
 				String path = headers.get("path");
-				if(path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")) path += ".html";
-				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1),WWWFiles);
+				if (path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")
+						|| path.equals("/operation"))
+					path += ".html";
+				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1), WWWFiles);
 				response.put("content", static_res.get("body"));
 				response.put("code", static_res.get("code"));
 				String[] pathSplit = path.split("\\.");
@@ -111,7 +123,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			API.err(e);
+			log.e(e, "Engine", "main");
 			return new HashMap<>() {
 				{
 					put("content", "Server error".getBytes());

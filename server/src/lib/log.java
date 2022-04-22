@@ -5,10 +5,10 @@ import java.io.StringWriter;
 
 public class log {
 	static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-	public static final String RESET = isWindows ? "\033[0;37m":"\u001B[0m";
-	public static final String RED = isWindows ? "\033[0;31m":"\u001B[31m";
-	public static final String GREEN = isWindows ? "\033[0;32m":"\u001B[32m";
-	public static final String CYAN = isWindows ? "\033[0;36m":"\u001B[36m";
+	public static final String RESET = isWindows ? "\033[0;37m" : "\u001B[0m";
+	public static final String RED = isWindows ? "\033[0;31m" : "\u001B[31m";
+	public static final String GREEN = isWindows ? "\033[0;32m" : "\u001B[32m";
+	public static final String CYAN = isWindows ? "\033[0;36m" : "\u001B[36m";
 
 	/**
 	 * Display error msg
@@ -16,7 +16,7 @@ public class log {
 	 * @param in message to print
 	 */
 	public static void e(String in) {
-		System.out.println(RED + "[Error] " + in + RESET);
+		// System.out.println(RED + "[Error] " + in + RESET); | DEPRECATED
 	}
 
 	/**

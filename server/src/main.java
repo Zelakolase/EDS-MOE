@@ -32,7 +32,11 @@ public class main {
 		boolean DocsDB = new File("./conf/docs.db").exists();
 		boolean InfoDB = new File("./conf/info.txt").exists();
 		boolean Queries = new File("./conf/queries.txt").exists();
-		if (ServerKey && UserDB && DocsDB && InfoDB && Queries ) {
+		if(! new File("./stats/").exists()) {
+			new File("./stats/").mkdir();
+			new File("./stats/performance.csv").createNewFile();
+		}
+		if (ServerKey && UserDB && DocsDB && InfoDB && Queries) {
 			// Good to go
 			System.out.print("Enter the server key: ");
 			String k = s.nextLine();
@@ -55,10 +59,9 @@ public class main {
 			System.out.print("Enter the new server key: ");
 			String ServerK = s.nextLine();
 			IO.write("./conf/users.db", AES.encrypt("\"full_name\",\"user\",\"password\"", ServerK), false);
-			IO.write("./conf/docs.db",
-					AES.encrypt("\"pub_code\",\"verify_code\",\"path\",\"doc_name\",\"verifier\",\"writer\",\"date\",\"sha\"",
-							ServerK),
-					false);
+			IO.write("./conf/docs.db", AES.encrypt(
+					"\"pub_code\",\"verify_code\",\"path\",\"doc_name\",\"verifier\",\"writer\",\"date\",\"sha\"",
+					ServerK), false);
 			System.out.print("Enter the school name: ");
 			String SchoolName = s.nextLine();
 			System.out.print("Enter the number of verifiers: ");

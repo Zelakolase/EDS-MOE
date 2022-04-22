@@ -16,8 +16,8 @@ public class IO {
 	 */
 	public static byte[] read(String filename) {
 		try {
-			BufferedInputStream inputStream2 = new BufferedInputStream(new FileInputStream(new File(filename)));
-			return inputStream2.readAllBytes();
+			BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+			return inputStream.readAllBytes();
 		} catch (Exception e) {
 			log.e(e, IO.class.getName(), "read");
 			return null;

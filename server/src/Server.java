@@ -4,9 +4,9 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.security.KeyStore;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +15,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
 import lib.ArraySplit;
+import lib.IO;
 import lib.Network;
 import lib.log;
 
@@ -43,9 +44,11 @@ public abstract class Server {
 	public void setBacklog(int in) {
 		backlog = in;
 	}
+
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword) {
 		HTTPSStart(port, KeyStorePath, KeyStorePassword, "TLSv1.3", "JKS", "SunX509");
 	}
+
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword, String TLSVersion,
 			String KeyStoreType, String KeyManagerFactoryType) {
 		// HTTPS Server start, default values
@@ -54,6 +57,7 @@ public abstract class Server {
 			ServerSocket SS = getSSLContext(Path.of(KeyStorePath), keyStorePassword, TLSVersion, KeyStoreType,
 					KeyManagerFactoryType).getServerSocketFactory().createServerSocket(port, backlog);
 			Arrays.fill(keyStorePassword, '0');
+			int req_num = 0;
 			while (true) {
 				/*
 				 * Max 10,000 retries (1ms delay between each) for every request to process if
@@ -61,11 +65,19 @@ public abstract class Server {
 				 */
 				int tries = 0; // current tries
 				inner: while (tries < 10001) {
-					if (tries > 0) Thread.sleep(1);
+					if (tries > 0)
+						Thread.sleep(1);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
-						Engine e = new Engine(SS.accept());
+						Socket S = SS.accept();
+						S.setKeepAlive(false);
+						S.setTcpNoDelay(true);
+						Engine e = new Engine(S, S.getRemoteSocketAddress(), req_num);
 						e.start();
 						CurrentConcurrentRequests++;
+						
+						if(req_num >= Integer.MAX_VALUE) req_num = 0;
+						else req_num++;
+						
 						break inner;
 					} else {
 						tries++;
@@ -93,43 +105,37 @@ public abstract class Server {
 		}
 	}
 
-	private byte[] toPrimitives(Byte[] oBytes) {
-		byte[] bytes = new byte[oBytes.length];
-		for (int i = 0; i < oBytes.length; i++) {
-			bytes[i] = oBytes[i];
-		}
-		return bytes;
-	}
-
 	public class Engine extends Thread {
 		// The main request processor
 		Socket S;
-
-		Engine(Socket in) {
+		SocketAddress SA;
+		int req_num;
+		Engine(Socket in, SocketAddress SA, int req_num) {
 			S = in;
+			this.SA = SA;
+			this.req_num = req_num;
 		}
 
 		@Override
 		public void run() {
 			try {
+				String IDENTIFIER = "["+SA.toString()+"|"+req_num+"],";
 				DataInputStream DIS = new DataInputStream(S.getInputStream());
 				DataOutputStream DOS = new DataOutputStream(S.getOutputStream());
-
-				ArrayList<Byte> RequestInAL = Network.read(DIS, MAX_REQ_SIZE);
-				byte[] Request = toPrimitives(RequestInAL.toArray(Byte[]::new));
-
+				long F = System.nanoTime();
+				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
+				IO.write("./stats/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				F = System.nanoTime();
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
 				/*
 				 * Dynamic Mode
 				 */
-				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE*1000) - Request.length);
-
-				Network.write(DOS,
-						Reply.get("content"),
-						new String(Reply.get("mime")),
-						new String(Reply.get("code")),
+				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
+				IO.write("./stats/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
 						GZip, AddedResponseHeaders);
+				IO.write("./stats/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				S.close();
 			} catch (Exception e) {
 				log.e(e, Engine.class.getName(), "run");

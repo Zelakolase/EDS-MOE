@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.zip.GZIPOutputStream;
 
 public class Network {
@@ -64,20 +63,23 @@ public class Network {
 	 *
 	 * @param MAX_REQ_SIZE the maximum kbytes to read
 	 */
-	public static ArrayList<Byte> read(DataInputStream DIS, int MAX_REQ_SIZE) {
-		ArrayList<Byte> result = new ArrayList<>();
-		int byteCounter = 0;
+	public static ByteArrayOutputStream read(DataInputStream DIS, int MAX_REQ_SIZE) {
+		MAX_REQ_SIZE = MAX_REQ_SIZE * 1000;
+		ByteArrayOutputStream Reply = new ByteArrayOutputStream(1024);
+		int counter = 0;
 		try {
-			do {
-				if (byteCounter < MAX_REQ_SIZE * 1000) {
-					result.add(DIS.readNBytes(1)[0]);
-					byteCounter++;
+			ReadLoop: do {
+				if (counter < MAX_REQ_SIZE) {
+					Reply.write(DIS.readByte());
+					counter++;
+				} else {
+					break ReadLoop;
 				}
 			} while (DIS.available() > 0);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.e(e, Network.class.getName(), "read");
 		}
-		return result;
+		return Reply;
 	}
 
 	/**
@@ -86,7 +88,7 @@ public class Network {
 	public static byte[] ManRead(DataInputStream DIS, int bytestoread) {
 		try {
 			return DIS.readNBytes(bytestoread);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.e(e, Network.class.getName(), "ManRead");
 		}
 		return null;
