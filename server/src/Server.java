@@ -1,4 +1,5 @@
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -120,7 +121,7 @@ public abstract class Server {
 		public void run() {
 			try {
 				String IDENTIFIER = "["+SA.toString()+"|"+req_num+"],";
-				DataInputStream DIS = new DataInputStream(S.getInputStream());
+				DataInputStream DIS = new DataInputStream(new BufferedInputStream(S.getInputStream()));
 				DataOutputStream DOS = new DataOutputStream(S.getOutputStream());
 				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();

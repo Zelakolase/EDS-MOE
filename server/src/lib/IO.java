@@ -3,6 +3,7 @@ package lib;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -16,7 +17,7 @@ public class IO {
 	 */
 	public static byte[] read(String filename) {
 		try {
-			BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(filename)));
+			BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(filename)),8192);
 			return inputStream.readAllBytes();
 		} catch (Exception e) {
 			log.e(e, IO.class.getName(), "read");
@@ -48,16 +49,15 @@ public class IO {
 	 * @param append   weather to append to existing value or not
 	 */
 	public static void write(String filename, byte[] content, boolean append) {
-
-		try {
-			StandardOpenOption set = null;
-			if (append)
-				set = StandardOpenOption.APPEND;
-			if (!append)
-				set = StandardOpenOption.WRITE;
-			Files.write(Paths.get(filename), content, set);
-		} catch (Exception e) {
-			log.e(e, IO.class.getName(), "write");
-		}
+		StandardOpenOption set = append? StandardOpenOption.APPEND : StandardOpenOption.WRITE;
+			(new Thread() {
+				  public void run() {
+						try {
+							Files.write(Paths.get(filename), content, set);
+						} catch (IOException e) {
+							log.e(e, IO.class.getName(), "write");
+						}
+				  }
+				 }).start();
 	}
 }
