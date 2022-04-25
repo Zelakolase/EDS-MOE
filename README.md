@@ -6,7 +6,7 @@
 - [x] Security check for API
 - [ ] Frontend publish
 - [x] Backend publish
-- [ ] Source code review and security check for backend
+- [x] Source code review and security check for backend (24 Apr. 2022)
 - [ ] android application
 - [ ] compile to native image (exe + elf)
 
