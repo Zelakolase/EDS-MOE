@@ -306,6 +306,7 @@ public class API {
 		try {
 			// BODY is post req body compared to path in db docs
 			// compare original sha to BODY sha
+			if(docs.Mapper.get("verify_code").contains(verify_code)) {
 			boolean compare = docs.get("verify_code", verify_code, "sha")
 					.equals(new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
 			String msg = compare ? "The file is identical with the verify code"
@@ -315,6 +316,13 @@ public class API {
 					put("msg", msg);
 				}
 			});
+			}else {
+				res = JSON.HMQ(new HashMap<String, String>() {
+					{
+						put("msg","Verify Code isn't found");
+					}
+				});
+			}
 		} catch (Exception e) {
 			res = "error";
 		}

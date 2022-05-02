@@ -51,7 +51,8 @@ public class IO {
 	public static void write(String filename, byte[] content, boolean append) {
 		StandardOpenOption set = append? StandardOpenOption.APPEND : StandardOpenOption.WRITE;
 			(new Thread() {
-				  public void run() {
+				  @Override
+				public void run() {
 						try {
 							Files.write(Paths.get(filename), content, set);
 						} catch (IOException e) {
