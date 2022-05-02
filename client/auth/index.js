@@ -18,6 +18,14 @@ export default function AuthProvider({ children }) {
 			typeof cookie.get("session_id") !== "undefined"
 		) {
 			setIsSignedIn(true);
+
+			// TODO: Fix a bug here
+			/**
+			 * - DETAILS
+			 * * If the account information (username and password) changes,
+			 * * and somehow you have logged in before or added the required cookies to your browser,
+			 * * the system will show that you are already logged in.
+			 */
 			setUsername(cookie.get("username"));
 			setSessionID(cookie.get("session_id"));
 		}
@@ -32,17 +40,7 @@ export default function AuthProvider({ children }) {
 			pass,
 		});
 		const data = response.data;
-		if (data?.status === "failed") {
-			toast({
-				position: "top",
-				title: "Login was failed.",
-				description: data?.msg,
-				status: "error",
-				duration: 9000,
-				isClosable: true,
-			});
-			return;
-		}
+		if (data?.status === "failed") throw data?.msg;
 		setUsername(data?.first_name);
 		setSessionID(data?.session_id);
 		cookie.set("username", data?.first_name);
@@ -63,6 +61,7 @@ export default function AuthProvider({ children }) {
 		signin,
 		signout,
 		username,
+		sessionID,
 	};
 	return (
 		<AuthContext.Provider value={value}>{children}</AuthContext.Provider>

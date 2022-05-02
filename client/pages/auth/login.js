@@ -15,6 +15,8 @@ import {
 	FormLabel,
 	FormErrorMessage,
 	FormHelperText,
+	Form,
+	useToast,
 } from "@chakra-ui/react";
 
 import {
@@ -37,15 +39,40 @@ function generatingRandomPassword() {
 }
 
 export default function Login() {
-	const { signin, isSignedIn } = useAuth();
+	const { signin, isSignedIn, username } = useAuth();
+
+	const toast = useToast();
 	const router = useRouter();
 
 	const [form, setForm] = useState({ user: "", pass: "" });
+	const [isLoading, setIsLoading] = useState(false);
+
 	const [isPassFieldVisiable, setIsPassFieldVisiable] = useState(false);
 	const [passwordPlaceholder, _] = useState(generatingRandomPassword());
 
-	function signInHandler() {
-		signin(form);
+	async function signInHandler() {
+		setIsLoading(true);
+
+		try {
+			await signin(form);
+			toast({
+				position: "top",
+				description: `Welcome back!`,
+				status: "success",
+				duration: 9000,
+				isClosable: true,
+			});
+		} catch (err) {
+			toast({
+				position: "top",
+				title: "Login was failed.",
+				description: err.toString(),
+				status: "error",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
+		setIsLoading(false);
 	}
 
 	useEffect(() => {
@@ -59,14 +86,14 @@ export default function Login() {
 			maxW={"96"}
 			spacing={6}
 			padding={4}
-			align="center"
 			h="full"
-			justify={"center"}>
+			align="center"
+			justify="center">
 			<Logo />
 			<Stack w="full" spacing={1}>
 				<HStack align="end">
 					<AiOutlineUser size="1.3em" />
-					<FormLabel for="username" fontSize={13}>
+					<FormLabel htmlFor="username" fontSize={13}>
 						Username
 					</FormLabel>
 				</HStack>
@@ -81,7 +108,7 @@ export default function Login() {
 			<Stack w="full" spacing={1}>
 				<HStack align="end">
 					<BsKey size="1.3em" />
-					<FormLabel htmlfor="password" fontSize={13}>
+					<FormLabel htmlFor="password" fontSize={13}>
 						Password
 					</FormLabel>
 				</HStack>
@@ -121,8 +148,9 @@ export default function Login() {
 				</Box>
 			</Stack>
 			<Button
+				onClick={signInHandler}
 				rightIcon={<BiLogIn size="1.4em" />}
-				onClick={signInHandler}>
+				isLoading={isLoading}>
 				Login
 			</Button>
 		</FormControl>
