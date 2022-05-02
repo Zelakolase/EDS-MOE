@@ -66,7 +66,7 @@ Response body :
 
 ---
 
-### **Verify a document : /api.vad** Server : Done , Client : -
+### **Verify a document : /api.vad** Server : Done , Client : Done
 
 Request body :
 
