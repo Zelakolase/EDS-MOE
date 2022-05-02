@@ -1,13 +1,13 @@
 package lib;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
 public class PostRequestMerge {
-	public static byte[] merge(List<byte[]> aLm, DataInputStream DIS, HashMap<String, String> headers, int max_bytes)
+	public static byte[] merge(List<byte[]> aLm, BufferedInputStream dIS, HashMap<String, String> headers, int max_bytes)
 			throws IOException {
 		ByteArrayOutputStream whole = new ByteArrayOutputStream();
 		if (aLm.size() >= 2) {
@@ -26,7 +26,7 @@ public class PostRequestMerge {
 				if (whole.size() < num) {
 					// S L O W
 					int to_read = num - whole.size();
-					whole.write(Network.ManRead(DIS, to_read > max_bytes ? max_bytes : to_read));
+					whole.write(Network.ManRead(dIS, to_read > max_bytes ? max_bytes : to_read));
 				}
 			}
 		} else {

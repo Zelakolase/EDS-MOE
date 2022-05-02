@@ -1,5 +1,6 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class Engine extends Server {
 	 * Dynamic Engine Entry point
 	 */
 	@Override
-	HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS, int max_size) {
+	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size) {
 		try {
 			HashMap<String, String> headers = HeaderToHashmap.convert(new String(aLm.get(0))); // headers
 			HashMap<String, byte[]> response = new HashMap<>(); // content, mime, code

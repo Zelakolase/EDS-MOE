@@ -1,7 +1,6 @@
 
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -72,6 +71,7 @@ public abstract class Server {
 						Socket S = SS.accept();
 						S.setKeepAlive(false);
 						S.setTcpNoDelay(true);
+						S.setSoTimeout(150);
 						Engine e = new Engine(S, S.getRemoteSocketAddress(), req_num);
 						e.start();
 						CurrentConcurrentRequests++;
@@ -120,9 +120,9 @@ public abstract class Server {
 		@Override
 		public void run() {
 			try {
-				String IDENTIFIER = "["+SA.toString()+"|"+req_num+"],";
-				DataInputStream DIS = new DataInputStream(new BufferedInputStream(S.getInputStream(),8192));
-				DataOutputStream DOS = new DataOutputStream(S.getOutputStream());
+				String IDENTIFIER = "["+SA.toString()+"|ID:"+req_num+"],";
+				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),8192);
+				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),8192);
 				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
 				IO.write("./stats/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
@@ -148,5 +148,5 @@ public abstract class Server {
 
 	}
 
-	abstract HashMap<String, byte[]> main(List<byte[]> aLm, DataInputStream DIS, DataOutputStream DOS, int max_size);
+	abstract HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream dIS, BufferedOutputStream dOS, int max_size);
 }
