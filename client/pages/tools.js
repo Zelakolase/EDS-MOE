@@ -29,6 +29,8 @@ import {
 	useToast,
 	Divider,
 	Text,
+	Alert,
+	AlertIcon,
 } from "@chakra-ui/react";
 
 import {
@@ -39,6 +41,7 @@ import {
 import { MdOutlineVerified } from "react-icons/md";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
 import { RiFolderInfoLine } from "react-icons/ri";
+import { useRouter } from "next/router";
 
 const ToolsContext = createContext();
 
@@ -48,7 +51,7 @@ function Tools() {
 			publicCode: "",
 		},
 		verifyDocument: {
-			file: "",
+			file: null,
 			verifyCode: "",
 		},
 		searchDocument: {
@@ -68,7 +71,7 @@ function Tools() {
 				},
 			});
 
-			console.log(state);
+			// console.log(state);
 		};
 	}
 
@@ -143,7 +146,6 @@ function DownloadDocumentComponent() {
 	const { downloadDocument, stateSetter } = useContext(ToolsContext);
 	const { publicCode } = downloadDocument;
 
-	// async
 	async function downloadHandler() {
 		setLoading(true);
 		try {
@@ -204,11 +206,42 @@ function DownloadDocumentComponent() {
 }
 
 function VerifyDocumentComponent() {
-	// const [file, setFile] = useState();
+	const toast = useToast();
+	const [loading, setLoading] = useState(false);
+	const [result, setResult] = useState();
 	// const [verifyCode, setVerifyCode] = useState("");
 
 	const { verifyDocument, stateSetter } = useContext(ToolsContext);
+	const [fileContent, setFileContent] = useState("");
 	const { verifyCode, file } = verifyDocument;
+
+	// useEffect(() => console.log(fileContent), [fileContent]);
+
+	async function verifyHandler() {
+		setLoading(true);
+		// console.log(file);
+		try {
+			const response = await request("post", "vad")(fileContent, {
+				"Content-Type": "application/pdf",
+				verify_code: verifyCode,
+			});
+			if (response?.data.status === "failed") throw response.data.msg;
+			if (response?.data === "error")
+				throw "Something wrong, Please try again or contact with support to solve this problem.";
+			console.log(response.data);
+			setResult(response.data);
+		} catch (err) {
+			toast({
+				title: "Verify failed.",
+				description: err.toString(),
+				status: "error",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
+		setLoading(false);
+	}
 	return (
 		<Stack w="full" spacing={8} align={"center"}>
 			<Stack>
@@ -242,11 +275,17 @@ function VerifyDocumentComponent() {
 							<Input
 								w="full"
 								type={"file"}
+								accept=".pdf"
 								left={0}
-								onChange={e => {
-									stateSetter("verifyDocument.file")(
-										e.target.files[0]
-									);
+								onChange={async e => {
+									let __file__ = e.target.files[0];
+									if (typeof __file__ !== "undefined") {
+										stateSetter("verifyDocument.file")(
+											__file__
+										);
+										setFileContent(await __file__?.text());
+									}
+									// console.log(await e.target.files[0].text());
 									// console.log(verifyDocument);
 								}}
 								top={0}
@@ -261,7 +300,11 @@ function VerifyDocumentComponent() {
 				</HStack>
 			</Stack>
 			<Button
+				onClick={async () => {
+					await verifyHandler();
+				}}
 				isDisabled={!file || !verifyCode}
+				isLoading={loading}
 				maxW={"min-content"}
 				rightIcon={<MdOutlineVerified size="1.4em" />}>
 				Verify
@@ -271,10 +314,12 @@ function VerifyDocumentComponent() {
 }
 
 function SearchDocumentComponent() {
-	const [result, setResult] = useState(null);
+	const toast = useToast();
+	const router = useRouter();
+
+	const [result, setResult] = useState({});
 
 	const [loading, setLoading] = useState(false);
-	const toast = useToast();
 
 	const disclosure = useDisclosure();
 	const { onOpen, onClose } = disclosure;
@@ -340,27 +385,48 @@ function SearchDocumentComponent() {
 				header={`Search result `}
 				footer={<Button onClick={onClose}>Close</Button>}>
 				<Stack>
+					{[
+						"document_name",
+						"verifier",
+						"writer",
+						"date_of_publication",
+					].filter(e => !result.has).length > 0 && (
+						<Alert status="error">
+							<AlertIcon />
+							<div>
+								Some data isn't found, Please{" "}
+								<span
+									style={{
+										textDecoration: "underline",
+										cursor: "pointer",
+									}}
+									onClick={() => router.push("/support")}>
+									contact us
+								</span>{" "}
+								to solve this problem.
+							</div>
+						</Alert>
+					)}
+
 					<Divider />
+
 					<Stack spacing={2}>
 						<Stack spacing={0}>
 							<Heading fontSize={12}>Document name</Heading>
-							<Text>
-								{result?.document_name ?? "[Document name]"}
-							</Text>
+							<Text>{result?.document_name ?? "Not found"}</Text>
 						</Stack>
 						<Stack spacing={0}>
 							<Heading fontSize={12}>Verifier</Heading>
-							<Text>{result?.verifier ?? "[Verifier]"}</Text>
+							<Text>{result?.verifier ?? "Not found"}</Text>
 						</Stack>
 						<Stack spacing={0}>
 							<Heading fontSize={12}>Writer</Heading>
-							<Text>{result?.writer ?? "[Writer]"}</Text>
+							<Text>{result?.writer ?? "Not found"}</Text>
 						</Stack>
 						<Stack spacing={0}>
 							<Heading fontSize={12}>Date of publication</Heading>
 							<Text>
-								{result?.date_of_publication ??
-									"[date_of_publication]"}
+								{result?.date_of_publication ?? "Not found"}
 							</Text>
 						</Stack>
 					</Stack>
