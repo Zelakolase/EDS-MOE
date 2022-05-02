@@ -121,7 +121,7 @@ public abstract class Server {
 		public void run() {
 			try {
 				String IDENTIFIER = "["+SA.toString()+"|"+req_num+"],";
-				DataInputStream DIS = new DataInputStream(new BufferedInputStream(S.getInputStream()));
+				DataInputStream DIS = new DataInputStream(new BufferedInputStream(S.getInputStream(),8192));
 				DataOutputStream DOS = new DataOutputStream(S.getOutputStream());
 				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
