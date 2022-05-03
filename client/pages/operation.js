@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, createContext, useRef } from "react";
 import { useRouter } from "next/router";
+
 import { useAuth } from "@Auth";
+import { request } from "@API";
 
 import { useWindowSize } from "rooks";
 import { MINI_WIDTH_SCREEN } from "@Theme";
@@ -9,6 +11,8 @@ import {
 	Stack,
 	Button,
 	Input,
+	InputGroup,
+	InputRightAddon,
 	Heading,
 	HStack,
 	Box,
@@ -17,18 +21,55 @@ import {
 	Tooltip,
 	Divider,
 	useBreakpointValue,
+	useToast,
 } from "@chakra-ui/react";
 import { Step, Steps, useSteps } from "chakra-ui-steps";
+
 import { AiOutlineArrowRight, AiOutlineUpload } from "react-icons/ai";
 import { RiFolderInfoLine } from "react-icons/ri";
-export default function Login() {
-	const { isSignedIn, username } = useAuth();
+import { MdDateRange } from "react-icons/md";
+const OperaionContext = createContext();
+
+const useOperation = () => useContext(OperaionContext);
+
+export default function Operation() {
+	const { isSignedIn, username, sessionID } = useAuth();
+
 	const router = useRouter();
+	const toast = useToast();
 
 	const { innerWidth } = useWindowSize();
 	const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
 		initialStep: 0,
 	});
+
+	// States
+	const [isNextButtonDisabled, setIsNextButtonDisabled] = useState(false);
+	const [isNextButtonLoading, setIsNextButtonLoading] = useState(false);
+	const [generatedDocResult, setGenerateDocResult] = useState(null);
+	const [uploadDocResult, setuploadDocResult] = useState(null);
+
+	const [state, setState] = useState({
+		generateDocument: {
+			document_name: "",
+			date: "",
+			writer: "",
+		},
+		upload: {
+			file: null,
+		},
+	});
+
+	function stateSetter(q, value) {
+		let query = q.split(".").map(e => e.trim());
+		setState(state => ({
+			...state,
+			[query[0]]: {
+				...state[query[0]],
+				[query[1]]: value,
+			},
+		}));
+	}
 
 	let steps = [
 		{
@@ -46,66 +87,154 @@ export default function Login() {
 	];
 
 	const isLastStep = activeStep === steps.length - 1;
-	const isFirstStep = activeStep === 0;
 
+	async function generateDoc() {
+		setIsNextButtonLoading(true);
+		try {
+			// Destructing
+			const { generateDocument } = state;
+			const { documentName: doc_name, date, writer } = generateDocument;
+
+			const response = await request(
+				"post",
+				"generate"
+			)({ doc_name, date, writer, session_id: sessionID });
+			if (response?.data?.status === "failed") throw response?.data?.msg;
+
+			setGenerateDocResult(response?.data);
+			nextStep();
+		} catch (err) {
+			toast({
+				title: "Generate failed.",
+				description: err.toString(),
+				status: "error",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
+		setIsNextButtonLoading(false);
+	}
+	async function uploadDoc() {
+		setIsNextButtonLoading(true);
+		try {
+			const response = await request(
+				"post",
+				"genrate"
+			)(...{ session_id: sessionID });
+			if (response?.data?.status === "failed") throw response?.data?.msg;
+
+			setGeneratedDocResilt(response?.data);
+			nextStep();
+		} catch (err) {
+			toast({
+				title: "Generate failed.",
+				description: err.toString(),
+				status: "error",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
+		setIsNextButtonLoading(false);
+	}
 	useEffect(() => {
 		if (!isSignedIn) router.replace("/auth/login");
 	});
 
 	return (
-		<Stack
-			w="full"
-			h="full"
-			spacing={6}
-			padding={4}
-			justify="space-around"
-			align="center">
-			<Heading>Welcome, {username}</Heading>
-			<Stack w="full" h="full">
-				<Steps activeStep={activeStep} labelOrientation={"vertical"}>
-					{steps.map(({ label, component }) => (
-						<Step
-							alignSelf={
-								innerWidth > MINI_WIDTH_SCREEN
-									? "center"
-									: "auto"
+		<OperaionContext.Provider
+			value={{
+				generateDoc,
+				generatedDocResult,
+				uploadDoc,
+				uploadDocResult,
+				stateSetter,
+				...state.generateDocument,
+				...state.upload,
+				setIsNextButtonDisabled,
+			}}>
+			<Stack
+				w="full"
+				h="full"
+				spacing={6}
+				padding={4}
+				justify="space-around"
+				align="center">
+				<Heading>Welcome, {username}</Heading>
+				<Stack w="full" h="full">
+					<Steps
+						activeStep={activeStep}
+						labelOrientation={"vertical"}>
+						{steps.map(({ label, component }, index) => (
+							<Step
+								key={index}
+								alignSelf={
+									innerWidth > MINI_WIDTH_SCREEN
+										? "center"
+										: "auto"
+								}
+								label={label}>
+								<Stack
+									w="full"
+									h="full"
+									align="center"
+									justify="center">
+									{component}
+								</Stack>
+							</Step>
+						))}
+					</Steps>
+				</Stack>
+				<HStack alignSelf={"end"}>
+					<Button
+						isDisabled={isNextButtonDisabled}
+						isLoading={isNextButtonLoading}
+						size="sm"
+						onClick={async () =>
+							// isLastStep ? router.push("/") : nextStep()
+							{
+								switch (activeStep) {
+									case 0:
+										await generateDoc();
+										break;
+
+									case 1:
+										await uploadDoc();
+										break;
+									case isLastStep:
+										router.push("/");
+										break;
+									default:
+										break;
+								}
 							}
-							label={label}>
-							<Stack
-								w="full"
-								h="full"
-								align="center"
-								justify="center">
-								{component}
-							</Stack>
-						</Step>
-					))}
-				</Steps>
-			</Stack>
-			<HStack alignSelf={"end"}>
-				{!isFirstStep && (
-					<Button onClick={prevStep} variant={"ghost"} size="sm">
-						Previous
+						}>
+						{activeStep === steps.length - 1 ? "Finish" : "Next"}
 					</Button>
-				)}
-				<Button
-					size="sm"
-					onClick={() =>
-						isLastStep ? router.push("/") : nextStep()
-					}>
-					{activeStep === steps.length - 1 ? "Finish" : "Next"}
-				</Button>
-			</HStack>
-		</Stack>
+				</HStack>
+			</Stack>
+		</OperaionContext.Provider>
 	);
 }
 
 function GenerateDocument() {
-	const [info, setInfo] = useState({
-		documentName: "",
-		date: "",
-		writer: "",
-	});
+	const datePickerRef = useRef();
+
+	const {
+		document_name,
+		writer,
+		date,
+		stateSetter,
+		setIsNextButtonDisabled,
+	} = useOperation();
+
+	useEffect(() => {
+		if ([document_name, writer, date].filter(e => !e).length > 0)
+			setIsNextButtonDisabled(true);
+		else setIsNextButtonDisabled(false);
+	}, [document_name, writer, date]);
+
 	return (
 		<Stack spacing={6} my={6} maxW={80}>
 			<Stack w="full" spacing={1}>
@@ -114,9 +243,12 @@ function GenerateDocument() {
 				</HStack>
 				<Input
 					variant={"filled"}
-					value={info.documentName}
+					value={document_name}
 					onChange={e =>
-						setInfo({ ...info, documentName: e.target.value })
+						stateSetter(
+							"generateDocument.document_name",
+							e.target.value
+						)
 					}
 				/>
 			</Stack>
@@ -129,11 +261,14 @@ function GenerateDocument() {
 					w="full"
 					display={"flex"}
 					alignContent="center">
+					{/* <InputGroup size="md"> */}
 					<Input
 						variant={"filled"}
-						value={info.date}
+						value={date}
+						ref={datePickerRef}
+						type="date"
 						onChange={e =>
-							setInfo({ ...info, date: e.target.value })
+							stateSetter("generateDocument.date", e.target.value)
 						}
 					/>
 				</Box>
@@ -144,8 +279,10 @@ function GenerateDocument() {
 				</HStack>
 				<Input
 					variant={"filled"}
-					value={info.writer}
-					onChange={e => setInfo({ ...info, writer: e.target.value })}
+					value={writer}
+					onChange={e =>
+						stateSetter("generateDocument.writer", e.target.value)
+					}
 				/>
 			</Stack>
 		</Stack>
@@ -153,12 +290,17 @@ function GenerateDocument() {
 }
 
 function Upload() {
+	const { stateSetter, file, setIsNextButtonDisabled } = useOperation();
+
 	const buttonSize = useBreakpointValue({
 		xs: "sm",
 		md: "lg",
 	});
-	const [file, setFile] = useState();
-	const [verifyCode, setVerifyCode] = useState("");
+
+	useEffect(() => {
+		if (file === null) setIsNextButtonDisabled(true);
+		else setIsNextButtonDisabled(false);
+	}, [file]);
 
 	return (
 		<Stack w="full" h="full" spacing={2} justify="center" align={"center"}>
@@ -166,7 +308,7 @@ function Upload() {
 				Please, Insert Verification code inside the document, then
 				upload it below.
 			</Text>
-			<Stack>
+			<HStack>
 				<Tooltip
 					hasArrow
 					placement="top"
@@ -180,8 +322,16 @@ function Upload() {
 						<Input
 							w="full"
 							type={"file"}
+							accept=".pdf"
 							left={0}
-							onChange={e => setFile(e.target.files[0])}
+							// value={file}
+							onChange={e => {
+								let __file__ = e.target.files[0];
+								console.log(__file__);
+								if (typeof __file__ !== "undefined") {
+									stateSetter("upload.file", __file__);
+								}
+							}}
 							top={0}
 							cursor={"pointer"}
 							position={"absolute"}
@@ -194,7 +344,7 @@ function Upload() {
 				<HStack justify={"end"} align="end" w="full">
 					{file && <FileInfo file={file} />}
 				</HStack>
-			</Stack>
+			</HStack>
 		</Stack>
 	);
 }
