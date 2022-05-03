@@ -47,6 +47,9 @@ const ToolsContext = createContext();
 
 function Tools() {
 	const [state, setState] = useState({
+		/**
+		 * TODO: implement download document
+		 */
 		downloadDocument: {
 			publicCode: "",
 		},
@@ -59,7 +62,7 @@ function Tools() {
 		},
 	});
 
-	function stateSetter(q) {
+	function stateSetter(q, value) {
 		let query = q.split(".").map(e => e.trim());
 
 		return value => {
@@ -181,7 +184,8 @@ function DownloadDocumentComponent() {
 					<Input
 						value={publicCode}
 						onChange={e =>
-							stateSetter("downloadDocument.publicCode")(
+							stateSetter(
+								"downloadDocument.publicCode",
 								e.target.value
 							)
 						}
@@ -252,7 +256,8 @@ function VerifyDocumentComponent() {
 					placeholder="Code"
 					value={verifyCode}
 					onChange={e => {
-						stateSetter("verifyDocument.verifyCode")(
+						stateSetter(
+							"verifyDocument.verifyCode",
 							e.target.value
 						);
 						// console.log(verifyCode);
@@ -280,7 +285,8 @@ function VerifyDocumentComponent() {
 								onChange={async e => {
 									let __file__ = e.target.files[0];
 									if (typeof __file__ !== "undefined") {
-										stateSetter("verifyDocument.file")(
+										stateSetter(
+											"verifyDocument.file",
 											__file__
 										);
 										setFileContent(await __file__?.text());
@@ -360,7 +366,8 @@ function SearchDocumentComponent() {
 					<Input
 						value={publicCode}
 						onChange={e =>
-							stateSetter("searchDocument.publicCode")(
+							stateSetter(
+								"searchDocument.publicCode",
 								e.target.value
 							)
 						}

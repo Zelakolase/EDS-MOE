@@ -13,6 +13,7 @@ export function request(method, route) {
 		// console.log(body, headers);
 		return await axios[method](`${API_URL}.${route}`, body, {
 			headers: { ...DefaultHeaders, ...headers },
+			withCredentials: true,
 		});
 	};
 }
