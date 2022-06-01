@@ -71,7 +71,8 @@ public abstract class Server {
 						Socket S = SS.accept();
 						S.setKeepAlive(false);
 						S.setTcpNoDelay(true);
-						S.setSoTimeout(150);
+						S.setReceiveBufferSize(64000);
+						S.setSendBufferSize(64000);
 						Engine e = new Engine(S, S.getRemoteSocketAddress(), req_num);
 						e.start();
 						CurrentConcurrentRequests++;
@@ -121,8 +122,8 @@ public abstract class Server {
 		public void run() {
 			try {
 				String IDENTIFIER = "["+SA.toString()+"|ID:"+req_num+"],";
-				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),8192);
-				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),8192);
+				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),16384);
+				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
 				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
 				IO.write("./stats/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
@@ -134,12 +135,13 @@ public abstract class Server {
 				 */
 				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
 				IO.write("./stats/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				F = System.nanoTime();
 				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
 						GZip, AddedResponseHeaders);
 				IO.write("./stats/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				S.close();
 			} catch (Exception e) {
-				log.e(e, Engine.class.getName(), "run");
+
 			} finally {
 				CurrentConcurrentRequests--;
 			}

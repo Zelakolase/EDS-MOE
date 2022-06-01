@@ -1,9 +1,6 @@
 package lib;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -17,8 +14,11 @@ public class IO {
 	 */
 	public static byte[] read(String filename) {
 		try {
-			BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(new File(filename)),8192);
-			return inputStream.readAllBytes();
+			RandomAccessFile f = new RandomAccessFile(filename, "r");
+			byte[] b = new byte[(int)f.length()];
+			f.readFully(b);
+			f.close();
+			return b;
 		} catch (Exception e) {
 			log.e(e, IO.class.getName(), "read");
 			return null;

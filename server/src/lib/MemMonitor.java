@@ -7,8 +7,8 @@ public class MemMonitor extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			double usage = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000;
-			if (usage >= 512.0) {
+			double usage = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0;
+			if (usage >= 1024.0) {
 				System.gc();
 			}
 			try {

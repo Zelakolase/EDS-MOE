@@ -11,24 +11,26 @@ import lib.IO;
 import lib.JSON;
 import lib.RandomGenerator;
 import lib.SparkDB;
-
 public class API {
 	/**
 	 * API Processing class
 	 */
-	static String ENCRYPTION_KEY = "";
-	static Map<String, String> SESSION_IDS; // id, full name
-	static SparkDB users = new SparkDB();
-	static SparkDB docs = new SparkDB();
+	String ENCRYPTION_KEY = "";
+	Map<String, String> SESSION_IDS; // id, full name
+	SparkDB users = new SparkDB();
+	SparkDB docs = new SparkDB();
+	String mime = "application/json";
+	SparkDB MIME = new SparkDB();
 
-	public static HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) {
+
+	public HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) throws Exception {
 		String code = HTTPCode.OK;
 		String verify_code = "", session_id = "";
 		String extension = "";
 		byte[] BODY = null; // HTTPS Body
-
 		HashMap<String, Object> res = new HashMap<>();
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
+		MIME = (SparkDB) Elshanta_temp.get("mime");
 		if (Elshanta_temp.containsKey("body"))
 			BODY = (byte[]) Elshanta_temp.get("body");
 		if (Elshanta_temp.containsKey("session_ids"))
@@ -91,6 +93,7 @@ public class API {
 			res.put("docs", docs);
 		if (Elshanta_temp.containsKey("users_db"))
 			res.put("users", users);
+		res.put("mime", mime);
 		return res;
 	}
 
@@ -98,8 +101,7 @@ public class API {
 	 * Log out req : {"session_id":"a","pass":"b"} res : {"status":"c"} Where 'c' is
 	 * either failed or success
 	 */
-	static String logout(byte[] BODY) {
-		try {
+	String logout(byte[] BODY) throws Exception{
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (SESSION_IDS.containsKey(in.get("session_id"))) {
 				String password = users.get("full_name", SESSION_IDS.get(in.get("session_id")), "password");
@@ -116,33 +118,25 @@ public class API {
 					put("status", "failed");
 				}
 			});
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
 	 * This function tells the name of the school req : GET Request res :
 	 * {"name":"x"}
 	 */
-	static String name() {
-		try {
+	String name() throws Exception{
 			return JSON.HMQ(new HashMap<String, String>() {
 				{
 					put("name", AES.decrypt(new String(IO.read("./conf/info.txt")), ENCRYPTION_KEY));
 				}
 			});
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
 	 * About data to /about req : GET Request res :
 	 * {"document_num":"a","query_num":"b"}
 	 */
-	static String about() {
-		try {
+	String about() throws Exception{
 			HashMap<String, String> data = new HashMap<>();
 			SparkDB db = new SparkDB();
 			db.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
@@ -150,18 +144,14 @@ public class API {
 			data.put("query_num", new String(IO.read("./conf/queries.txt")));
 
 			return JSON.HMQ(data);
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
 	 * Login functionality req : {"user":"a","pass":"b"} res0 :
 	 * {"status":"failed","msg":"c"} res1 : {"session_id":"a","first_name":"b"}
 	 */
-	static String login(byte[] BODY) {
-		try {
-			String res = "";
+	String login(byte[] BODY) throws Exception {
+			String res = "error";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (users.Mapper.get("user").contains(in.get("user"))
 					&& users.get("user", in.get("user"), "password").equals(in.get("pass"))) {
@@ -182,9 +172,6 @@ public class API {
 				});
 			}
 			return res;
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
@@ -192,9 +179,8 @@ public class API {
 	 * {"status":"failed","msg":"b"} res1 :
 	 * {"document_name":"c","verifier":"d","writer":"e","date_of_publication":"f"}
 	 */
-	static String sfad(byte[] BODY) {
-		try {
-			String res = "";
+	String sfad(byte[] BODY) throws Exception {
+			String res = "error";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
 				res = JSON.HMQ(new HashMap<String, String>() {
@@ -214,21 +200,19 @@ public class API {
 				});
 			}
 			return res;
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
 	 * Download a document req : {"public_code":"a"} res0 :
 	 * {"status":"failed","msg":"b"} res1 : File byte[]
 	 */
-	static byte[] dac(byte[] BODY) {
-		try {
-			byte[] res = null;
+	byte[] dac(byte[] BODY) throws Exception {
+			byte[] res = {};
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
 				res = AES.decrypt(IO.read(docs.get("pub_code", in.get("public_code"), "path")), ENCRYPTION_KEY);
+				String[] pathSplit = docs.get("pub_code", in.get("public_code"), "path").split("\\.");
+				mime = MIME.get("extension", pathSplit[pathSplit.length - 1], "mime");
 			} else {
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{
@@ -238,9 +222,6 @@ public class API {
 				}).getBytes();
 			}
 			return res;
-		} catch (Exception e) {
-			return "error".getBytes();
-		}
 	}
 
 	/**
@@ -248,8 +229,7 @@ public class API {
 	 * {"doc_name":"a","date":"b","writer":"c","session_id":"d"} res0 :
 	 * {"verify_code":"e"} res1 : {"status":"failed","msg":"f"}
 	 */
-	static String generate(byte[] BODY) {
-		try {
+	String generate(byte[] BODY) throws Exception {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (SESSION_IDS.containsKey(in.get("session_id"))) {
@@ -264,14 +244,15 @@ public class API {
 							+ RandomGenerator.getSaltString(3, 2);
 				} while (docs.Mapper.get("pub_code").contains(pub_code));
 				String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Calendar.getInstance().getTime());
-				docs.add(new String[] { pub_code, // public_code
+				docs.add(new String[] {
+						pub_code, // public_code
 						ver_code, // verify code
-						"", // path
+						"0", // path
 						in.get("doc_name"), // document name
 						SESSION_IDS.get(in.get("session_id")), // verifier
 						in.get("writer"), // writer
 						timeStamp, // date
-						"" // sha
+						"0" // sha
 				});
 				IO.write("./conf/docs.db", AES.encrypt(docs.print(), ENCRYPTION_KEY), false);
 				new JSON();
@@ -292,18 +273,14 @@ public class API {
 				});
 			}
 			return res;
-		} catch (Exception e) {
-			return "error";
-		}
 	}
 
 	/**
 	 * Verify a document using file upload and verify code in headers req : file as
 	 * binary in body and verify code in header res : {"msg":"a"}
 	 */
-	static String vad(byte[] BODY, String verify_code) {
-		String res = "";
-		try {
+	String vad(byte[] BODY, String verify_code) throws Exception {
+		String res = "error";
 			// BODY is post req body compared to path in db docs
 			// compare original sha to BODY sha
 			if(docs.Mapper.get("verify_code").contains(verify_code)) {
@@ -323,9 +300,6 @@ public class API {
 					}
 				});
 			}
-		} catch (Exception e) {
-			res = "error";
-		}
 		return res;
 	}
 
@@ -333,10 +307,9 @@ public class API {
 	 * Submit a document using verify code and session id and file res0 :
 	 * {"public_code":"a","verify_code":"b"} res1 : {"status":"failed","msg":"c"}
 	 */
-	static String doc(byte[] BODY, String session_id, String verify_code, String extension) {
-		String res = "";
-		try {
-			if (SESSION_IDS.containsValue(session_id)) {
+	String doc(byte[] BODY, String session_id, String verify_code, String extension) throws Exception {
+		String res = "error";
+			if (SESSION_IDS.containsKey(session_id)) {
 				// BODY is file
 				String path = "./docs/" + RandomGenerator.getSaltString(20, 0) + "." + extension; // ./docs/aakF5igjdfigjdo.pdf
 				new File(path).createNewFile();
@@ -360,9 +333,6 @@ public class API {
 					}
 				});
 			}
-		} catch (Exception e) {
-			res = "error";
-		}
 		return res;
 	}
 }

@@ -42,7 +42,7 @@ public class Network {
 			dOS.write((ResponseCode + "\r\n").getBytes());
 			dOS.write("Server: SWS 1.0\r\n".getBytes());
 			dOS.write((AddedResponseHeaders).getBytes());
-			dOS.write(("Connection: Keep-Alive\r\n").getBytes());
+			dOS.write(("Connection: close\r\n").getBytes());
 			if (GZip)
 				dOS.write("Content-Encoding: gzip\r\n".getBytes());
 			if (ContentType.equals("text/html")) {

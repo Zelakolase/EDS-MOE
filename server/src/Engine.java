@@ -62,7 +62,7 @@ public class Engine extends Server {
 			}
 			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		} catch (Exception e) {
-			log.e(e, "Engine", "run()");
+
 		}
 	}
 
@@ -83,12 +83,13 @@ public class Engine extends Server {
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
+				Elshanta.put("mime", MIME);
 				if (ser.equals("login") || ser.equals("logout")) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
 				if (ser.equals("generate") || ser.equals("doc"))
-					Elshanta.put("session_ids", users);
+					Elshanta.put("session_ids", SESSION_IDS);
 				if (Stream.of("about", "sfad", "dac", "generate", "vad", "doc").anyMatch(ser::equals))
 					Elshanta.put("docs_db", docs);
 				if (headers.containsKey("verify_code"))
@@ -97,7 +98,20 @@ public class Engine extends Server {
 					Elshanta.put("session_id", headers.get("session_id"));
 				if (headers.containsKey("extension"))
 					Elshanta.put("extension", headers.get("extension"));
-				HashMap<String, Object> res = API.redirector(Elshanta); // Elshanta reply
+				HashMap<String, Object> res;
+				try {
+				res = new API().redirector(Elshanta); // Elshanta reply
+				}catch(Exception e) {
+					res = new HashMap<>() {{
+						put("body","Error!");
+						put("mime","text/html");
+					}};
+					log.e("API Error!\n"+
+				"API endpoint: " +ser
+				+"\nAPI request body: "+(String) Elshanta.get("body")
+							);
+					e.printStackTrace();
+				}
 				if (res.containsKey("session_ids"))
 					SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if (res.containsKey("users"))
@@ -106,7 +120,7 @@ public class Engine extends Server {
 					docs = (SparkDB) res.get("docs");
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
-				response.put("mime", "application/json".getBytes());
+				response.put("mime", ((String) res.get("mime")).getBytes());
 			} else {
 				/**
 				 * Static file request detected
@@ -123,7 +137,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			log.e(e, "Engine", "main");
+			e.printStackTrace();
 			return new HashMap<>() {
 				{
 					put("content", "Server error".getBytes());
