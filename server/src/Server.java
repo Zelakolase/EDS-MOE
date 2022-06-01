@@ -121,12 +121,12 @@ public abstract class Server {
 		@Override
 		public void run() {
 			try {
-				String IDENTIFIER = "["+SA.toString()+"|ID:"+req_num+"],";
+				String IDENTIFIER = "["+SA.toString()+" | ID:"+req_num+"],";
 				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),16384);
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
 				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
-				IO.write("./stats/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				IO.write("./other/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				F = System.nanoTime();
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
@@ -134,14 +134,14 @@ public abstract class Server {
 				 * Dynamic Mode
 				 */
 				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
-				IO.write("./stats/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				IO.write("./other/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				F = System.nanoTime();
 				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
 						GZip, AddedResponseHeaders);
-				IO.write("./stats/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
+				IO.write("./other/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				S.close();
 			} catch (Exception e) {
-
+				
 			} finally {
 				CurrentConcurrentRequests--;
 			}

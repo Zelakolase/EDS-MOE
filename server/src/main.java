@@ -32,9 +32,10 @@ public class main {
 		boolean DocsDB = new File("./conf/docs.db").exists();
 		boolean InfoDB = new File("./conf/info.txt").exists();
 		boolean Queries = new File("./conf/queries.txt").exists();
-		if(! new File("./stats/").exists()) {
-			new File("./stats/").mkdir();
-			new File("./stats/performance.csv").createNewFile();
+		if(! new File("./other/").exists()) {
+			new File("./other/").mkdir();
+			new File("./other/performance.csv").createNewFile();
+			new File("./other/error.log").createNewFile();
 		}
 		if (ServerKey && UserDB && DocsDB && InfoDB && Queries) {
 			// Good to go

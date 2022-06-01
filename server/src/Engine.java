@@ -102,15 +102,7 @@ public class Engine extends Server {
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
-					res = new HashMap<>() {{
-						put("body","Error!");
-						put("mime","text/html");
-					}};
-					log.e("API Error!\n"+
-				"API endpoint: " +ser
-				+"\nAPI request body: "+(String) Elshanta.get("body")
-							);
-					e.printStackTrace();
+					res = lib.ErrorWriter.wAPI(e, ENCRYPTION_KEY, ser);
 				}
 				if (res.containsKey("session_ids"))
 					SESSION_IDS = (Map<String, String>) res.get("session_ids");
@@ -125,7 +117,9 @@ public class Engine extends Server {
 				/**
 				 * Static file request detected
 				 */
-				String path = headers.get("path");
+				String path = "";
+				try {
+				path = headers.get("path");
 				if (path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")
 						|| path.equals("/operation"))
 					path += ".html";
@@ -134,6 +128,9 @@ public class Engine extends Server {
 				response.put("code", static_res.get("code"));
 				String[] pathSplit = path.split("\\.");
 				response.put("mime", MIME.get("extension", pathSplit[pathSplit.length - 1], "mime").getBytes());
+				}catch(Exception e) {
+					response = lib.ErrorWriter.wnAPI(e, ENCRYPTION_KEY, path);
+				}
 			}
 			return response;
 		} catch (Exception e) {
