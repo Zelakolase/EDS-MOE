@@ -10,7 +10,8 @@ public class ErrorWriter {
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String ErrID = lib.RandomGenerator.getSaltString(5, 0);
-		IO.write("./other/error.log",AES.encrypt(
+		IO.write("./other/error.log",
+				AES.encrypt(AES.decrypt(IO.read("./other/error.log"), ENCRYPTION_KEY)+
 				"Error ID: "+ErrID+" | "
 				+"Path: "+Path+" | "
 				+"Error details: "+sw.toString()
@@ -27,7 +28,7 @@ public class ErrorWriter {
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);
 		String ErrID = lib.RandomGenerator.getSaltString(5, 0);
-		IO.write("./other/error.log",AES.encrypt(
+		IO.write("./other/error.log",AES.encrypt(AES.decrypt(IO.read("./other/error.log"), ENCRYPTION_KEY)+
 				"Error ID: "+ErrID+" | "
 				+"API point: "+APIPoint+" | "
 				+"Error details: "+sw.toString()
