@@ -14,7 +14,9 @@ export default function Home() {
 					Electronic Document System
 				</Heading>
 			</Stack>
-			<Button maxW={100}>Template</Button>
+			<a href="/templete.docx">
+				<Button maxW={100}>Template</Button>
+			</a>
 		</Stack>
 	);
 }
