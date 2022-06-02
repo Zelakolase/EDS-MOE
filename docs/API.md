@@ -122,7 +122,12 @@ Response body :
 Request Body :
 
 ```jsonc
-{ "doc_name": "x", "date": "y", "writer": "z", "session_id": "a" }
+{
+	"doc_name": "x",
+	"date": "y",
+	"writer": "z",
+	"session_id": "a"
+}
 ```
 
 Response body :
