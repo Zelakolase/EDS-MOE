@@ -1,6 +1,7 @@
 import { request } from "@API";
 import { useState, useContext, createContext } from "react";
 import { useTheme } from "@Theme";
+import { useContextState } from "@Hooks";
 
 import { FileInfo, Modal } from "@Components";
 
@@ -46,10 +47,10 @@ import { useRouter } from "next/router";
 const ToolsContext = createContext();
 
 function Tools() {
-	const [state, setState] = useState({
-		/**
-		 * TODO: implement download document
-		 */
+	/**
+	 * TODO: implement download document
+	 */
+	const [state, stateSetter] = useContextState({
 		downloadDocument: {
 			publicCode: "",
 		},
@@ -61,22 +62,6 @@ function Tools() {
 			publicCode: "",
 		},
 	});
-
-	function stateSetter(q, value) {
-		let query = q.split(".").map(e => e.trim());
-
-		return value => {
-			setState({
-				...state,
-				[query[0]]: {
-					...state[query[0]],
-					[query[1]]: value,
-				},
-			});
-
-			// console.log(state);
-		};
-	}
 
 	const tools = [
 		{

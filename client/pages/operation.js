@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 
 import { useAuth } from "@Auth";
 import { request } from "@API";
+import { useContextState } from "@Hooks";
 
 import { useWindowSize } from "rooks";
 import { MINI_WIDTH_SCREEN } from "@Theme";
@@ -49,7 +50,7 @@ export default function Operation() {
 	const [generatedDocResult, setGenerateDocResult] = useState(null);
 	const [uploadDocResult, setuploadDocResult] = useState(null);
 
-	const [state, setState] = useState({
+	const [state, stateSetter] = useContextState({
 		generateDocument: {
 			document_name: "",
 			date: "",
@@ -59,17 +60,6 @@ export default function Operation() {
 			file: null,
 		},
 	});
-
-	function stateSetter(q, value) {
-		let query = q.split(".").map(e => e.trim());
-		setState(state => ({
-			...state,
-			[query[0]]: {
-				...state[query[0]],
-				[query[1]]: value,
-			},
-		}));
-	}
 
 	let steps = [
 		{
