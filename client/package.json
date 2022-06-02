@@ -23,6 +23,7 @@
 		"rooks": "^5.10.0"
 	},
 	"devDependencies": {
+		"babel-plugin-transform-remove-console": "^6.9.4",
 		"eslint": "8.9.0",
 		"eslint-config-next": "12.0.10",
 		"prettier": "2.6.1"

@@ -20,7 +20,9 @@
 			"@Theme": ["theme.js"],
 			"@API": ["api"],
 			"@API/": ["api/*"],
-			"@Auth": ["auth"]
+			"@Auth": ["auth"],
+			"@Hooks/": ["hooks/*"],
+			"@Hooks": ["hooks"]
 		}
 	}
 }
