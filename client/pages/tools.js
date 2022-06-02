@@ -382,7 +382,7 @@ function SearchDocumentComponent() {
 						"verifier",
 						"writer",
 						"date_of_publication",
-					].filter(e => !result.has).length > 0 && (
+					].filter(e => !result.hasOwnProperty(e)).length > 0 && (
 						<Alert status="error">
 							<AlertIcon />
 							<div>

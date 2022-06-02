@@ -23,6 +23,8 @@ import {
 	Divider,
 	useBreakpointValue,
 	useToast,
+	Alert,
+	AlertIcon,
 } from "@chakra-ui/react";
 import { Step, Steps, useSteps } from "chakra-ui-steps";
 
@@ -53,7 +55,6 @@ export default function Operation() {
 	const [state, stateSetter] = useContextState({
 		generateDocument: {
 			document_name: "",
-			date: "",
 			writer: "",
 		},
 		upload: {
@@ -83,12 +84,12 @@ export default function Operation() {
 		try {
 			// Destructing
 			const { generateDocument } = state;
-			const { documentName: doc_name, date, writer } = generateDocument;
+			const { document_name: doc_name, writer } = generateDocument;
 
 			const response = await request(
 				"post",
 				"generate"
-			)({ doc_name, date, writer, session_id: sessionID });
+			)({ writer, session_id: sessionID, doc_name });
 			if (response?.data?.status === "failed") throw response?.data?.msg;
 
 			setGenerateDocResult(response?.data);
@@ -105,18 +106,36 @@ export default function Operation() {
 		}
 		setIsNextButtonLoading(false);
 	}
-	async function uploadDoc() {
+	const uploadDoc = async () => {
 		setIsNextButtonLoading(true);
+
 		try {
-			const response = await request(
-				"post",
-				"genrate"
-			)(...{ session_id: sessionID });
+			if (state.upload.file === null)
+				throw "You should use a file to upload it.";
+			if (typeof generatedDocResult.verify_code === "undefined")
+				throw "Verify code not found.";
+
+			const { file } = state.upload;
+			let arrBuf = await file.arrayBuffer();
+
+			let __file__ = {
+				buffer: new Uint8Array(arrBuf),
+				extension: file.name.split(".").at(-1),
+			};
+
+			const response = await request("post", "doc")(__file__.buffer, {
+				extension: __file__.extension,
+				verfiy_code: generatedDocResult?.verify_code,
+				session_id: sessionID,
+				"Content-type": "application/text",
+			});
+
 			if (response?.data?.status === "failed") throw response?.data?.msg;
 
-			setGeneratedDocResilt(response?.data);
+			setuploadDocResult(response?.data);
 			nextStep();
 		} catch (err) {
+			console.error(err);
 			toast({
 				title: "Generate failed.",
 				description: err.toString(),
@@ -127,7 +146,7 @@ export default function Operation() {
 			});
 		}
 		setIsNextButtonLoading(false);
-	}
+	};
 	useEffect(() => {
 		if (!isSignedIn) router.replace("/auth/login");
 	});
@@ -209,21 +228,14 @@ export default function Operation() {
 }
 
 function GenerateDocument() {
-	const datePickerRef = useRef();
-
-	const {
-		document_name,
-		writer,
-		date,
-		stateSetter,
-		setIsNextButtonDisabled,
-	} = useOperation();
+	const { document_name, writer, stateSetter, setIsNextButtonDisabled } =
+		useOperation();
 
 	useEffect(() => {
-		if ([document_name, writer, date].filter(e => !e).length > 0)
+		if ([document_name, writer].filter(e => !e).length > 0)
 			setIsNextButtonDisabled(true);
 		else setIsNextButtonDisabled(false);
-	}, [document_name, writer, date]);
+	}, [document_name, writer]);
 
 	return (
 		<Stack spacing={6} my={6} maxW={80}>
@@ -242,27 +254,7 @@ function GenerateDocument() {
 					}
 				/>
 			</Stack>
-			<Stack w="full" spacing={1}>
-				<HStack align="end">
-					<Heading fontSize={13}>Date of publication</Heading>
-				</HStack>
-				<Box
-					position={"relative"}
-					w="full"
-					display={"flex"}
-					alignContent="center">
-					{/* <InputGroup size="md"> */}
-					<Input
-						variant={"filled"}
-						value={date}
-						ref={datePickerRef}
-						type="date"
-						onChange={e =>
-							stateSetter("generateDocument.date", e.target.value)
-						}
-					/>
-				</Box>
-			</Stack>
+
 			<Stack>
 				<HStack align="end">
 					<Heading fontSize={13}>Writer</Heading>
@@ -320,6 +312,7 @@ function Upload() {
 								console.log(__file__);
 								if (typeof __file__ !== "undefined") {
 									stateSetter("upload.file", __file__);
+									// stateSetter("upload.file", __file__);
 								}
 							}}
 							top={0}
@@ -340,19 +333,43 @@ function Upload() {
 }
 
 function Done() {
+	const router = useRouter();
+	const { uploadDocResult } = useOperation();
 	return (
 		<Stack align={"center"}>
+			{["verify_code", "public_code"].filter(
+				e => !uploadDocResult.hasOwnProperty(e) && e.trim().length > 0
+			).length > 0 && (
+				<Alert status="error">
+					<AlertIcon />
+					<div>
+						Some data isn't found, Please{" "}
+						<span
+							style={{
+								textDecoration: "underline",
+								cursor: "pointer",
+							}}
+							onClick={() => router.push("/support")}>
+							contact us
+						</span>{" "}
+						to solve this problem.
+					</div>
+				</Alert>
+			)}
 			<Text fontSize={18}>The document is uploaded successfully !</Text>
 			<Divider />
 			<Stack>
-				<Stack spacing={0}>
-					<Heading fontSize={12}>Public code</Heading>
-					<Text>[Pubic code placeholder]</Text>
-				</Stack>
-				<Stack spacing={0}>
-					<Heading fontSize={12}>Verification code</Heading>
-					<Text>[Verification code placeholder]</Text>
-				</Stack>
+				{["public_code", "verify_code"].map(e => (
+					<Stack spacing={0.5}>
+						<Heading
+							opacity={0.5}
+							fontSize={10}
+							textTransform="capitalize">
+							{e.replace(/_/g, " ")}
+						</Heading>
+						<Text>{uploadDocResult[e] || "Error: Not found"}</Text>
+					</Stack>
+				))}
 			</Stack>
 		</Stack>
 	);
