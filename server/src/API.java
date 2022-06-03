@@ -1,6 +1,7 @@
 import java.io.File;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -285,7 +286,9 @@ public class API {
 			// compare original sha to BODY sha
 			if(docs.Mapper.get("verify_code").contains(verify_code)) {
 			boolean compare = docs.get("verify_code", verify_code, "sha")
-					.equals(new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
+					.equals(
+							Arrays.toString(MessageDigest.getInstance("SHA-256").digest(BODY))
+							);
 			String msg = compare ? "The file is identical with the verify code"
 					: "The file isn't identical with the verify code";
 			res = JSON.HMQ(new HashMap<String, String>() {
@@ -316,7 +319,8 @@ public class API {
 				IO.write(path, AES.encrypt(BODY, ENCRYPTION_KEY), false);
 				docs.change("verify_code", verify_code, "path", path);
 				docs.change("verify_code", verify_code, "sha",
-						new String(MessageDigest.getInstance("SHA-256").digest(BODY)));
+						Arrays.toString(MessageDigest.getInstance("SHA-256").digest(BODY))
+						);
 				IO.write("./conf/docs.db", AES.encrypt(docs.print(), ENCRYPTION_KEY), false);
 				// then construct the response
 				res = JSON.HMQ(new HashMap<String, String>() {

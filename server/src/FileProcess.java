@@ -9,7 +9,7 @@ public class FileProcess {
 	/**
 	 * Serving Static file process
 	 */
-	public static HashMap<String, byte[]> redirector(String in, ArrayList<String> files) {
+	public static HashMap<String, byte[]> redirector(String in, ArrayList<String> files) throws Exception{
 		HashMap<String, byte[]> res = new HashMap<>();
 		if (files.contains(in)) {
 			if (new File("./www/" + in).exists()) {

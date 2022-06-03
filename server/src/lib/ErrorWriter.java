@@ -16,6 +16,7 @@ public class ErrorWriter {
 				+"Path: "+Path+" | "
 				+"Error details: "+sw.toString()
 				+ "\n\n\n",ENCRYPTION_KEY) , true);
+		e.printStackTrace();
 		return new HashMap<>() {{
 			put("content",("Error! If you see this error, please contact the server administrator with the error ID.<br>"
 					+"Error ID: "+ErrID).getBytes());
@@ -33,6 +34,7 @@ public class ErrorWriter {
 				+"API point: "+APIPoint+" | "
 				+"Error details: "+sw.toString()
 				+ "\n\n\n",ENCRYPTION_KEY) , true);
+		e.printStackTrace();
 		return new HashMap<>() {{
 			put("body",("Error! If you see this error, please contact the server administrator with the error ID.<br>"
 					+"Error ID: "+ErrID).getBytes());

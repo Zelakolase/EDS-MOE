@@ -92,7 +92,9 @@ public class Engine extends Server {
 					Elshanta.put("session_ids", SESSION_IDS);
 				if (Stream.of("about", "sfad", "dac", "generate", "vad", "doc").anyMatch(ser::equals))
 					Elshanta.put("docs_db", docs);
-				if (headers.containsKey("verify_code"))
+				if (headers.containsKey("verfiy_code"))
+					Elshanta.put("verify_code", headers.get("verfiy_code"));
+				if(headers.containsKey("verify_code")) // Too lazy to inform the frontend
 					Elshanta.put("verify_code", headers.get("verify_code"));
 				if (headers.containsKey("session_id"))
 					Elshanta.put("session_id", headers.get("session_id"));

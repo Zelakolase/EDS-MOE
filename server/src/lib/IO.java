@@ -12,17 +12,12 @@ public class IO {
 	 * @param filename the name of the dest. file
 	 * @return file content in bytes
 	 */
-	public static byte[] read(String filename) {
-		try {
+	public static byte[] read(String filename) throws Exception {
 			RandomAccessFile f = new RandomAccessFile(filename, "r");
 			byte[] b = new byte[(int)f.length()];
 			f.readFully(b);
 			f.close();
 			return b;
-		} catch (Exception e) {
-			log.e(e, IO.class.getName(), "read");
-			return null;
-		}
 	}
 
 	/**
@@ -32,13 +27,8 @@ public class IO {
 	 * @param content  the content to write in String
 	 * @param append   weather to append to existing value or not
 	 */
-	public static void write(String filename, String content, boolean append) {
-
-		try {
+	public static void write(String filename, String content, boolean append) throws Exception{
 			write(filename, content.getBytes(), append);
-		} catch (Exception e) {
-			log.e(e, IO.class.getName(), "write");
-		}
 	}
 
 	/**

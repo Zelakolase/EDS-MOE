@@ -106,36 +106,26 @@ public class SparkDB {
 	/*
 	 * get an individual item
 	 */
-	public String get(String FromCol, String ColVal, String ColToFind) {
-		try {
+	public String get(String FromCol, String ColVal, String ColToFind) throws Exception{
 			return Mapper.get(ColToFind).get(Mapper.get(FromCol).indexOf(ColVal));
-		} catch (Exception e) {
-			log.e(e, SparkDB.class.getName(), "get");
-			return "ERR/ERR";
-		}
 	}
 
-	public void change(String FromCol, String ColVal, String ColToFind, String replacement) {
-		try {
-			int indextotarget = Mapper.get(FromCol).indexOf(ColVal);
-			Mapper.get(ColToFind).set(indextotarget, replacement);
-		} catch (Exception e) {
-			log.e(e, SparkDB.class.getName(), "get");
-		}
+	public void change(String FromCol, String ColVal, String ColToFind, String replacement) throws Exception{
+			int indextotarget = Mapper
+					.get(FromCol)
+					.indexOf(ColVal);
+			Mapper.get(ColToFind)
+			.set(indextotarget, replacement);
 	}
 
 	/*
 	 * Add a new item
 	 */
-	public void add(String[] in) {
-		try {
+	public void add(String[] in) throws Exception {
 			for (int i = 0; i < num_header; i++) {
 				Mapper.get(Headers.get(i)).add(in[i].replaceAll("\",", ""));
 			}
 			num_queries++;
-		} catch (Exception e) {
-			log.e(e, SparkDB.class.getName(), "add");
-		}
 	}
 
 	/*
@@ -155,15 +145,11 @@ public class SparkDB {
 	/*
 	 * Delete an item
 	 */
-	public void delete(String[] in) {
-		try {
+	public void delete(String[] in) throws Exception {
 			for (int i = 0; i < num_header; i++) {
 				Mapper.get(Headers.get(i)).remove(in[i]);
 			}
 			num_queries--;
-		} catch (Exception e) {
-			log.e(e, SparkDB.class.getName(), "delete");
-		}
 	}
 
 	/*
