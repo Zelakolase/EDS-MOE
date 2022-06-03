@@ -39,7 +39,7 @@ function generatingRandomPassword() {
 }
 
 export default function Login() {
-	const { signin, isSignedIn, username } = useAuth();
+	const { signin, isAuth, username } = useAuth();
 
 	const toast = useToast();
 	const router = useRouter();
@@ -76,7 +76,7 @@ export default function Login() {
 	}
 
 	useEffect(() => {
-		if (isSignedIn) router.replace("/operation");
+		if (isAuth) router.replace("/submit");
 	});
 
 	return (

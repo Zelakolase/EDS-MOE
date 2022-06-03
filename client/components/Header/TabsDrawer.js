@@ -37,7 +37,7 @@ export function TabsDrawer({
 	const { toggleColorMode, colorMode } = useColorMode();
 
 	const { bg, color, bgHover } = useTheme();
-	const { isSignedIn } = useAuth();
+	const { isAuth } = useAuth();
 
 	return (
 		<>
@@ -61,23 +61,26 @@ export function TabsDrawer({
 					<DrawerBody>
 						<Stack h="full" justify="space-between">
 							<Stack>
-								{tabs.map((tab, index) => (
-									<Button
-										key={index}
-										leftIcon={tab.icon}
-										variant={"ghost"}
-										w="full"
-										textTransform="capitalize"
-										onClick={() => {
-											router.push(tab.path);
-											onClose();
-										}}>
-										{tab.label}
-									</Button>
-								))}
+								{tabs.map(
+									(tab, index) =>
+										tab.visible && (
+											<Button
+												key={index}
+												leftIcon={tab.icon}
+												variant={"ghost"}
+												w="full"
+												textTransform="capitalize"
+												onClick={() => {
+													router.push(tab.path);
+													onClose();
+												}}>
+												{tab.label}
+											</Button>
+										)
+								)}
 							</Stack>
 							<HStack w="full">
-								{!isSignedIn ? (
+								{!isAuth ? (
 									<Button
 										w="full"
 										alignItems="center"

@@ -9,7 +9,7 @@ const AuthContext = createContext();
 export default function AuthProvider({ children }) {
 	const [username, setUsername] = useState(null);
 	const [sessionID, setSessionID] = useState(null);
-	const [isSignedIn, setIsSignedIn] = useState(false);
+	const [isAuth, setIsAuth] = useState(false);
 	const toast = useToast();
 
 	useEffect(() => {
@@ -17,7 +17,7 @@ export default function AuthProvider({ children }) {
 			typeof cookie.get("username") !== "undefined" &&
 			typeof cookie.get("session_id") !== "undefined"
 		) {
-			setIsSignedIn(true);
+			setIsAuth(true);
 
 			// TODO: Fix a bug here
 			/**
@@ -53,11 +53,11 @@ export default function AuthProvider({ children }) {
 
 		setUsername(null);
 		setSessionID(null);
-		setIsSignedIn(false);
+		setIsAuth(false);
 	}
 
 	const value = {
-		isSignedIn,
+		isAuth,
 		signin,
 		signout,
 		username,

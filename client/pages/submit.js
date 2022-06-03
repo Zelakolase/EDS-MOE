@@ -36,7 +36,7 @@ const OperaionContext = createContext();
 const useOperation = () => useContext(OperaionContext);
 
 export default function Operation() {
-	const { isSignedIn, username, sessionID } = useAuth();
+	const { isAuth, username, sessionID } = useAuth();
 
 	const router = useRouter();
 	const toast = useToast();
@@ -148,7 +148,7 @@ export default function Operation() {
 		setIsNextButtonLoading(false);
 	};
 	useEffect(() => {
-		if (!isSignedIn) router.replace("/auth/login");
+		if (!isAuth) router.replace("/auth/login");
 	});
 
 	return (

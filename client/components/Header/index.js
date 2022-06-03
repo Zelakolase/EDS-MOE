@@ -26,27 +26,47 @@ import { MdSupportAgent } from "react-icons/md";
 import { BiHomeAlt, BiInfoCircle, BiMoon } from "react-icons/bi";
 import { BsSun } from "react-icons/bs";
 import { AiOutlineTool } from "react-icons/ai";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import { useState } from "react";
 
 export function Header() {
+	const { isAuth } = useAuth();
 	const [bannerName, setBannerName] = useState("Electronic Document System");
 
 	const router = useRouter();
 	const { innerWidth } = useWindowSize();
 	const { bg, color, bgHover } = useTheme();
 
-	const tabs = [
-		{ label: "home", path: "/", icon: <BiHomeAlt size="1.4em" /> },
+	let tabs = [
+		{
+			label: "home",
+			path: "/",
+			icon: <BiHomeAlt size="1.4em" />,
+			visible: true,
+		},
 		{
 			label: "tools",
 			path: "/tools",
 			icon: <AiOutlineTool size="1.4em" />,
+			visible: true,
 		},
-		{ label: "about", path: "/about", icon: <BiInfoCircle size="1.4em" /> },
+		{
+			label: "about",
+			path: "/about",
+			icon: <BiInfoCircle size="1.4em" />,
+			visible: true,
+		},
 		{
 			label: "support",
 			path: "/support",
 			icon: <MdSupportAgent size="1.4em" />,
+			visible: true,
+		},
+		{
+			label: "Submit a document",
+			path: "/submit",
+			icon: <HiOutlineDocumentDuplicate size="1.4em" />,
+			visible: isAuth,
 		},
 	];
 	useEffect(async () => {
@@ -82,25 +102,29 @@ export function Header() {
 }
 
 function Toolbar({ tabs }) {
-	const { isSignedIn, signout } = useAuth();
+	const { isAuth, signout } = useAuth();
 	const { toggleColorMode, colorMode } = useColorMode();
 	const router = useRouter();
 	const { bg, color, bgHover } = useTheme();
+
 	return (
 		<>
-			{tabs.map((tab, index) => (
-				<Button
-					variant="ghost"
-					key={index}
-					size="sm"
-					textTransform="capitalize"
-					leftIcon={tab.icon}
-					onClick={() => router.push(tab.path)}>
-					{tab.label}
-				</Button>
-			))}
+			{tabs.map(
+				(tab, index) =>
+					tab.visible && (
+						<Button
+							variant="ghost"
+							key={index}
+							size="sm"
+							textTransform="capitalize"
+							leftIcon={tab.icon}
+							onClick={() => router.push(tab.path)}>
+							{tab.label}
+						</Button>
+					)
+			)}
 			<HStack spacing={1}>
-				{!isSignedIn ? (
+				{!isAuth ? (
 					<Button
 						alignItems="center"
 						bgColor={bg}
