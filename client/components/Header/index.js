@@ -74,7 +74,7 @@ export function Header() {
 			const response = await request("get", "name")();
 			setBannerName(response?.data?.name);
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 		}
 	}, []);
 

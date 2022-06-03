@@ -129,6 +129,7 @@ function ToolsMenu({ tools = [], setCurrentTool, currentTool = 0 }) {
 
 function DownloadDocumentComponent() {
 	const toast = useToast();
+
 	const [loading, setLoading] = useState(false);
 
 	const { downloadDocument, stateSetter } = useContext(ToolsContext);
@@ -137,18 +138,31 @@ function DownloadDocumentComponent() {
 	async function downloadHandler() {
 		setLoading(true);
 		try {
-			const response = await request(
-				"post",
-				"dac"
-			)({
-				public_code: publicCode,
-			});
+			const link = document.createElement("a");
+			link.target = "_blank";
+			link.download = `${publicCode}.pdf`;
+
+			const response = await request("post", "dac")(
+				{
+					public_code: publicCode,
+				},
+				null,
+				{
+					responseType: "blob",
+				}
+			);
+
 			if (response?.data.status === "failed") throw response.data.msg;
+
 			if (response?.data === "error")
 				throw "Something wrong, Please contact with support to solve this problem.";
-			// console.log(data);
-			setResult(data.data);
-			onOpen();
+
+			console.log(response);
+			link.href = URL.createObjectURL(response.data);
+
+			document.body.appendChild(link);
+			link.click();
+			link.parentNode.removeChild(link);
 		} catch (err) {
 			toast({
 				title: "Search failed.",
@@ -158,6 +172,7 @@ function DownloadDocumentComponent() {
 				duration: 9000,
 				isClosable: true,
 			});
+			console.error(err);
 		}
 		setLoading(false);
 	}
@@ -210,15 +225,28 @@ function VerifyDocumentComponent() {
 		setLoading(true);
 		// console.log(file);
 		try {
-			const response = await request("post", "vad")(fileContent, {
-				"Content-Type": "application/pdf",
-				verify_code: verifyCode,
-			});
+			let arrBuf = await file.arrayBuffer();
+
+			const response = await request("post", "vad")(
+				new Uint8Array(arrBuf),
+				{
+					"Content-Type": "application/pdf",
+					verify_code: verifyCode,
+				}
+			);
 			if (response?.data.status === "failed") throw response.data.msg;
 			if (response?.data === "error")
 				throw "Something wrong, Please try again or contact with support to solve this problem.";
-			console.log(response.data);
+
 			setResult(response.data);
+			toast({
+				title: "Result.",
+				description: response.data.msg,
+				status: "info",
+				position: "top",
+				duration: 9000,
+				isClosable: true,
+			});
 		} catch (err) {
 			toast({
 				title: "Verify failed.",

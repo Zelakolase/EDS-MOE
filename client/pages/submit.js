@@ -226,8 +226,6 @@ export default function Operation() {
 										await uploadDoc();
 										break;
 									case lastStep:
-										// router.push("/");
-										console.log("open modal");
 										disclosure.onOpen();
 										break;
 									default:
@@ -296,7 +294,6 @@ function Upload() {
 		xs: "sm",
 		md: "lg",
 	});
-	console.log(generatedDocResult);
 
 	useEffect(() => {
 		if (file === null) setIsNextButtonDisabled(true);
@@ -362,7 +359,6 @@ function Upload() {
 									// value={file}
 									onChange={e => {
 										let __file__ = e.target.files[0];
-										console.log(__file__);
 										if (typeof __file__ !== "undefined") {
 											stateSetter(
 												"upload.file",
