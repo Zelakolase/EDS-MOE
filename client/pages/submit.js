@@ -7,7 +7,7 @@ import { useContextState } from "@Hooks";
 
 import { useWindowSize } from "rooks";
 import { MINI_WIDTH_SCREEN } from "@Theme";
-import { Logo, FileInfo } from "@Components";
+import { Logo, FileInfo, AlertDialog } from "@Components";
 import {
 	Stack,
 	Button,
@@ -25,24 +25,35 @@ import {
 	useToast,
 	Alert,
 	AlertIcon,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { Step, Steps, useSteps } from "chakra-ui-steps";
 
 import { AiOutlineArrowRight, AiOutlineUpload } from "react-icons/ai";
 import { RiFolderInfoLine } from "react-icons/ri";
 import { MdDateRange } from "react-icons/md";
+import { BiHomeAlt } from "react-icons/bi";
+import { HiOutlineDocumentAdd } from "react-icons/hi";
+
 const OperaionContext = createContext();
 
 const useOperation = () => useContext(OperaionContext);
 
 export default function Operation() {
 	const { isAuth, username, sessionID } = useAuth();
+	const disclosure = useDisclosure();
 
 	const router = useRouter();
 	const toast = useToast();
 
 	const { innerWidth } = useWindowSize();
-	const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
+	const {
+		nextStep,
+		prevStep,
+		setStep,
+		reset: stepsResetter,
+		activeStep,
+	} = useSteps({
 		initialStep: 0,
 	});
 
@@ -52,7 +63,7 @@ export default function Operation() {
 	const [generatedDocResult, setGenerateDocResult] = useState(null);
 	const [uploadDocResult, setuploadDocResult] = useState(null);
 
-	const [state, stateSetter] = useContextState({
+	const [state, stateSetter, stateResetter] = useContextState({
 		generateDocument: {
 			document_name: "",
 			writer: "",
@@ -78,6 +89,7 @@ export default function Operation() {
 	];
 
 	const isLastStep = activeStep === steps.length - 1;
+	const lastStep = steps.length - 1;
 
 	async function generateDoc() {
 		setIsNextButtonLoading(true);
@@ -162,6 +174,8 @@ export default function Operation() {
 				...state.generateDocument,
 				...state.upload,
 				setIsNextButtonDisabled,
+				stateResetter,
+				stepsResetter,
 			}}>
 			<Stack
 				w="full"
@@ -211,8 +225,10 @@ export default function Operation() {
 									case 1:
 										await uploadDoc();
 										break;
-									case isLastStep:
-										router.push("/");
+									case lastStep:
+										// router.push("/");
+										console.log("open modal");
+										disclosure.onOpen();
 										break;
 									default:
 										break;
@@ -223,6 +239,7 @@ export default function Operation() {
 					</Button>
 				</HStack>
 			</Stack>
+			<FinishAlert disclosure={disclosure} />
 		</OperaionContext.Provider>
 	);
 }
@@ -272,12 +289,14 @@ function GenerateDocument() {
 }
 
 function Upload() {
-	const { stateSetter, file, setIsNextButtonDisabled } = useOperation();
+	const { stateSetter, file, setIsNextButtonDisabled, generatedDocResult } =
+		useOperation();
 
 	const buttonSize = useBreakpointValue({
 		xs: "sm",
 		md: "lg",
 	});
+	console.log(generatedDocResult);
 
 	useEffect(() => {
 		if (file === null) setIsNextButtonDisabled(true);
@@ -285,50 +304,89 @@ function Upload() {
 	}, [file]);
 
 	return (
-		<Stack w="full" h="full" spacing={2} justify="center" align={"center"}>
-			<Text>
-				Please, Insert Verification code inside the document, then
-				upload it below.
-			</Text>
-			<HStack>
-				<Tooltip
-					hasArrow
-					placement="top"
-					label="Import the document which you need to verify">
-					<Box position="relative" w={"max-content"}>
-						<Button
-							size={buttonSize}
-							rightIcon={<AiOutlineUpload size="1.4em" />}>
-							Upload File
-						</Button>
-						<Input
-							w="full"
-							type={"file"}
-							accept=".pdf"
-							left={0}
-							// value={file}
-							onChange={e => {
-								let __file__ = e.target.files[0];
-								console.log(__file__);
-								if (typeof __file__ !== "undefined") {
-									stateSetter("upload.file", __file__);
-									// stateSetter("upload.file", __file__);
-								}
+		<>
+			{!generatedDocResult.verify_code && (
+				<Alert status="error">
+					<AlertIcon />
+					<div>
+						Verify code not found, Please{" "}
+						<span
+							style={{
+								textDecoration: "underline",
+								cursor: "pointer",
 							}}
-							top={0}
-							cursor={"pointer"}
-							position={"absolute"}
-							opacity={0}
-							w="full"
-							h="full"
-						/>
-					</Box>
-				</Tooltip>
-				<HStack justify={"end"} align="end" w="full">
-					{file && <FileInfo file={file} />}
-				</HStack>
-			</HStack>
-		</Stack>
+							onClick={() => router.push("/support")}>
+							contact us
+						</span>{" "}
+						to solve this problem.
+					</div>
+				</Alert>
+			)}
+			<Stack
+				w="full"
+				h="full"
+				spacing={6}
+				justify="center"
+				align={"center"}>
+				{generatedDocResult.verify_code && (
+					<Stack spacing={0}>
+						<Heading opacity={0.5} fontSize="x-small">
+							Verify code
+						</Heading>
+						<Heading>{generatedDocResult["verify_code"]}</Heading>
+					</Stack>
+				)}
+				<Stack align={"center"}>
+					<Text>
+						Please, Insert Verification code inside the document,
+						then upload it below.
+					</Text>
+					<HStack>
+						<Tooltip
+							hasArrow
+							placement="top"
+							label="Import the document which you need to verify">
+							<Box position="relative" w={"max-content"}>
+								<Button
+									size={buttonSize}
+									rightIcon={
+										<AiOutlineUpload size="1.4em" />
+									}>
+									Upload File
+								</Button>
+								<Input
+									w="full"
+									type={"file"}
+									accept=".pdf"
+									left={0}
+									// value={file}
+									onChange={e => {
+										let __file__ = e.target.files[0];
+										console.log(__file__);
+										if (typeof __file__ !== "undefined") {
+											stateSetter(
+												"upload.file",
+												__file__
+											);
+											// stateSetter("upload.file", __file__);
+										}
+									}}
+									top={0}
+									cursor={"pointer"}
+									position={"absolute"}
+									opacity={0}
+									w="full"
+									h="full"
+								/>
+							</Box>
+						</Tooltip>
+						<HStack justify={"end"} align="end" w="full">
+							{file && <FileInfo file={file} />}
+						</HStack>
+					</HStack>
+				</Stack>
+			</Stack>
+		</>
 	);
 }
 
@@ -367,10 +425,47 @@ function Done() {
 							textTransform="capitalize">
 							{e.replace(/_/g, " ")}
 						</Heading>
-						<Text>{uploadDocResult[e] || "Error: Not found"}</Text>
+						<Heading size="lg">
+							{uploadDocResult[e] || "Error: Not found"}
+						</Heading>
 					</Stack>
 				))}
 			</Stack>
 		</Stack>
+	);
+}
+
+function FinishAlert({ disclosure }) {
+	const router = useRouter();
+	const { stateResetter, stepsResetter } = useOperation();
+	return (
+		<AlertDialog
+			{...disclosure}
+			header={`Submit more? `}
+			footer={
+				<HStack justify={"space-between"} w="full">
+					<Button
+						leftIcon={<BiHomeAlt size="1.4em" />}
+						size="sm"
+						onClick={() => router.push("/")}>
+						Back Home
+					</Button>
+					<Button
+						size="sm"
+						leftIcon={<HiOutlineDocumentAdd size="1.4em" />}
+						onClick={() => {
+							stateResetter();
+							stepsResetter();
+							disclosure.onClose();
+						}}>
+						Submit more
+					</Button>
+				</HStack>
+			}>
+			<Text>
+				Do you want to submit more documents or that{"'"}s enough for
+				this day?
+			</Text>
+		</AlertDialog>
 	);
 }

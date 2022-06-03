@@ -18,5 +18,9 @@ export function useContextState(defaultValue = null) {
 		})(value);
 	}
 
-	return [state, stateSetter];
+	function reset() {
+		setState(defaultValue);
+	}
+
+	return [state, stateSetter, reset];
 }

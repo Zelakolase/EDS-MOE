@@ -19,7 +19,7 @@ export default function Modal({
 }) {
 	return (
 		<>
-			<ChakraModal isOpen={isOpen} onClose={onClose}>
+			<ChakraModal isOpen={isOpen} onClose={onClose} isCentered>
 				<ModalOverlay />
 				<ModalContent>
 					<ModalHeader>{header}</ModalHeader>
