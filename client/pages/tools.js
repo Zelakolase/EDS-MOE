@@ -47,9 +47,6 @@ import { useRouter } from "next/router";
 const ToolsContext = createContext();
 
 function Tools() {
-	/**
-	 * TODO: implement download document
-	 */
 	const [state, stateSetter] = useContextState({
 		downloadDocument: {
 			publicCode: "",
