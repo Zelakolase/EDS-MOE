@@ -38,11 +38,12 @@ export function Logo({
 							w={8}
 							borderRadius={6}
 							bgColor={bg}
-							transitionDuration=".2s"
+							transitionDuration=".3s"
 							_hover={{ bgColor: bgHover, h: 10, w: 10 }}
 						/>
 					</motion.div>
 					<Heading
+						pointerEvents={"none"}
 						pt={1}
 						size="md"
 						color={color}
