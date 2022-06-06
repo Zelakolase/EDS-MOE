@@ -138,10 +138,6 @@ function DownloadDocumentComponent() {
 	async function downloadHandler() {
 		setLoading(true);
 		try {
-			const link = document.createElement("a");
-			link.target = "_blank";
-			link.download = `${publicCode}.pdf`;
-
 			const response = await request("post", "dac")(
 				{
 					public_code: publicCode,
@@ -151,13 +147,15 @@ function DownloadDocumentComponent() {
 					responseType: "blob",
 				}
 			);
-
 			if (response?.data.status === "failed") throw response.data.msg;
 
 			if (response?.data === "error")
 				throw "Something wrong, Please contact with support to solve this problem.";
 
-			console.log(response);
+			const link = document.createElement("a");
+
+			link.target = "_blank";
+			link.download = `${publicCode}.${response.headers["content-type"]}`;
 			link.href = URL.createObjectURL(response.data);
 
 			document.body.appendChild(link);
