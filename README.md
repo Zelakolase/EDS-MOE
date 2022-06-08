@@ -4,11 +4,11 @@
 ## Progress
 - [x] API documentation
 - [x] Security check for API
-- [ ] Frontend publish
+- [x] Frontend publish
 - [x] Backend publish
 - [x] Source code review and security check for backend (24 Apr. 2022)
 - [ ] android application
-- [ ] compile to native image (exe + elf)
+- [x] compile to native image (exe + elf)
 
 ## Universal principles to be applied in frontend, backend, and android
 - [Keep it simple stupid](http://principles-wiki.net/principles:keep_it_simple_stupid)
