@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.Console;
 
 import lib.AES;
 import lib.FileToAL;
@@ -15,6 +16,7 @@ public class main {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		Console console = System.console();
 		Scanner s = new Scanner(System.in);
 		// Stage 1
 		ArrayList<String> FrontendFiles = FileToAL.convert("WWWFiles.db"); // List of all frontend files after './www/'
@@ -39,8 +41,7 @@ public class main {
 		}
 		if (ServerKey && UserDB && DocsDB && InfoDB && Queries) {
 			// Good to go
-			System.out.print("Enter the server key: ");
-			String k = s.nextLine();
+			String k = new String(console.readPassword("Enter the server key: "));
 			boolean key = !AES.decrypt(new String(IO.read("./conf/server.key")), k).equals("ERR.ERR.ERR");
 			if (key) {
 				log.s("Encryption key is correct");
@@ -57,8 +58,7 @@ public class main {
 			new File("./conf/info.txt").createNewFile();
 			new File("./conf/queries.txt").createNewFile();
 			IO.write("./conf/queries.txt", "0", false);
-			System.out.print("Enter the new server key: ");
-			String ServerK = s.nextLine();
+			String ServerK = new String(console.readPassword("Enter the new server key: "));
 			IO.write("./conf/users.db", AES.encrypt("\"full_name\",\"user\",\"password\"", ServerK), false);
 			IO.write("./conf/docs.db", AES.encrypt(
 					"\"pub_code\",\"verify_code\",\"path\",\"doc_name\",\"verifier\",\"writer\",\"date\",\"sha\"",
@@ -74,8 +74,7 @@ public class main {
 				String full = s.nextLine();
 				System.out.print("For verifier " + (i + 1) + ". Enter the username: ");
 				String user = s.nextLine();
-				System.out.print("For verifier " + (i + 1) + ". Enter the password: ");
-				String pass = s.nextLine();
+				String pass = new String(console.readPassword("For verifier " + (i + 1) + ". Enter the password: "));
 
 				users.add(new String[] { full, // fullname
 						user, // user

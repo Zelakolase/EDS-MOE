@@ -47,7 +47,7 @@ public class Engine extends Server {
 			WWWFiles = FileToAL.convert("WWWFiles.db");
 			this.setMaximumConcurrentRequests(1000);
 			this.setMaximumRequestSizeInKB(50000); // 50MB
-			this.setGZip(false);
+			this.setGZip(true);
 			this.setBacklog(10000);
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";

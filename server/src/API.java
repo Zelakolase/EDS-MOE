@@ -213,7 +213,8 @@ public class API {
 			if (docs.Mapper.get("pub_code").contains(in.get("public_code"))) {
 				res = AES.decrypt(IO.read(docs.get("pub_code", in.get("public_code"), "path")), ENCRYPTION_KEY);
 				String[] pathSplit = docs.get("pub_code", in.get("public_code"), "path").split("\\.");
-				mime = MIME.get("extension", pathSplit[pathSplit.length - 1], "mime");
+				//mime = MIME.get("extension", pathSplit[pathSplit.length - 1], "mime");
+				mime = pathSplit[pathSplit.length - 1];
 			} else {
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{

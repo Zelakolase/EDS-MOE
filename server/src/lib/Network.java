@@ -35,12 +35,13 @@ public class Network {
 	 *                             'X-XSS-Protection'
 	 */
 	public static void write(BufferedOutputStream dOS, byte[] ResponseData, String ContentType, String ResponseCode,
-			boolean GZip, String AddedResponseHeaders) {
+			boolean GZip, String AddedResponseHeaders, boolean Cache) {
 		try {
 			if (GZip)
 				ResponseData = compress(ResponseData);
 			dOS.write((ResponseCode + "\r\n").getBytes());
 			dOS.write("Server: SWS 1.0\r\n".getBytes());
+			if(Cache) dOS.write("Cache-Control: max-age=31536000\r\n".getBytes());
 			dOS.write((AddedResponseHeaders).getBytes());
 			dOS.write(("Connection: close\r\n").getBytes());
 			if (GZip)

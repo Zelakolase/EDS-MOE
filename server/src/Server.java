@@ -10,6 +10,8 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -52,6 +54,7 @@ public abstract class Server {
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword, String TLSVersion,
 			String KeyStoreType, String KeyManagerFactoryType) {
 		// HTTPS Server start, default values
+		ExecutorService executor = Executors.newFixedThreadPool(MaxConcurrentRequests);
 		try {
 			char[] keyStorePassword = KeyStorePassword.toCharArray();
 			ServerSocket SS = getSSLContext(Path.of(KeyStorePath), keyStorePassword, TLSVersion, KeyStoreType,
@@ -60,11 +63,11 @@ public abstract class Server {
 			int req_num = 0;
 			while (true) {
 				/*
-				 * Max 10,000 retries (1ms delay between each) for every request to process if
+				 * Max 5,000 retries (1ms delay between each) for every request to process if
 				 * MaxConcurrentReqs is reached
 				 */
 				int tries = 0; // current tries
-				inner: while (tries < 10001) {
+				inner: while (tries < 5001) {
 					if (tries > 0)
 						Thread.sleep(1);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
@@ -73,8 +76,7 @@ public abstract class Server {
 						S.setTcpNoDelay(true);
 						S.setReceiveBufferSize(64000);
 						S.setSendBufferSize(64000);
-						Engine e = new Engine(S, S.getRemoteSocketAddress(), req_num);
-						e.start();
+						executor.execute(new Engine(S, S.getRemoteSocketAddress(), req_num));
 						CurrentConcurrentRequests++;
 
 						if(req_num >= Integer.MAX_VALUE) req_num = 0;
@@ -88,6 +90,8 @@ public abstract class Server {
 			}
 		} catch (Exception e) {
 			log.e(e, Server.class.getName(), "HTTPSStart");
+		} finally {
+			executor.shutdown();
 		}
 	}
 
@@ -121,6 +125,7 @@ public abstract class Server {
 		@Override
 		public void run() {
 			try {
+				if(req_num == Integer.MAX_VALUE - 1) req_num = 0;
 				String IDENTIFIER = "["+SA.toString()+" | ID:"+req_num+"],";
 				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),16384);
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
@@ -136,8 +141,10 @@ public abstract class Server {
 				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
 				IO.write("./other/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				F = System.nanoTime();
+				boolean cache = false;
+				if(! new String(Reply.get("mime")).equals("application/json")) cache = true; 
 				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
-						GZip, AddedResponseHeaders);
+						GZip, AddedResponseHeaders, cache);
 				IO.write("./other/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				S.close();
 			} catch (Exception e) {
