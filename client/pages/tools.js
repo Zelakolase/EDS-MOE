@@ -1,5 +1,5 @@
 import { request } from "@API";
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useRef, useEffect } from "react";
 import { useTheme } from "@Theme";
 import { useContextState } from "@Hooks";
 
@@ -75,11 +75,28 @@ function Tools() {
 		},
 	];
 	const [currentTool, setCurrentTool] = useState(0);
+	const btnRef = useRef(null);
 
 	const { bg, color, bgHover } = useTheme();
 
+	useEffect(() => {
+		const keyDownHandler = e => {
+			switch (e.key) {
+				case "Enter":
+					btnRef.current.click();
+					break;
+
+				default:
+					break;
+			}
+		};
+		window.addEventListener("keydown", keyDownHandler);
+
+		return () => window.removeEventListener("keydown", keyDownHandler);
+	}, []);
+
 	return (
-		<ToolsContext.Provider value={{ ...state, stateSetter }}>
+		<ToolsContext.Provider value={{ ...state, stateSetter, btnRef }}>
 			<Stack align="center" spacing={10} justify="center" h="full">
 				<ToolsMenu
 					tools={tools}
@@ -129,7 +146,7 @@ function DownloadDocumentComponent() {
 
 	const [loading, setLoading] = useState(false);
 
-	const { downloadDocument, stateSetter } = useContext(ToolsContext);
+	const { downloadDocument, stateSetter, btnRef } = useContext(ToolsContext);
 	const { publicCode } = downloadDocument;
 
 	async function downloadHandler() {
@@ -190,6 +207,7 @@ function DownloadDocumentComponent() {
 					/>
 				</Stack>
 				<Button
+					ref={btnRef}
 					isDisabled={!publicCode}
 					isLoading={loading}
 					onClick={async () => {
@@ -208,17 +226,12 @@ function VerifyDocumentComponent() {
 	const toast = useToast();
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState();
-	// const [verifyCode, setVerifyCode] = useState("");
 
-	const { verifyDocument, stateSetter } = useContext(ToolsContext);
-	const [fileContent, setFileContent] = useState("");
+	const { verifyDocument, stateSetter, btnRef } = useContext(ToolsContext);
 	const { verifyCode, file } = verifyDocument;
-
-	// useEffect(() => console.log(fileContent), [fileContent]);
 
 	async function verifyHandler() {
 		setLoading(true);
-		// console.log(file);
 		try {
 			let arrBuf = await file.arrayBuffer();
 
@@ -297,10 +310,7 @@ function VerifyDocumentComponent() {
 											"verifyDocument.file",
 											__file__
 										);
-										setFileContent(await __file__?.text());
 									}
-									// console.log(await e.target.files[0].text());
-									// console.log(verifyDocument);
 								}}
 								top={0}
 								cursor={"pointer"}
@@ -314,6 +324,7 @@ function VerifyDocumentComponent() {
 				</HStack>
 			</Stack>
 			<Button
+				ref={btnRef}
 				onClick={async () => {
 					await verifyHandler();
 				}}
@@ -338,7 +349,7 @@ function SearchDocumentComponent() {
 	const disclosure = useDisclosure();
 	const { onOpen, onClose } = disclosure;
 
-	const { searchDocument, stateSetter } = useContext(ToolsContext);
+	const { searchDocument, stateSetter, btnRef } = useContext(ToolsContext);
 	const { publicCode } = searchDocument;
 
 	async function searchHandler() {
@@ -385,6 +396,7 @@ function SearchDocumentComponent() {
 					/>
 				</Stack>
 				<Button
+					ref={btnRef}
 					isDisabled={!publicCode}
 					isLoading={loading}
 					onClick={async () => {

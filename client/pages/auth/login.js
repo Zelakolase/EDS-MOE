@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@Auth";
 import { useRouter } from "next/router";
 
@@ -43,6 +43,7 @@ export default function Login() {
 
 	const toast = useToast();
 	const router = useRouter();
+	const btnRef = useRef(null);
 
 	const [form, setForm] = useState({ user: "", pass: "" });
 	const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +75,22 @@ export default function Login() {
 		}
 		setIsLoading(false);
 	}
+
+	useEffect(() => {
+		const keyDownHandler = e => {
+			switch (e.key) {
+				case "Enter":
+					btnRef.current.click();
+					break;
+
+				default:
+					break;
+			}
+		};
+		window.addEventListener("keydown", keyDownHandler);
+
+		return () => window.removeEventListener("keydown", keyDownHandler);
+	}, []);
 
 	useEffect(() => {
 		if (isAuth) router.replace("/submit");
@@ -148,6 +165,8 @@ export default function Login() {
 				</Box>
 			</Stack>
 			<Button
+				ref={btnRef}
+				isDisabled={!form.pass || !form.user}
 				onClick={signInHandler}
 				rightIcon={<BiLogIn size="1.4em" />}
 				isLoading={isLoading}>

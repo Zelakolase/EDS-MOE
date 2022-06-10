@@ -23,6 +23,7 @@ import { useAuth } from "@Auth";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { BsSun } from "react-icons/bs";
 import { BiMoon } from "react-icons/bi";
+import { useEffect } from "react";
 export function TabsDrawer({
 	tabs = [
 		/*{
@@ -39,6 +40,23 @@ export function TabsDrawer({
 	const { bg, color, bgHover } = useTheme();
 	const { isAuth } = useAuth();
 
+	useEffect(() => {
+		const keyDownHandler = e => {
+			switch (e.key) {
+				case "k":
+					onOpen();
+					break;
+				case "Escape":
+					onClose();
+					break;
+				default:
+					break;
+			}
+		};
+		window.addEventListener("keydown", keyDownHandler);
+
+		return () => window.removeEventListener("keydown", keyDownHandler);
+	}, []);
 	return (
 		<>
 			<IconButton
