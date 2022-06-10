@@ -15,9 +15,11 @@ import {
 	Link,
 	UnorderedList,
 	ListItem,
+	useToast,
 } from "@chakra-ui/react";
 
 export default function About() {
+	const toast = useToast();
 	const [count, setCount] = useState({
 		queries: null,
 		documents: null,
@@ -32,7 +34,7 @@ export default function About() {
 				queries: response.data.query_num,
 				queries: response.data.document_num,
 			});
-		} catch (e) {
+		} catch (err) {
 			toast({
 				position: "top",
 				title: "Login was failed.",
