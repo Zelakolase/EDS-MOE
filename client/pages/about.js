@@ -18,15 +18,30 @@ import {
 } from "@chakra-ui/react";
 
 export default function About() {
-	const [documentsCount, setDocumentsCount] = useState(null);
-	const [queriesCount, setQueriesCount] = useState(null);
+	const [count, setCount] = useState({
+		queries: null,
+		documents: null,
+	});
 
 	useEffect(async () => {
-		const response = await request("get", "about")();
-		const data = response.data;
-		console.debug(data);
-		setDocumentsCount(data?.document_num);
-		setQueriesCount(data?.query_num);
+		try {
+			const response = await request("get", "about")();
+			const data = response.data;
+			console.debug(data);
+			setCount({
+				queries: response.data.query_num,
+				queries: response.data.document_num,
+			});
+		} catch (e) {
+			toast({
+				position: "top",
+				title: "Login was failed.",
+				description: err.toString(),
+				status: "error",
+				duration: 9000,
+				isClosable: true,
+			});
+		}
 	}, []);
 	return (
 		<Stack spacing={24} align="center" justify="center" h="full">
@@ -44,10 +59,12 @@ export default function About() {
 					</Link>{" "}
 					Team. We currently have{" "}
 					<span>
-						{documentsCount !== null ? documentsCount : "many"}
+						{count["documents"] !== null ? documentsCount : "many"}
 					</span>{" "}
 					documents on our system. And{" "}
-					<span>{queriesCount !== null ? queriesCount : "many"}</span>{" "}
+					<span>
+						{count["queries"] !== null ? count["queries"] : "many"}
+					</span>{" "}
 					queries processed.
 				</Text>
 			</Stack>
