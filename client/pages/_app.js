@@ -9,6 +9,7 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { StepsStyleConfig as Steps } from "chakra-ui-steps";
 
 import "../styles/globals.css";
+import { useEffect, useState } from "react";
 
 const theme = extendTheme({
 	components: {
@@ -19,27 +20,35 @@ const theme = extendTheme({
 
 function App({ Component, pageProps }) {
 	let router = useRouter();
-	console.log({ ...router });
-	let title = `EDS | ${(() => {
-		switch (router.pathname) {
-			case "/":
-				return "Home";
-			case "/404":
-				return "Not found";
-			default:
-				return router.pathname
-					.split("/")
-					.at(-1)
-					.split("")
-					.map((c, index) => (index === 0 ? c.toUpperCase() : c))
-					.join("");
-		}
-	})()} `;
+	const [title, setTitle] = useState("");
+	// console.log({ ...router });
+
+	useEffect(() => {
+		setTitle(() => {
+			switch (router.pathname) {
+				case "/":
+					return "| Home";
+				case "/404":
+					return "| Not found";
+				default:
+					return `| ${router?.pathname
+						?.split("/")
+						?.at(-1)
+						?.split("")
+						.map((c, index) => (index === 0 ? c.toUpperCase() : c))
+						.join("")}`;
+			}
+		});
+	}, [router]);
 
 	return (
 		<>
 			<Head>
-				<title>{title}</title>
+				<title>EDS {title}</title>
+				<meta
+					content={`Electronic Document System`}
+					propery="og:title"
+				/>
 			</Head>
 			<ChakraProvider theme={theme}>
 				<AuthProvider>
