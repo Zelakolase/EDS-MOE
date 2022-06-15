@@ -112,7 +112,7 @@ No request as it’s GET
 Response body :
 
 ```jsonc
-{ "document_num": "a", "query_num": "b" }
+{ "document_num": "a"}
 ```
 
 ---
