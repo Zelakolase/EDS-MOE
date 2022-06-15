@@ -48,12 +48,12 @@ Where 'c' is either `failed` or `success`
 
 ---
 
-### **Download a document : /api.dac** Server : Done , Client : -
+### **Download a document : /api.DownloadDoc** Server : Done , Client : -
 
 Request body :
 
 ```jsonc
-{ "public_code": "x" }
+{ "code": "x" }
 ```
 
 Response body :
@@ -66,11 +66,11 @@ Response body :
 
 ---
 
-### **Verify a document : /api.vad** Server : Done , Client : Done
+### **Verify a document : /api.VerifyDoc** Server : Done , Client : Done
 
 Request body :
 
-File in request body with 'verify_code' as header
+File in request body with 'code' as header
 
 Response body :
 
@@ -80,12 +80,12 @@ Response body :
 
 ---
 
-### **Search for a document : /api.sfad** Server : Done , Client : Done
+### **Search for a document : /api.SearchDoc** Server : Done , Client : Done
 
 Request body :
 
 ```jsonc
-{ "public_code": "x" }
+{ "code": "x" }
 ```
 
 Response body :
@@ -133,7 +133,7 @@ Request Body :
 Response body :
 
 ```jsonc
-{ "verify_code": "b" }
+{ "code": "b" }
 ```
 
 ```jsonc
@@ -144,14 +144,14 @@ Response body :
 
 ---
 
-### **SAD S.2 : /api.doc** Server : Done , Client : -
+### **SAD S.2 : /api.DataDoc** Server : Done , Client : -
 
-Request body is request body with 'verify_code', 'extension', 'session_id' as headers
+Request body is request body with 'code', 'extension', 'session_id' as headers
 
 Response body :
 
 ```jsonc
-{ "public_code": "x", "verify_code": "y" }
+{ "status": "success"}
 ```
 
 ```jsonc
