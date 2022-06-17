@@ -10,8 +10,7 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -29,7 +28,6 @@ public abstract class Server {
 	int backlog = 50; // Max requests to wait for processing, default is 5000MB
 	String WWWDir = "www";
 	String AddedResponseHeaders = ""; // Custom Response headers
-
 	public void setMaximumConcurrentRequests(int in) {
 		MaxConcurrentRequests = in;
 	}
@@ -49,7 +47,6 @@ public abstract class Server {
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword) {
 		HTTPSStart(port, KeyStorePath, KeyStorePassword, "TLSv1.3", "JKS", "SunX509");
 	}
-
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword, String TLSVersion,
 			String KeyStoreType, String KeyManagerFactoryType) {
 		// HTTPS Server start, default values
@@ -77,7 +74,6 @@ public abstract class Server {
 						S.setSendBufferSize(64000);
 						executor.execute(new Engine(S, S.getRemoteSocketAddress(), req_num));
 						CurrentConcurrentRequests++;
-
 						if(req_num >= Integer.MAX_VALUE) req_num = 0;
 						else req_num++;
 
@@ -90,7 +86,7 @@ public abstract class Server {
 		} catch (Exception e) {
 			log.e(e, Server.class.getName(), "HTTPSStart");
 		} finally {
-			executor.shutdown();
+			executor.shutdownNow();
 		}
 	}
 
