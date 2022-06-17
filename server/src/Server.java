@@ -72,6 +72,7 @@ public abstract class Server {
 						S.setTcpNoDelay(true);
 						S.setReceiveBufferSize(64000);
 						S.setSendBufferSize(64000);
+						S.setSoTimeout(5000);
 						executor.execute(new Engine(S, S.getRemoteSocketAddress(), req_num));
 						CurrentConcurrentRequests++;
 						if(req_num >= Integer.MAX_VALUE) req_num = 0;
