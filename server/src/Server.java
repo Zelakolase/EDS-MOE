@@ -17,7 +17,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
 import lib.ArraySplit;
-import lib.IO;
 import lib.Network;
 import lib.log;
 
@@ -126,29 +125,22 @@ public abstract class Server {
 		public void run() {
 			try {
 				if(req_num == Integer.MAX_VALUE - 1) req_num = 0;
-				String IDENTIFIER = "["+SA.toString()+" | ID:"+req_num+"],";
 				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),16384);
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
-				long F = System.nanoTime();
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
-				IO.write("./other/performance.csv", (IDENTIFIER+"read,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
-				F = System.nanoTime();
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
 				/*
 				 * Dynamic Mode
 				 */
 				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
-				IO.write("./other/performance.csv", (IDENTIFIER+"process,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
-				F = System.nanoTime();
 				boolean cache = false;
-				if(! new String(Reply.get("mime")).equals("application/json")) cache = true; 
+				if(! new String(Reply.get("mime")).equals("application/json")) cache = true;
 				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
 						GZip, AddedResponseHeaders, cache);
-				IO.write("./other/performance.csv", (IDENTIFIER+"write,"+(System.nanoTime()-F)/1000000.0+"\n").getBytes(), true);
 				S.close();
 			} catch (Exception e) {
-				
+
 			} finally {
 				CurrentConcurrentRequests--;
 			}

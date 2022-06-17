@@ -1,7 +1,8 @@
+import java.io.Console;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
-import java.io.Console;
 
 import lib.AES;
 import lib.FileToAL;
@@ -24,22 +25,26 @@ public class main {
 			if (!new File("./www/" + frontendFile).exists()) {
 				log.e("File " + frontendFile + " doesn't exist");
 				System.exit(1);
-			} else {
-				log.s("File " + frontendFile + " exist");
 			}
 		}
+		log.s("Frontend Files Check - Done");
 		// Stage 2
-		boolean ServerKey = new File("./conf/server.key").exists();
-		boolean UserDB = new File("./conf/users.db").exists();
-		boolean DocsDB = new File("./conf/docs.db").exists();
-		boolean InfoDB = new File("./conf/info.txt").exists();
-		boolean Queries = new File("./conf/queries.txt").exists();
-		if(! new File("./other/").exists()) {
-			new File("./other/").mkdir();
-			new File("./other/performance.csv").createNewFile();
-			new File("./other/error.log").createNewFile();
+		boolean ServerKey = new File("./conf/server.key").exists(); // Server Enc/Dec Key
+		boolean UserDB = new File("./conf/users.db").exists(); // Users DB
+		boolean DocsDB = new File("./conf/docs.db").exists(); // Docs Mapping for DocDB
+		boolean DocDBFolder = new File("./conf/doc").exists(); // DocDB Folder folder
+		boolean DocDB = true;
+		for(int i = 0;i<1000;i++) {
+			DocDB = DocDB && new File("./conf/doc/"+String.format("%03d", i)+".db").exists();
 		}
-		if (ServerKey && UserDB && DocsDB && InfoDB && Queries) {
+		boolean InfoDB = new File("./conf/info.txt").exists(); // School name
+		boolean Queries = new File("./conf/queries.txt").exists(); // Number of queries
+		boolean Doc = new File("./conf/doc.txt").exists(); // Number of documents
+		boolean Docs = new File("./docs/").exists(); // Documents folder
+		/**
+		 * If Server is not new
+		 */
+		if (ServerKey && UserDB && DocsDB && InfoDB && Queries && Docs && DocDBFolder && Doc) {
 			// Good to go
 			String k = new String(console.readPassword("Enter the server key: "));
 			boolean key = !AES.decrypt(new String(IO.read("./conf/server.key")), k).equals("ERR.ERR.ERR");
@@ -50,50 +55,104 @@ public class main {
 			} else {
 				log.e("Encryption key is not correct");
 			}
-		} else if (!ServerKey && !UserDB && !DocsDB && !InfoDB && !Queries) {
-			// New user
-			new File("./conf/server.key").createNewFile();
-			new File("./conf/users.db").createNewFile();
-			new File("./conf/docs.db").createNewFile();
-			new File("./conf/info.txt").createNewFile();
-			new File("./conf/queries.txt").createNewFile();
-			IO.write("./conf/queries.txt", "0", false);
-			String ServerK = new String(console.readPassword("Enter the new server key: "));
-			IO.write("./conf/users.db", AES.encrypt("\"full_name\",\"user\",\"password\"", ServerK), false);
-			IO.write("./conf/docs.db", AES.encrypt(
-					"\"pub_code\",\"verify_code\",\"path\",\"doc_name\",\"verifier\",\"writer\",\"date\",\"sha\"",
-					ServerK), false);
-			System.out.print("Enter the school name: ");
-			String SchoolName = s.nextLine();
+		}
+		/**
+		 * If Server is new
+		 */
+		else {
+			// 1. Verifiers Initialization
+			SparkDB Verifiers = new SparkDB();
+			Verifiers.create(new ArrayList<String>() {{
+				add("full_name");
+				add("user");
+				add("pass");
+			}});
 			System.out.print("Enter the number of verifiers: ");
 			int Num = Integer.parseInt(s.nextLine());
-			SparkDB users = new SparkDB();
-			users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ServerK));
 			for (int i = 0; i < Num; i++) {
-				System.out.print("For verifier " + (i + 1) + ". Enter the fullname: ");
+				System.out.print("For verifier " + (i + 1) + " -> Enter the fullname: ");
 				String full = s.nextLine();
-				System.out.print("For verifier " + (i + 1) + ". Enter the username: ");
+				System.out.print("For verifier " + (i + 1) + " -> Enter the username: ");
 				String user = s.nextLine();
-				String pass = new String(console.readPassword("For verifier " + (i + 1) + ". Enter the password: "));
-
-				users.add(new String[] { full, // fullname
-						user, // user
-						pass// password
-				});
+				String pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
+				Verifiers.add(new HashMap<String, String>() {{
+					put("full_name", full);
+					put("user",user);
+					put("pass",pass);
+				}});
 			}
-			IO.write("./conf/users.db", AES.encrypt(users.print(), ServerK), false);
-			IO.write("./conf/info.txt", AES.encrypt(SchoolName, ServerK), false);
-			IO.write("./conf/server.key", AES.encrypt(ServerK, ServerK), false);
-			log.s("Setup is complete.");
-		} else {
-			// Data is corrupted
-			log.e("Possible data corruption, self destruction in process.");
-			new File("./conf/users.db").delete();
-			new File("./conf/info.txt").delete();
-			new File("./conf/server.key").delete();
-			new File("./conf/docs.db").delete();
+			// 2. School Name
+			System.out.print("Enter the school name: ");
+			String SchoolName = s.nextLine();
+			// 3. Server Key
+			String ServerK = new String(console.readPassword("Enter the new server key: "));
+			// 4. Write on disk
+			new File("./conf/").mkdir(); // <-- Configuration files
+			log.s("Created directory conf/");
+			new File("./conf/doc").mkdir(); // <-- DocDB 000-999
+			log.s("Created directory conf/doc/");
+			new File("./docs/").mkdir(); // <-- Documents
+			log.s("Created directory docs/");
+				// a. Write Server Key
+				new File("./conf/server.key").createNewFile();
+				IO.write("./conf/server.key", AES.encrypt(ServerK, ServerK), false);
+				log.s("Stored Server Key");
+				// b. Write School name
+				new File("./conf/info.txt").createNewFile();
+				IO.write("./conf/info.txt", AES.encrypt(SchoolName, ServerK), false);
+				log.s("Stored School Name");
+				// c. Write Verifiers
+				new File("./conf/users.db").createNewFile();
+				IO.write("./conf/users.db", AES.encrypt(Verifiers.toString(), ServerK), false);
+				log.s("Stored Verifiers data");
+				// d. Write DocsDB
+				SparkDB temp = new SparkDB();
+				temp.create(new ArrayList<String>() {{
+					add("prefix"); add("size"); add("min_query");
+				}});
+				for(int i = 0;i<1000;i++) {
+					final String tempStr = String.format("%03d", i);
+					temp.add(new HashMap<String, String>() {{
+						put("prefix", tempStr);
+						put("size", "0");
+						put("min_query","0");
+					}});
+				}
+				new File("./conf/docs.db").createNewFile();
+				IO.write("./conf/docs.db",
+						AES.encrypt(temp.toString(), ServerK)
+						, false);
+				log.s("Created main document database");
+				// e. add queries.txt
+				new File("./conf/queries.txt").createNewFile();
+				IO.write("./conf/queries.txt", AES.encrypt("0", ServerK), false);
+				log.s("Created queries counter");
+				// f. Write DocDB 000-999
+				SparkDB tempDB = new SparkDB();
+				tempDB.create(new ArrayList<String>() {{
+					add("code"); add("path"); add("doc_name"); add("verifier"); add("writer"); add("sha"); add("age"); add("date");
+				}});
+				for(int i = 0;i<1000;i++) {
+					new File("./conf/doc/"+String.format("%03d", i)+".db").createNewFile();
+					IO.write("./conf/doc/"+String.format("%03d", i)+".db",
+							AES.encrypt(tempDB.toString(), ServerK)
+							, false);
+				}
+				log.s("Created document databases");
+				// g. add doc.txt
+				new File("./conf/doc.txt").createNewFile();
+				IO.write("./conf/doc.txt", AES.encrypt("0", ServerK), false);
+				log.s("Created document counter");
+				// h. Encrypt WWW files
+				for(String path : FrontendFiles) {
+					if(new File("./www/"+path).isFile()) {
+						IO.write("./www/"+path,
+								AES.encrypt(IO.read("./www/"+path), ServerK)
+								, false);
+					}
+				}
+			log.s("You may relaunch the server!");
 		}
-
 		s.close();
 	}
-}
+	}

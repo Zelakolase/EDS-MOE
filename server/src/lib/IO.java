@@ -15,8 +15,8 @@ public class IO {
 	public static byte[] read(String filename) throws Exception {
 			RandomAccessFile f = new RandomAccessFile(filename, "r");
 			byte[] b = new byte[(int)f.length()];
-			f.readFully(b);
-			f.close();
+				f.readFully(b);
+				f.close();
 			return b;
 	}
 

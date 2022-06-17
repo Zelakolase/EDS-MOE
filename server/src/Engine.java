@@ -1,5 +1,6 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -26,10 +27,10 @@ public class Engine extends Server {
 	 */
 	static String ENCRYPTION_KEY;
 	static SparkDB MIME = new SparkDB();
-	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id,
-																													// username
+	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
 	static SparkDB users = new SparkDB();
 	static SparkDB docs = new SparkDB();
+	static Map<String, byte[]> WWWData = new HashMap<>();
 	static ArrayList<String> WWWFiles = new ArrayList<>();
 	// Here goes the constant objects that never removed after request process
 
@@ -41,14 +42,17 @@ public class Engine extends Server {
 		try {
 			MemMonitor MM = new MemMonitor();
 			MM.start();
-			MIME.readfromfile("mime.db");
-			users.readfromstring(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
-			docs.readfromstring(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
+			MIME.readFromFile("mime.db");
+			users.readFromString(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
+			docs.readFromString(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
 			this.setMaximumConcurrentRequests(1000);
 			this.setMaximumRequestSizeInKB(50000); // 50MB
-			this.setGZip(true);
+			this.setGZip(false);
 			this.setBacklog(10000);
+			for(String file : WWWFiles) {
+				if(new File("./www/"+file).isFile()) WWWData.put("/"+file, AES.decrypt(IO.read("./www/"+file), ENCRYPTION_KEY));
+			}
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
 					/**
@@ -84,37 +88,29 @@ public class Engine extends Server {
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
-				if (ser.equals("login") || ser.equals("logout")) {
+				if (ser.equals("login") || ser.equals("logout") || ser.equals("DataDoc")) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
-				if (ser.equals("generate") || ser.equals("doc"))
-					Elshanta.put("session_ids", SESSION_IDS);
-				if (Stream.of("about", "sfad", "dac", "generate", "vad", "doc").anyMatch(ser::equals))
-					Elshanta.put("docs_db", docs);
-				if (headers.containsKey("verfiy_code"))
-					Elshanta.put("verify_code", headers.get("verfiy_code"));
-				if(headers.containsKey("verify_code")) // Too lazy to inform the frontend
-					Elshanta.put("verify_code", headers.get("verify_code"));
-				if (headers.containsKey("session_id"))
-					Elshanta.put("session_id", headers.get("session_id"));
-				if (headers.containsKey("extension"))
-					Elshanta.put("extension", headers.get("extension"));
+				if (ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", SESSION_IDS);
+				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
+				if (headers.containsKey("code")) Elshanta.put("code", headers.get("code"));
+				if (headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
+				if (headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res;
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
 					res = lib.ErrorWriter.wAPI(e, ENCRYPTION_KEY, ser);
 				}
-				if (res.containsKey("session_ids"))
-					SESSION_IDS = (Map<String, String>) res.get("session_ids");
-				if (res.containsKey("users"))
-					users = (SparkDB) res.get("users");
-				if (res.containsKey("docs"))
+				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
+				if (res.containsKey("docs")) {
 					docs = (SparkDB) res.get("docs");
+					IO.write("./conf/docs.db", AES.encrypt(docs.toString(), ENCRYPTION_KEY), false);
+				}
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
-				response.put("mime", ((String) res.get("mime")).getBytes());
+				response.put("mime", (byte[]) res.get("mime"));
 			} else {
 				/**
 				 * Static file request detected
@@ -125,11 +121,24 @@ public class Engine extends Server {
 				if (path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")
 						|| path.equals("/operation"))
 					path += ".html";
-				HashMap<String, byte[]> static_res = FileProcess.redirector(path.substring(1), WWWFiles);
-				response.put("content", static_res.get("body"));
-				response.put("code", static_res.get("code"));
-				String[] pathSplit = path.split("\\.");
-				response.put("mime", MIME.get("extension", pathSplit[pathSplit.length - 1], "mime").getBytes());
+				if(WWWData.containsKey(path)) {
+					response.put("content", WWWData.get(path));
+					response.put("code", HTTPCode.OK.getBytes());
+					String[] pathSplit = path.split("\\.");
+					try {
+						response.put("mime",
+								MIME.get(new HashMap<String, String>() {{
+									put("extension", pathSplit[pathSplit.length - 1]);
+								}}, "mime", 1).get(0).getBytes()
+								);
+					}catch(Exception e) {
+						response.put("mime", "text/html".getBytes());
+					}
+				}else {
+					response.put("content","Unauthorized".getBytes());
+					response.put("code", HTTPCode.UNAUTHORIZED.getBytes());
+					response.put("mime", "text/html".getBytes());
+				}
 				}catch(Exception e) {
 					response = lib.ErrorWriter.wnAPI(e, ENCRYPTION_KEY, path);
 				}
