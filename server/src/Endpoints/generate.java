@@ -1,5 +1,6 @@
 package Endpoints;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,6 +43,7 @@ public class generate {
 				SparkDB db = new SparkDB();
 				db.readFromFile("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", ENCRYPTION_KEY);
 				if(db.size() == 10000) {
+					new File(db.getColumn("path").get(0)).delete();
 					db.delete(0);
 					docs.modify(targetIndex, new HashMap<String, String>() {{
 						put("min_query",Collections.min(db.getColumn("age")));
