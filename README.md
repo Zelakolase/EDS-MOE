@@ -7,7 +7,6 @@
 - [x] Frontend publish
 - [x] Backend publish
 - [x] Source code review and security check for backend (24 Apr. 2022)
-- [ ] android application
 - [x] compile to native image (exe + elf)
 
 ## Universal principles to be applied in frontend, backend, and android
