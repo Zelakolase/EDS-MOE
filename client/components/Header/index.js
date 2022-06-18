@@ -1,10 +1,14 @@
 import { useAuth } from "@Auth";
-import { request } from "@API";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { useTheme, MINI_WIDTH_SCREEN } from "@Theme";
 import { LOGIN_PATHNAME } from "@CONSTANTS";
+
+import { request } from "@API";
+import { INFO } from "@API/endpoints";
+
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { useWindowSize } from "rooks";
+
 import {
 	HStack,
 	Button,
@@ -71,7 +75,7 @@ export function Header() {
 	];
 	useEffect(async () => {
 		try {
-			const response = await request("get", "name")();
+			const response = await request("get", INFO["NAME"])();
 			setBannerName(response?.data?.name);
 		} catch (err) {
 			console.error(err);
@@ -113,7 +117,9 @@ function Toolbar({ tabs }) {
 				(tab, index) =>
 					tab.visible && (
 						<Button
-							variant="ghost"
+							variant={
+								router.pathname === tab.path ? "solid" : "ghost"
+							}
 							key={index}
 							size="sm"
 							textTransform="capitalize"
