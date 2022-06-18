@@ -30,9 +30,10 @@ export default function About() {
 			const response = await request("get", "about")();
 			const data = response.data;
 			console.debug(data);
+
 			setCount({
-				queries: response.data.query_num,
-				queries: response.data.document_num,
+				queries: Number(response.data.query_num),
+				documents: Number(response.data.document_num),
 			});
 		} catch (err) {
 			toast({
@@ -60,14 +61,10 @@ export default function About() {
 						ZSDP
 					</Link>{" "}
 					Team. We currently have{" "}
-					<span>
-						{count["documents"] !== null ? documentsCount : "many"}
-					</span>{" "}
-					documents on our system. And{" "}
-					<span>
-						{count["queries"] !== null ? count["queries"] : "many"}
-					</span>{" "}
-					queries processed.
+					<span>{count["documents"] ?? "many"}</span> document
+					{count["documents"] > 1 && "s"} on our system. And{" "}
+					<span>{count["queries"] ?? "many"}</span> querie
+					{count["queries"] > 1 && "s"} processed.
 				</Text>
 			</Stack>
 			<Stack alignSelf={"start"}>
