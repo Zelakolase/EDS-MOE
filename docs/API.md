@@ -95,7 +95,6 @@ Response body :
 	"document_name": "a",
 	"verifier": "b",
 	"writer": "c",
-	"date_of_publication": "d"
 }
 ```
 
