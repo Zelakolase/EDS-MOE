@@ -124,7 +124,6 @@ Request Body :
 ```jsonc
 {
 	"doc_name": "x",
-	"date": "y",
 	"writer": "z",
 	"session_id": "a"
 }
