@@ -2,7 +2,9 @@ import { useContext, createContext, useState, useEffect } from "react";
 import axios from "axios";
 import cookie from "js-cookie";
 import { useToast } from "@chakra-ui/react";
+
 import { request } from "@API";
+import { AUTH } from "@API/endpoints";
 
 const AuthContext = createContext();
 
@@ -32,19 +34,27 @@ export default function AuthProvider({ children }) {
 	});
 
 	async function signin({ user, pass }) {
-		const response = await request(
-			"post",
-			"login"
-		)({
-			user,
-			pass,
-		});
-		const data = response.data;
-		if (data?.status === "failed") throw data?.msg;
-		setUsername(data?.first_name);
-		setSessionID(data?.session_id);
-		cookie.set("username", data?.first_name);
-		cookie.set("session_id", data?.session_id);
+		try {
+			const response = await request(
+				"post",
+				AUTH["LOGIN"]
+			)({
+				user,
+				pass,
+			});
+
+			const data = response.data;
+			if (data?.status === "failed") throw data?.msg;
+
+			setUsername(data?.first_name);
+			setSessionID(data?.session_id);
+
+			cookie.set("username", data?.first_name);
+			cookie.set("session_id", data?.session_id);
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
 	}
 
 	function signout() {

@@ -15,13 +15,13 @@
 			"@Util/*": ["util/*"],
 			"@Util": ["util"],
 			"@Assests": ["assests"],
-			"@Assests/": ["assests/"],
+			"@Assests/*": ["assests/*"],
 			"@CONSTANTS": ["constants"],
 			"@Theme": ["theme.js"],
 			"@API": ["api"],
-			"@API/": ["api/*"],
+			"@API/*": ["api/*"],
 			"@Auth": ["auth"],
-			"@Hooks/": ["hooks/*"],
+			"@Hooks/*": ["hooks/*"],
 			"@Hooks": ["hooks"]
 		}
 	}

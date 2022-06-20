@@ -1,5 +1,6 @@
 import axios from "axios";
 import { isProd } from "@Util";
+
 export const API_URL = isProd ? "/api" : process.env.NEXT_PUBLIC_API_URL;
 
 const DefaultHeaders = {
@@ -11,10 +12,14 @@ const DefaultHeaders = {
 };
 
 export function request(method, route) {
-	return async (body, headers, props = {}) => {
-		return await axios[method](`${API_URL}.${route}`, body, {
+	return async (data, headers, props = {}) => {
+		let config = {
+			method,
+			url: `${API_URL}.${route}`,
 			headers: { ...DefaultHeaders, ...headers },
-			...props,
-		});
+			data,
+		};
+
+		return await axios(config);
 	};
 }

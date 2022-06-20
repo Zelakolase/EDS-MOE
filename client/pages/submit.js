@@ -34,6 +34,7 @@ import { RiFolderInfoLine } from "react-icons/ri";
 import { MdDateRange } from "react-icons/md";
 import { BiHomeAlt } from "react-icons/bi";
 import { HiOutlineDocumentAdd } from "react-icons/hi";
+import { SUBMIT } from "@API/endpoints";
 
 const OperaionContext = createContext();
 
@@ -100,7 +101,7 @@ export default function Operation() {
 
 			const response = await request(
 				"post",
-				"generate"
+				SUBMIT["GENERATE_CODE"]
 			)({ writer, session_id: sessionID, doc_name });
 			if (response?.data?.status === "failed") throw response?.data?.msg;
 
@@ -124,7 +125,7 @@ export default function Operation() {
 		try {
 			if (state.upload.file === null)
 				throw "You should use a file to upload it.";
-			if (typeof generatedDocResult.verify_code === "undefined")
+			if (typeof generatedDocResult.code === "undefined")
 				throw "Verify code not found.";
 
 			const { file } = state.upload;
@@ -135,12 +136,15 @@ export default function Operation() {
 				extension: file.name.split(".").at(-1),
 			};
 
-			const response = await request("post", "doc")(__file__.buffer, {
-				extension: __file__.extension,
-				verfiy_code: generatedDocResult?.verify_code,
-				session_id: sessionID,
-				"Content-type": "application/text",
-			});
+			const response = await request("post", SUBMIT["UPLOAD"])(
+				__file__.buffer,
+				{
+					extension: __file__.extension,
+					verfiy_code: generatedDocResult?.code,
+					session_id: sessionID,
+					"Content-type": "application/text",
+				}
+			);
 
 			if (response?.data?.status === "failed") throw response?.data?.msg;
 
@@ -184,7 +188,13 @@ export default function Operation() {
 				padding={4}
 				justify="space-around"
 				align="center">
-				<Heading>Welcome, {username}</Heading>
+				<Heading>
+					Welcome,{" "}
+					{username
+						?.split("")
+						.map((c, i) => (i === 0 ? c.toUpperCase() : c))
+						.join("")}
+				</Heading>
 				<Stack w="full" h="full">
 					<Steps
 						activeStep={activeStep}
@@ -302,7 +312,7 @@ function Upload() {
 
 	return (
 		<>
-			{!generatedDocResult.verify_code && (
+			{!generatedDocResult.code && (
 				<Alert status="error">
 					<AlertIcon />
 					<div>
@@ -325,12 +335,12 @@ function Upload() {
 				spacing={6}
 				justify="center"
 				align={"center"}>
-				{generatedDocResult.verify_code && (
+				{generatedDocResult.code && (
 					<Stack spacing={0}>
 						<Heading opacity={0.5} fontSize="x-small">
 							Verify code
 						</Heading>
-						<Heading>{generatedDocResult["verify_code"]}</Heading>
+						<Heading>{generatedDocResult["code"]}</Heading>
 					</Stack>
 				)}
 				<Stack align={"center"}>
@@ -354,7 +364,6 @@ function Upload() {
 								<Input
 									w="full"
 									type={"file"}
-									accept=".pdf"
 									left={0}
 									// value={file}
 									onChange={e => {
@@ -391,7 +400,7 @@ function Done() {
 	const { uploadDocResult } = useOperation();
 	return (
 		<Stack align={"center"}>
-			{["verify_code", "public_code"].filter(
+			{["code"].filter(
 				e => !uploadDocResult.hasOwnProperty(e) && e.trim().length > 0
 			).length > 0 && (
 				<Alert status="error">
@@ -413,7 +422,7 @@ function Done() {
 			<Text fontSize={18}>The document is uploaded successfully !</Text>
 			<Divider />
 			<Stack>
-				{["public_code", "verify_code"].map(e => (
+				{["code"].map(e => (
 					<Stack spacing={0.5}>
 						<Heading
 							opacity={0.5}

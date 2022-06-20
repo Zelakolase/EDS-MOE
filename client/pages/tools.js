@@ -1,4 +1,6 @@
 import { request } from "@API";
+import { DOCUMENT } from "@API/endpoints";
+
 import { useState, useContext, createContext, useRef, useEffect } from "react";
 import { useTheme } from "@Theme";
 import { useContextState } from "@Hooks";
@@ -49,14 +51,14 @@ const ToolsContext = createContext();
 function Tools() {
 	const [state, stateSetter] = useContextState({
 		downloadDocument: {
-			publicCode: "",
+			code: "",
 		},
 		verifyDocument: {
 			file: null,
-			verifyCode: "",
+			code: "",
 		},
 		searchDocument: {
-			publicCode: "",
+			code: "",
 		},
 	});
 
@@ -147,14 +149,14 @@ function DownloadDocumentComponent() {
 	const [loading, setLoading] = useState(false);
 
 	const { downloadDocument, stateSetter, btnRef } = useContext(ToolsContext);
-	const { publicCode } = downloadDocument;
+	const { code } = downloadDocument;
 
 	async function downloadHandler() {
 		setLoading(true);
 		try {
-			const response = await request("post", "dac")(
+			const response = await request("post", DOCUMENT["DOWNALOD"])(
 				{
-					public_code: publicCode,
+					code: code,
 				},
 				null,
 				{
@@ -169,7 +171,7 @@ function DownloadDocumentComponent() {
 			const link = document.createElement("a");
 
 			link.target = "_blank";
-			link.download = `${publicCode}.${response.headers["content-type"]}`;
+			link.download = `${code}.${response.headers["content-type"]}`;
 			link.href = URL.createObjectURL(response.data);
 
 			document.body.appendChild(link);
@@ -192,14 +194,11 @@ function DownloadDocumentComponent() {
 		<>
 			<Stack w="full" spacing={5} align={"center"}>
 				<Stack>
-					<Heading size="xs">Public Code</Heading>
+					<Heading size="xs">Code</Heading>
 					<Input
-						value={publicCode}
+						value={code}
 						onChange={e =>
-							stateSetter(
-								"downloadDocument.publicCode",
-								e.target.value
-							)
+							stateSetter("downloadDocument.code", e.target.value)
 						}
 						size={"md"}
 						variant={"filled"}
@@ -208,7 +207,7 @@ function DownloadDocumentComponent() {
 				</Stack>
 				<Button
 					ref={btnRef}
-					isDisabled={!publicCode}
+					isDisabled={!code}
 					isLoading={loading}
 					onClick={async () => {
 						await downloadHandler();
@@ -228,18 +227,18 @@ function VerifyDocumentComponent() {
 	const [result, setResult] = useState();
 
 	const { verifyDocument, stateSetter, btnRef } = useContext(ToolsContext);
-	const { verifyCode, file } = verifyDocument;
+	const { code, file } = verifyDocument;
 
 	async function verifyHandler() {
 		setLoading(true);
 		try {
 			let arrBuf = await file.arrayBuffer();
 
-			const response = await request("post", "vad")(
+			const response = await request("post", DOCUMENT["VERIFY"])(
 				new Uint8Array(arrBuf),
 				{
 					"Content-Type": "application/pdf",
-					verify_code: verifyCode,
+					code: code,
 				}
 			);
 			if (response?.data.status === "failed") throw response.data.msg;
@@ -270,18 +269,15 @@ function VerifyDocumentComponent() {
 	return (
 		<Stack w="full" spacing={8} align={"center"}>
 			<Stack>
-				<Heading size="xs">Verification Code</Heading>
+				<Heading size="xs">Code</Heading>
 				<Input
 					size={"md"}
 					variant={"filled"}
 					placeholder="Code"
-					value={verifyCode}
+					value={code}
 					onChange={e => {
-						stateSetter(
-							"verifyDocument.verifyCode",
-							e.target.value
-						);
-						// console.log(verifyCode);
+						stateSetter("verifyDocument.code", e.target.value);
+						// console.log(code);
 					}}
 				/>
 				<HStack justify={"end"}>
@@ -328,7 +324,7 @@ function VerifyDocumentComponent() {
 				onClick={async () => {
 					await verifyHandler();
 				}}
-				isDisabled={!file || !verifyCode}
+				isDisabled={!file || !code}
 				isLoading={loading}
 				maxW={"min-content"}
 				rightIcon={<MdOutlineVerified size="1.4em" />}>
@@ -350,16 +346,16 @@ function SearchDocumentComponent() {
 	const { onOpen, onClose } = disclosure;
 
 	const { searchDocument, stateSetter, btnRef } = useContext(ToolsContext);
-	const { publicCode } = searchDocument;
+	const { code } = searchDocument;
 
 	async function searchHandler() {
 		setLoading(true);
 		try {
 			const response = await request(
 				"post",
-				"sfad"
+				DOCUMENT["SEARCH"]
 			)({
-				public_code: publicCode,
+				code: code,
 			});
 			if (response?.data?.status === "failed") throw response?.data?.msg;
 			// console.log(response);
@@ -381,14 +377,11 @@ function SearchDocumentComponent() {
 		<>
 			<Stack w="full" spacing={5} align={"center"}>
 				<Stack>
-					<Heading size="xs">Public Code</Heading>
+					<Heading size="xs">Code</Heading>
 					<Input
-						value={publicCode}
+						value={code}
 						onChange={e =>
-							stateSetter(
-								"searchDocument.publicCode",
-								e.target.value
-							)
+							stateSetter("searchDocument.code", e.target.value)
 						}
 						size={"md"}
 						variant={"filled"}
@@ -397,7 +390,7 @@ function SearchDocumentComponent() {
 				</Stack>
 				<Button
 					ref={btnRef}
-					isDisabled={!publicCode}
+					isDisabled={!code}
 					isLoading={loading}
 					onClick={async () => {
 						await searchHandler();

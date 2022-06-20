@@ -1,7 +1,11 @@
 import Head from "next/head";
 import { TEAM_MEMBERS } from "@CONSTANTS";
+
 import { request } from "@API";
+import { INFO } from "@API/endpoints";
+
 // Hooks
+
 import { useEffect, useState } from "react";
 import { useTheme } from "@Theme";
 
@@ -27,7 +31,7 @@ export default function About() {
 
 	useEffect(async () => {
 		try {
-			const response = await request("get", "about")();
+			const response = await request("get", INFO["ABOUT"])();
 			const data = response.data;
 			console.debug(data);
 
@@ -62,9 +66,14 @@ export default function About() {
 					</Link>{" "}
 					Team. We currently have{" "}
 					<span>{count["documents"] ?? "many"}</span> document
-					{count["documents"] > 1 && "s"} on our system. And{" "}
-					<span>{count["queries"] ?? "many"}</span> querie
-					{count["queries"] > 1 && "s"} processed.
+					{count["documents"] > 1 ||
+						(count["documents"] === null && "s")}{" "}
+					on our system. And <span>{count["queries"] ?? "many"}</span>{" "}
+					quer
+					{count["queries"] > 1 || count["queries"] === null
+						? "ires"
+						: "y"}{" "}
+					processed.
 				</Text>
 			</Stack>
 			<Stack alignSelf={"start"}>
