@@ -32,6 +32,7 @@ public class Engine extends Server {
 	static SparkDB docs = new SparkDB();
 	static Map<String, byte[]> WWWData = new HashMap<>();
 	static ArrayList<String> WWWFiles = new ArrayList<>();
+	static String SCHOOL = "";
 	// Here goes the constant objects that never removed after request process
 
 	Engine(String ENC) {
@@ -46,6 +47,7 @@ public class Engine extends Server {
 			users.readFromString(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
 			docs.readFromString(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
+			SCHOOL = AES.decrypt(new String(IO.read("./conf/info.txt")), ENCRYPTION_KEY);
 			this.setMaximumConcurrentRequests(1000);
 			this.setMaximumRequestSizeInKB(50000); // 50MB
 			this.setGZip(false);
@@ -85,6 +87,8 @@ public class Engine extends Server {
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
+				log.i("Received "+new String(((byte[])Elshanta.get("body"))));
+				log.i("API Request at "+ser);
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
@@ -92,6 +96,7 @@ public class Engine extends Server {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
+				if(ser.equals("name")) Elshanta.put("name", SCHOOL);
 				if (ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", SESSION_IDS);
 				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
 				if (headers.containsKey("code")) Elshanta.put("code", headers.get("code"));
@@ -101,13 +106,20 @@ public class Engine extends Server {
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
-					res = lib.ErrorWriter.wAPI(e, ENCRYPTION_KEY, ser);
+					res = new HashMap<String, Object>() {{
+						put("body", "ERR");
+						put("code",HTTPCode.OK);
+						put("mime","text/html");
+					}};
+					log.e("PPP");
+					e.printStackTrace();
 				}
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if (res.containsKey("docs")) {
 					docs = (SparkDB) res.get("docs");
 					IO.write("./conf/docs.db", AES.encrypt(docs.toString(), ENCRYPTION_KEY), false);
 				}
+				log.i("Response : "+res.get("body").getClass().getName().contains("byte") != null ?new String((byte[]) res.get("body")) : (String) res.get("body"));
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
@@ -145,6 +157,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
+			log.e("EEE");
 			e.printStackTrace();
 			return new HashMap<>() {
 				{

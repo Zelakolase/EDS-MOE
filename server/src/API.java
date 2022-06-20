@@ -41,6 +41,10 @@ public class API {
 	 */
 	String mime = "application/json";
 	/**
+	 * School name
+	 */
+	String school = "";
+	/**
 	 * Redirects API calls to desired functions in 'Endpoints' package
 	 * @param Elshanta_temp Inputs, may vary in amount and type
 	 * @return response body and MIME type
@@ -51,6 +55,8 @@ public class API {
 		String extension = "";
 		byte[] BODY = null; // HTTPS Body
 		HashMap<String, Object> res = new HashMap<>();
+		// School Name
+		if(Elshanta_temp.containsKey("name")) school = (String) Elshanta_temp.get("name");
 		// Encryption Key
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		// Request Body
@@ -81,7 +87,7 @@ public class API {
 		}).start();
 		String in = (String) Elshanta_temp.get("api");
 		if (in.equals("name")) {
-			res.put("body", new name().run(ENCRYPTION_KEY).getBytes());
+			res.put("body", new name().run(ENCRYPTION_KEY, school).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("about")) {
 			res.put("body", new about().run(ENCRYPTION_KEY, docs).getBytes());
@@ -95,7 +101,7 @@ public class API {
 			res.put("body", new SearchDoc().run(BODY, ENCRYPTION_KEY).getBytes());
 			res.put("code", code.getBytes());
 		}
-			else if (in.equals("DownloadDoc")) {
+		else if (in.equals("DownloadDoc")) {
 				Map<String, byte[]> temp = new DownloadDoc().run(BODY, ENCRYPTION_KEY);
 			res.put("body", temp.get("body"));
 			mime = new String(temp.get("mime"));

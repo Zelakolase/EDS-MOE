@@ -46,7 +46,7 @@ public class IO {
 						try {
 							Files.write(Paths.get(filename), content, set);
 						} catch (IOException e) {
-							log.e(e, IO.class.getName(), "write");
+							
 						}
 				  }
 				 }).start();

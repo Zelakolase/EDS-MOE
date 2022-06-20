@@ -55,7 +55,6 @@ public class Network {
 			dOS.write(ResponseData);
 			dOS.flush();
 		} catch (Exception e) {
-			log.e(e, Network.class.getName(), "write");
 		}
 	}
 
@@ -78,7 +77,6 @@ public class Network {
 				}
 			} while (dIS.available() > 0);
 		} catch (Exception e) {
-			log.e(e, Network.class.getName(), "read");
 		}
 		return Reply;
 	}
@@ -90,7 +88,6 @@ public class Network {
 		try {
 			return dIS.readNBytes(bytestoread);
 		} catch (Exception e) {
-			log.e(e, Network.class.getName(), "ManRead");
 		}
 		return null;
 	}

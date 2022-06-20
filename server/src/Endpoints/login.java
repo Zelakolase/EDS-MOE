@@ -6,6 +6,7 @@ import java.util.Map;
 import lib.JSON;
 import lib.RandomGenerator;
 import lib.SparkDB;
+import lib.log;
 
 public class login {
 	/**
@@ -18,6 +19,7 @@ public class login {
 	 */
 	public Map<String, Object> run(byte[] BODY, SparkDB users, Map<String, String> SESSION_IDS) throws Exception {
 			Map<String, Object> out = new HashMap<>();
+			log.i("body raw : "+new String(BODY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (users.Mapper.get("user").contains(in.get("user"))
 					&& users.get(new HashMap<String, String>() {{
