@@ -128,6 +128,7 @@ export default function Operation() {
 			if (typeof generatedDocResult.code === "undefined")
 				throw "Verify code not found.";
 
+			const { code } = generatedDocResult;
 			const { file } = state.upload;
 			let arrBuf = await file.arrayBuffer();
 
@@ -139,8 +140,8 @@ export default function Operation() {
 			const response = await request("post", SUBMIT["UPLOAD"])(
 				__file__.buffer,
 				{
+					code,
 					extension: __file__.extension,
-					verfiy_code: generatedDocResult?.code,
 					session_id: sessionID,
 					"Content-type": "application/text",
 				}
