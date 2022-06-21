@@ -126,7 +126,7 @@ export default function Operation() {
 			if (state.upload.file === null)
 				throw "You should use a file to upload it.";
 			if (typeof generatedDocResult.code === "undefined")
-				throw "Verify code not found.";
+				throw "Document code not found.";
 
 			const { code } = generatedDocResult;
 			const { file } = state.upload;
@@ -317,7 +317,7 @@ function Upload() {
 				<Alert status="error">
 					<AlertIcon />
 					<div>
-						Verify code not found, Please{" "}
+						Document code not found, Please{" "}
 						<span
 							style={{
 								textDecoration: "underline",
@@ -339,21 +339,21 @@ function Upload() {
 				{generatedDocResult.code && (
 					<Stack spacing={0}>
 						<Heading opacity={0.5} fontSize="x-small">
-							Verify code
+							Document code
 						</Heading>
 						<Heading>{generatedDocResult["code"]}</Heading>
 					</Stack>
 				)}
 				<Stack align={"center"}>
 					<Text>
-						Please, Insert Verification code inside the document,
-						then upload it below.
+						Please, Insert Document code inside the document, then
+						upload it below.
 					</Text>
 					<HStack>
 						<Tooltip
 							hasArrow
 							placement="top"
-							label="Import the document which you need to verify">
+							label="Import the document which you need to upload">
 							<Box position="relative" w={"max-content"}>
 								<Button
 									size={buttonSize}
@@ -374,7 +374,6 @@ function Upload() {
 												"upload.file",
 												__file__
 											);
-											// stateSetter("upload.file", __file__);
 										}
 									}}
 									top={0}
@@ -423,19 +422,17 @@ function Done() {
 			<Text fontSize={18}>The document is uploaded successfully !</Text>
 			<Divider />
 			<Stack>
-				{["code"].map(e => (
-					<Stack spacing={0.5}>
-						<Heading
-							opacity={0.5}
-							fontSize={10}
-							textTransform="capitalize">
-							{e.replace(/_/g, " ")}
-						</Heading>
-						<Heading size="lg">
-							{uploadDocResult[e] || "Error: Not found"}
-						</Heading>
-					</Stack>
-				))}
+				<Stack spacing={0.5}>
+					<Heading
+						opacity={0.5}
+						fontSize={10}
+						textTransform="capitalize">
+						document code
+					</Heading>
+					<Heading size="lg">
+						{uploadDocResult["code"] || "Error: Not found"}
+					</Heading>
+				</Stack>
 			</Stack>
 		</Stack>
 	);
