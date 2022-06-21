@@ -4,7 +4,7 @@ const AUTH = {
 };
 
 const DOCUMENT = {
-	DOWNALOD: "DownloadDoc",
+	DOWNLOAD: "DownloadDoc",
 	VERIFY: "VerifyDoc",
 	SEARCH: "SearchDoc",
 };

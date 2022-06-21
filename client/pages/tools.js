@@ -154,7 +154,7 @@ function DownloadDocumentComponent() {
 	async function downloadHandler() {
 		setLoading(true);
 		try {
-			const response = await request("post", DOCUMENT["DOWNALOD"])(
+			const response = await request("post", DOCUMENT["DOWNLOAD"])(
 				{
 					code: code,
 				},
@@ -179,7 +179,7 @@ function DownloadDocumentComponent() {
 			link.parentNode.removeChild(link);
 		} catch (err) {
 			toast({
-				title: "Search failed.",
+				title: "Download failed.",
 				description: err.toString(),
 				status: "error",
 				position: "top",
