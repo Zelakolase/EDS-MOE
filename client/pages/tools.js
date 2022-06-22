@@ -154,9 +154,9 @@ function DownloadDocumentComponent() {
 	async function downloadHandler() {
 		setLoading(true);
 		try {
-			const response = await request("post", DOCUMENT["DOWNLOAD"])(
+			const response = await request("get", DOCUMENT["DOWNLOAD"])(
 				{
-					code: code,
+					code,
 				},
 				null,
 				{
