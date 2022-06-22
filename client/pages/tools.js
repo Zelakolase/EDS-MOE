@@ -171,7 +171,7 @@ function DownloadDocumentComponent() {
 			const link = document.createElement("a");
 
 			link.target = "_blank";
-			link.download = `${code}.${response.headers["content-type"]}`;
+			link.download = `${code}.${response.headers["extension"]}`;
 			link.href = URL.createObjectURL(response.data);
 
 			document.body.appendChild(link);
