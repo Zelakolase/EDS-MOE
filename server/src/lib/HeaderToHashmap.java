@@ -1,10 +1,15 @@
 package lib;
 
 import java.util.HashMap;
-
+/**
+ * The name says it all
+ * @author morad
+ */
 public class HeaderToHashmap {
-	/*
-	 * Reads the HTTP request, then makes a hashmap to store headers n' stuff.
+	/**
+	 * Reads the request, then makes a HashMap with headers
+	 * @param req Original request
+	 * @return HashMap. Key: Header name, Value: Header Value
 	 */
 	public static HashMap<String, String> convert(String req) {
 		HashMap<String, String> data = new HashMap<>();

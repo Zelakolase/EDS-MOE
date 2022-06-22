@@ -9,7 +9,7 @@ import lib.SparkDB;
 public class logout {
 	/**
 	 * Log out as a verifier
-	 * Request : {"session_id" : "a" , "pass" : "b"}
+	 * Request : {"session_id" : "a" , "pass" : "b"}<br>
 	 * Response : {"status" : "success/failed"}
 	 * @param BODY Request Body
 	 * @param users UsersDB

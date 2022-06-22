@@ -45,12 +45,20 @@ public class API {
 	 */
 	String school = "";
 	/**
+	 * MIMEs
+	 */
+	SparkDB MIME = new SparkDB();
+	/**
+	 * AES Object
+	 */
+	AES aes;
+	/**
 	 * Redirects API calls to desired functions in 'Endpoints' package
 	 * @param Elshanta_temp Inputs, may vary in amount and type
-	 * @return response body and MIME type
+	 * @return response body and MIME type and additional headers if necessary
 	 */
 	public HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) throws Exception {
-		String code = HTTPCode.OK;
+		String code = HTTPCode.OK; // Default HTTP Code
 		String PCode = "", session_id = "";
 		String extension = "";
 		byte[] BODY = null; // HTTPS Body
@@ -73,24 +81,20 @@ public class API {
 		if (Elshanta_temp.containsKey("extension")) extension = (String) Elshanta_temp.get("extension");
 		// Docs DB
 		if (Elshanta_temp.containsKey("docs_db")) docs = (SparkDB) Elshanta_temp.get("docs_db");
-		(new Thread() {
-			@Override
-			public void run() {
-				try {
+		// MIMEs
+		MIME = (SparkDB) Elshanta_temp.get("mime");
+		// AES Obj
+		aes = (AES) Elshanta_temp.get("aes");
+		// We processed one query, write it down.
 					IO.write("./conf/queries.txt",
-							AES.encrypt(String.valueOf(Integer.parseInt(AES.decrypt(new String(IO.read("./conf/queries.txt")), ENCRYPTION_KEY)) + 1),ENCRYPTION_KEY),
+							aes.encrypt(String.valueOf(Integer.parseInt(aes.decrypt(new String(IO.read("./conf/queries.txt")))) + 1)),
 							false);
-				}catch (Exception e) {
-					// Silent
-				}
-			}
-		}).start();
 		String in = (String) Elshanta_temp.get("api");
 		if (in.equals("name")) {
 			res.put("body", new name().run(ENCRYPTION_KEY, school).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("about")) {
-			res.put("body", new about().run(ENCRYPTION_KEY, docs).getBytes());
+			res.put("body", new about().run(ENCRYPTION_KEY, docs, aes).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("login")) {
 			Map<String, Object> login = new login().run(BODY,users, SESSION_IDS);
@@ -102,12 +106,17 @@ public class API {
 			res.put("code", code.getBytes());
 		}
 		else if (in.equals("DownloadDoc")) {
-				Map<String, byte[]> temp = new DownloadDoc().run(BODY, ENCRYPTION_KEY);
+				Map<String, byte[]> temp = new DownloadDoc().run(BODY, ENCRYPTION_KEY, aes);
 			res.put("body", temp.get("body"));
-			mime = new String(temp.get("mime"));
+			mime = MIME.get(new HashMap<String, String>() {
+				{
+					put("extension", new String(temp.get("mime")));
+				}
+			}, "mime", 1).get(0);
+			res.put("extension", new String(temp.get("mime")).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("generate")) {
-			res.put("body", new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs).getBytes()); // generate verification code
+			res.put("body", new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs, aes).getBytes()); // generate verification code
 			res.put("code", code.getBytes());
 		} else if (in.equals("VerifyDoc")) {
 			res.put("body", new VerifyDoc().run(BODY, PCode, ENCRYPTION_KEY).getBytes()); // verify a document
@@ -118,7 +127,7 @@ public class API {
 			res.put("code", code.getBytes());
 			SESSION_IDS = (Map<String, String>) temp.get("SID");
 		} else if (in.equals("DataDoc")) {
-			res.put("body", new DataDoc().run(BODY, session_id, PCode, extension, SESSION_IDS, ENCRYPTION_KEY).getBytes()); // SAD S.2
+			res.put("body", new DataDoc().run(BODY, session_id, PCode, extension, SESSION_IDS, ENCRYPTION_KEY, aes).getBytes()); // SAD S.2
 			res.put("code", code.getBytes());
 		} else {
 			res.put("body", JSON.HMQ(new HashMap<String, String>() {

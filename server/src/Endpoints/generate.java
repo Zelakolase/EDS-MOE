@@ -18,14 +18,15 @@ import lib.SparkDB;
 public class generate {
 	/**
 	 * Generates public code
-	 * Request : {"session_id" : "a" , "doc_name" : "b" , "writer" : "c"}
+	 * Request : {"session_id" : "a" , "doc_name" : "b" , "writer" : "c"}<br>
 	 * Response : {"code" : "d"} or {"status" : "failed" , "msg" : "e"}
 	 * @param BODY Request Body
 	 * @param SESSION_IDS Session IDs list
 	 * @param ENCRYPTION_KEY Encryption Key
 	 * @param docs DocsDB
+	 * @param aes AES Object
 	 */
-	public String run(byte[] BODY, Map<String, String> SESSION_IDS, String ENCRYPTION_KEY, SparkDB docs) throws Exception {
+	public String run(byte[] BODY, Map<String, String> SESSION_IDS, String ENCRYPTION_KEY, SparkDB docs, AES aes) throws Exception {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (SESSION_IDS.containsKey(in.get("session_id"))) {
@@ -64,12 +65,12 @@ public class generate {
 					put("writer", in.get("writer"));
 					put("date", timeStamp);
 					put("sha", "0");
-					put("age", new String(AES.decrypt(IO.read("./conf/doc.txt"), ENCRYPTION_KEY)));
+					put("age", new String(aes.decrypt(IO.read("./conf/doc.txt"))));
 				}});
 				// e. increase doc.txt by 1
-				IO.write("./conf/doc.txt", AES.encrypt(String.valueOf(Integer.valueOf(new String(AES.decrypt(IO.read("./conf/doc.txt"), ENCRYPTION_KEY)))+1), ENCRYPTION_KEY), false);
+				IO.write("./conf/doc.txt", aes.encrypt(String.valueOf(Integer.valueOf(new String(aes.decrypt(IO.read("./conf/doc.txt"))))+1)), false);
 				// f. write changes to disk. 000.db and docs change
-				IO.write("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", AES.encrypt(db.toString(), ENCRYPTION_KEY), false);
+				IO.write("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", aes.encrypt(db.toString()), false);
 				docs.modify(targetIndex, new HashMap<String, String>() {{
 					put("size", String.valueOf(db.size()));
 				}});

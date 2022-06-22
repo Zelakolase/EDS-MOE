@@ -4,7 +4,10 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-
+/**
+ * Disk IO Operations
+ * @author morad
+ */
 public class IO {
 	/**
 	 * Reads file as byte array
@@ -46,7 +49,7 @@ public class IO {
 						try {
 							Files.write(Paths.get(filename), content, set);
 						} catch (IOException e) {
-							
+
 						}
 				  }
 				 }).start();

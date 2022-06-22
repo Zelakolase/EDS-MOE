@@ -2,7 +2,12 @@ package lib;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
+/**
+ * HashMap with Maximum size. When it reaches the maximum size, it deletes the eldest entry.
+ * @author morad
+ * @param <K> Key
+ * @param <V> Value
+ */
 public class MaxSizeHashMap<K, V> extends LinkedHashMap<K, V> {
 	private final int maxSize;
 

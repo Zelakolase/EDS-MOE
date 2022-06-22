@@ -10,7 +10,7 @@ import lib.SparkDB;
 public class VerifyDoc {
 	/**
 	 * Verify a document
-	 * Request : Body : raw data of file - Headers : 'code'
+	 * Request : Body : raw data of file - Headers : 'code'<br>
 	 * Response : {"msg" : "x"}, where x can be 'Verify Code isn't found' or 'The file is identical with the verify code' or 'The file isn't identical with the verify code'
 	 * @param BODY Request Body
 	 * @param code Document Code from headers

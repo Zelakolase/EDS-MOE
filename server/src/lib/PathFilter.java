@@ -1,5 +1,9 @@
 package lib;
-
+/**
+ * HTTP Path filter to prevent LFI
+ * @author morad
+ *
+ */
 public class PathFilter {
 	public static String filter(String path) {
 		String res = path;

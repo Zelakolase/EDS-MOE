@@ -2,8 +2,16 @@ package lib;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * JSON Parser
+ * @author morad
+ */
 public class JSON {
+	/**
+	 * JSON Query to HashMap
+	 * @param Q Query to be processed
+	 * @return HashMap
+	 */
 	public static HashMap<String, String> QHM(String Q) {
 		HashMap<String, String> HM = new HashMap<>();
 		Q = Q.replaceFirst("\\{", "").substring(0, Q.length() - 2); // {“user”:”x”,”pass”:”y”} -> “user”:”x”,”pass”:”y”
@@ -15,7 +23,11 @@ public class JSON {
 		}
 		return HM;
 	}
-
+	/**
+	 * HashMap to JSON Query
+	 * @param HM HashMap to be converted
+	 * @return JSON Query
+	 */
 	public static String HMQ(HashMap<String, String> HM) {
 		StringBuilder Q = new StringBuilder("{");
 

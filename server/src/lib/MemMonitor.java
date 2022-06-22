@@ -2,7 +2,7 @@ package lib;
 
 public class MemMonitor extends Thread {
 	/**
-	 * If mem usage higher than or equal 150MB, GC every 50ms until goes down
+	 * If mem usage higher than or equal 1024MB, GC every 50ms until goes down
 	 */
 	@Override
 	public void run() {

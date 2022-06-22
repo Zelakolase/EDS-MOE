@@ -11,7 +11,7 @@ import lib.log;
 public class login {
 	/**
 	 * Login functionality for verifiers
-	 * Request : {"user" : "a" , "pass" : "b"}
+	 * Request : {"user" : "a" , "pass" : "b"}<br>
 	 * Response : {"session_id" : "c" , "first_name" : "d"} or {"status" : "failed" , "msg" : "e"}
 	 * @param BODY Request Body
 	 * @param users UsersDB

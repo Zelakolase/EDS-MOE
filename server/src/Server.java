@@ -10,7 +10,8 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -18,7 +19,10 @@ import javax.net.ssl.SSLContext;
 import lib.ArraySplit;
 import lib.Network;
 import lib.log;
-
+/**
+ * Core Web Server Class
+ * @author morad
+ */
 public abstract class Server {
 	int port = 80; // Port Number
 	int MaxConcurrentRequests = 200; // Max requests to process at a time
@@ -28,25 +32,45 @@ public abstract class Server {
 	int backlog = 50; // Max requests to wait for processing, default is 5000MB
 	String WWWDir = "www";
 	String AddedResponseHeaders = ""; // Custom Response headers
+	/**
+	 * Set Maximum Concurrent Requests/Threads
+	 * @param in Number of max. threads/requests
+	 */
 	public void setMaximumConcurrentRequests(int in) {
 		MaxConcurrentRequests = in;
 	}
-
+	/**
+	 * Do you want GZip Compression?
+	 * @param in true: GZip, false: no GZip
+	 */
 	public void setGZip(boolean in) {
 		GZip = in;
 	}
-
+	/**
+	 * Maximum request size to be read in KBs
+	 * @param in Max size in KBs
+	 */
 	public void setMaximumRequestSizeInKB(int in) {
 		MAX_REQ_SIZE = in;
 	}
-
+	/**
+	 * Backlog specification
+	 */
 	public void setBacklog(int in) {
 		backlog = in;
 	}
-
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword) {
 		HTTPSStart(port, KeyStorePath, KeyStorePassword, "TLSv1.3", "JKS", "SunX509");
 	}
+	/**
+	 * Start HTTPS Server
+	 * @param port Port for the web server
+	 * @param KeyStorePath
+	 * @param KeyStorePassword
+	 * @param TLSVersion TLSv1.3
+	 * @param KeyStoreType JKS
+	 * @param KeyManagerFactoryType SunX509
+	 */
 	public void HTTPSStart(int port, String KeyStorePath, String KeyStorePassword, String TLSVersion,
 			String KeyStoreType, String KeyManagerFactoryType) {
 		// HTTPS Server start, default values
@@ -84,7 +108,7 @@ public abstract class Server {
 				}
 			}
 		} catch (Exception e) {
-			
+
 		} finally {
 			executor.shutdownNow();
 		}
@@ -105,7 +129,10 @@ public abstract class Server {
 			return null;
 		}
 	}
-
+	/**
+	 * The first entry point for ANY request.
+	 * @author morad
+	 */
 	public class Engine extends Thread {
 		// The main request processor
 		Socket S;
@@ -125,13 +152,13 @@ public abstract class Server {
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
-				HashMap<String, byte[]> Reply = new HashMap<>(); // Reply
 				/*
 				 * Dynamic Mode
 				 */
-				Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
+				final HashMap<String, byte[]> Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
 				boolean cache = false;
 				if(! new String(Reply.get("mime")).equals("application/json")) cache = true;
+				if(Reply.containsKey("extension")) AddedResponseHeaders += "extension: "+new String(Reply.get("extension"))+"\r\n";
 				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
 						GZip, AddedResponseHeaders, cache);
 				S.close();
@@ -139,11 +166,19 @@ public abstract class Server {
 
 			} finally {
 				CurrentConcurrentRequests--;
+				AddedResponseHeaders = "";
 			}
 			this.interrupt();
 		}
 
 	}
-
+	/**
+	 * The dynamic Engine
+	 * @param aLm Request split by '\r\n'
+	 * @param dIS DataInputStream for the connection
+	 * @param dOS DataOutputStream for the connection
+	 * @param max_size Maximum request size in bytes.
+	 * @return The request body, MIME type, Response code.
+	 */
 	abstract HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream dIS, BufferedOutputStream dOS, int max_size);
 }

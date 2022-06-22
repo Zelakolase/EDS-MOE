@@ -1,7 +1,11 @@
 package lib;
 
 import java.util.Random;
-
+/**
+ * Generates random strings
+ * @author morad
+ *
+ */
 public class RandomGenerator {
 	/**
 	 * From StackOverflow, modified

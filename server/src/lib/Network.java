@@ -5,7 +5,10 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
-
+/**
+ * Network IO Functions
+ * @author morad
+ */
 public class Network {
 	/**
 	 * GZIP Compression

@@ -2,9 +2,12 @@ package lib;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
+/**
+ * Fancy logger
+ * @author morad
+ */
 public class log {
-	static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+	private static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
 	public static final String RESET = isWindows ? "\033[0;37m" : "\u001B[0m";
 	public static final String RED = isWindows ? "\033[0;31m" : "\u001B[31m";
 	public static final String GREEN = isWindows ? "\033[0;32m" : "\u001B[32m";

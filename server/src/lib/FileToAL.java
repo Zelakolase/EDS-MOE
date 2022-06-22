@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class FileToAL {
+	/**
+	 * Every line is an element in a file
+	 * @param filename Filename
+	 * @return ArrayList of every line as an element
+	 */
 	public static ArrayList<String> convert(String filename) throws Exception{
 		ArrayList<String> data = new ArrayList<>();
 		String[] raw = new String(IO.read(filename)).split("\n");

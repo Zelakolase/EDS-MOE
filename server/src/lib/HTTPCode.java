@@ -1,5 +1,8 @@
 package lib;
-
+/**
+ * HTTP Code headers
+ * @author morad
+ */
 public interface HTTPCode {
 	String OK = "HTTP/1.1 200 OK";
 	String CREATED = "HTTP/1.1 201 Created";

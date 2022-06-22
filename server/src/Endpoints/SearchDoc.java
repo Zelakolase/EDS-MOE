@@ -8,7 +8,7 @@ import lib.SparkDB;
 public class SearchDoc {
 	/**
 	 * Search for a document using the document code
-	 * Request : {"code" : "a"}
+	 * Request : {"code" : "a"}<br>
 	 * Response : {"status" : "failed" , "msg" : "b"} or {"document_name" : "c" , "verifier" : "d" , "writer" : "e" , "date_of_publication" : "f"}
 	 * @param Key Encryption Key
 	 * @param BODY Request Body

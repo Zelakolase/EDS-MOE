@@ -20,40 +20,73 @@ import lib.MemMonitor;
 import lib.PostRequestMerge;
 import lib.SparkDB;
 import lib.log;
-
+/**
+ * The Web Engine. Responsible for starting the web server and redirecting requests to either Static file processing or API processing.
+ * @author morad
+ */
 public class Engine extends Server {
 	/**
-	 * Stage 3, HTTPS
+	 * Server Encryption Key
 	 */
 	static String ENCRYPTION_KEY;
+	/**
+	 * MIMEs
+	 */
 	static SparkDB MIME = new SparkDB();
+	/**
+	 * Session IDs, maximum entries are 100. Key: ID, Value: Username
+	 */
 	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
+	/**
+	 * Users DB
+	 */
 	static SparkDB users = new SparkDB();
+	/**
+	 * DocsDB for redirection
+	 */
 	static SparkDB docs = new SparkDB();
+	/**
+	 * Static Files data. Key: Supposed Relative path, Value: Byte raw data of the file
+	 */
 	static Map<String, byte[]> WWWData = new HashMap<>();
+	/**
+	 * Files relative paths
+	 */
 	static ArrayList<String> WWWFiles = new ArrayList<>();
+	/**
+	 * School name
+	 */
 	static String SCHOOL = "";
-	// Here goes the constant objects that never removed after request process
-
+	/**
+	 * AES Object
+	 */
+	static AES aes;
+	/**
+	 * Engine calling constructor
+	 * @param ENC Server Encryption Key
+	 */
 	Engine(String ENC) {
 		ENCRYPTION_KEY = ENC;
+		aes = new AES(ENCRYPTION_KEY);
 	}
-
+	/**
+	 * Web Server Starter
+	 */
 	public void run() {
 		try {
 			MemMonitor MM = new MemMonitor();
 			MM.start();
 			MIME.readFromFile("mime.db");
-			users.readFromString(AES.decrypt(new String(IO.read("./conf/users.db")), ENCRYPTION_KEY));
-			docs.readFromString(AES.decrypt(new String(IO.read("./conf/docs.db")), ENCRYPTION_KEY));
+			users.readFromString(aes.decrypt(new String(IO.read("./conf/users.db"))));
+			docs.readFromString(aes.decrypt(new String(IO.read("./conf/docs.db"))));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
-			SCHOOL = AES.decrypt(new String(IO.read("./conf/info.txt")), ENCRYPTION_KEY);
+			SCHOOL = aes.decrypt(new String(IO.read("./conf/info.txt")));
 			this.setMaximumConcurrentRequests(1000);
 			this.setMaximumRequestSizeInKB(50000); // 50MB
 			this.setGZip(false);
 			this.setBacklog(10000);
 			for(String file : WWWFiles) {
-				if(new File("./www/"+file).isFile()) WWWData.put("/"+file, AES.decrypt(IO.read("./www/"+file), ENCRYPTION_KEY));
+				if(new File("./www/"+file).isFile()) WWWData.put("/"+file, aes.decrypt(IO.read("./www/"+file)));
 			}
 			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
 					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
@@ -92,6 +125,7 @@ public class Engine extends Server {
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
+				Elshanta.put("aes", aes);
 				if (ser.equals("login") || ser.equals("logout") || ser.equals("DataDoc")) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
@@ -106,9 +140,9 @@ public class Engine extends Server {
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
-					res = new HashMap<String, Object>() {{
-						put("body", "ERR");
-						put("code",HTTPCode.OK);
+					res = new HashMap<>() {{
+						put("body", "API Internal Error");
+						put("code",HTTPCode.BAD_REQUEST);
 						put("mime","text/html");
 					}};
 					log.e("PPP");
@@ -117,12 +151,13 @@ public class Engine extends Server {
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if (res.containsKey("docs")) {
 					docs = (SparkDB) res.get("docs");
-					IO.write("./conf/docs.db", AES.encrypt(docs.toString(), ENCRYPTION_KEY), false);
+					IO.write("./conf/docs.db", aes.encrypt(docs.toString()), false);
 				}
 				log.i("Response : "+res.get("body").getClass().getName().contains("byte") != null ?new String((byte[]) res.get("body")) : (String) res.get("body"));
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
+				if(res.containsKey("extension")) response.put("extension", (byte[]) res.get("extension"));
 			} else {
 				/**
 				 * Static file request detected
@@ -152,7 +187,11 @@ public class Engine extends Server {
 					response.put("mime", "text/html".getBytes());
 				}
 				}catch(Exception e) {
-					response = lib.ErrorWriter.wnAPI(e, ENCRYPTION_KEY, path);
+					response = new HashMap<>() {{
+						put("content","Internal Server Error".getBytes());
+						put("code",HTTPCode.INTERNAL_SERVER_ERROR.getBytes());
+						put("mime","text/html".getBytes());
+					}};
 				}
 			}
 			return response;

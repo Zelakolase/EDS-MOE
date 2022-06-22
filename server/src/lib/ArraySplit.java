@@ -3,10 +3,16 @@ package lib;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
+/**
+ * See {@link #split(byte[], byte[])}
+ * @author morad
+ */
 public class ArraySplit {
-	/*
-	 * Splits arr according to delimiter sequence
+	/**
+	 * Splits an array according to a byte sequence
+	 * @param array The original array
+	 * @param delimiter The byte sequence
+	 * @return A list with the resulting arrays
 	 */
 	public static List<byte[]> split(byte[] array, byte[] delimiter) {
 		List<byte[]> byteArrays = new LinkedList<>();

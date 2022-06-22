@@ -1,10 +1,15 @@
 package lib;
 
 import java.nio.charset.StandardCharsets;
-
+/**
+ * URI Decoder, duh?
+ * @author morad
+ */
 public class URIDecode {
-	/*
-	 * Decode URI
+	/**
+	 * Decodes URI special characters
+	 * @param in The weird URI
+	 * @return Decoded URI
 	 */
 	public static String decode(String in) {
 		in = in.replaceAll("\\+", " ");

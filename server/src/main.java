@@ -12,11 +12,10 @@ import lib.log;
 
 public class main {
 	/**
-	 * Entry point for the server
-	 *
-	 * @throws Exception
+	 * Entry point for the application
 	 */
 	public static void main(String[] args) throws Exception {
+		AES aes;
 		Console console = System.console();
 		Scanner s = new Scanner(System.in);
 		// Stage 1
@@ -47,7 +46,8 @@ public class main {
 		if (ServerKey && UserDB && DocsDB && InfoDB && Queries && Docs && DocDBFolder && Doc) {
 			// Good to go
 			String k = new String(console.readPassword("Enter the server key: "));
-			boolean key = !AES.decrypt(new String(IO.read("./conf/server.key")), k).equals("ERR.ERR.ERR");
+			aes = new AES(k);
+			boolean key = !aes.decrypt(new String(IO.read("./conf/server.key"))).equals("ERR.ERR.ERR");
 			if (key) {
 				log.s("Encryption key is correct");
 				Engine server = new Engine(k);
@@ -86,6 +86,7 @@ public class main {
 			String SchoolName = s.nextLine();
 			// 3. Server Key
 			String ServerK = new String(console.readPassword("Enter the new server key: "));
+			aes = new AES(ServerK);
 			// 4. Write on disk
 			new File("./conf/").mkdir(); // <-- Configuration files
 			log.s("Created directory conf/");
@@ -95,15 +96,15 @@ public class main {
 			log.s("Created directory docs/");
 				// a. Write Server Key
 				new File("./conf/server.key").createNewFile();
-				IO.write("./conf/server.key", AES.encrypt(ServerK, ServerK), false);
+				IO.write("./conf/server.key", aes.encrypt(ServerK), false);
 				log.s("Stored Server Key");
 				// b. Write School name
 				new File("./conf/info.txt").createNewFile();
-				IO.write("./conf/info.txt", AES.encrypt(SchoolName, ServerK), false);
+				IO.write("./conf/info.txt", aes.encrypt(SchoolName), false);
 				log.s("Stored School Name");
 				// c. Write Verifiers
 				new File("./conf/users.db").createNewFile();
-				IO.write("./conf/users.db", AES.encrypt(Verifiers.toString(), ServerK), false);
+				IO.write("./conf/users.db", aes.encrypt(Verifiers.toString()), false);
 				log.s("Stored Verifiers data");
 				// d. Write DocsDB
 				SparkDB temp = new SparkDB();
@@ -120,12 +121,12 @@ public class main {
 				}
 				new File("./conf/docs.db").createNewFile();
 				IO.write("./conf/docs.db",
-						AES.encrypt(temp.toString(), ServerK)
+						aes.encrypt(temp.toString())
 						, false);
 				log.s("Created main document database");
 				// e. add queries.txt
 				new File("./conf/queries.txt").createNewFile();
-				IO.write("./conf/queries.txt", AES.encrypt("0", ServerK), false);
+				IO.write("./conf/queries.txt", aes.encrypt("0"), false);
 				log.s("Created queries counter");
 				// f. Write DocDB 000-999
 				SparkDB tempDB = new SparkDB();
@@ -135,19 +136,19 @@ public class main {
 				for(int i = 0;i<1000;i++) {
 					new File("./conf/doc/"+String.format("%03d", i)+".db").createNewFile();
 					IO.write("./conf/doc/"+String.format("%03d", i)+".db",
-							AES.encrypt(tempDB.toString(), ServerK)
+							aes.encrypt(tempDB.toString())
 							, false);
 				}
 				log.s("Created document databases");
 				// g. add doc.txt
 				new File("./conf/doc.txt").createNewFile();
-				IO.write("./conf/doc.txt", AES.encrypt("0", ServerK), false);
+				IO.write("./conf/doc.txt", aes.encrypt("0"), false);
 				log.s("Created document counter");
 				// h. Encrypt WWW files
 				for(String path : FrontendFiles) {
 					if(new File("./www/"+path).isFile()) {
 						IO.write("./www/"+path,
-								AES.encrypt(IO.read("./www/"+path), ServerK)
+								aes.encrypt(IO.read("./www/"+path))
 								, false);
 					}
 				}
