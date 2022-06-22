@@ -13,13 +13,9 @@ const DefaultHeaders = {
 
 export function request(method, route) {
 	return async (data, headers, props = {}) => {
-		let config = {
-			method,
-			url: `${API_URL}.${route}`,
+		return await axios[method](`${API_URL}.${route}`, data, {
 			headers: { ...DefaultHeaders, ...headers },
-			data,
-		};
-
-		return await axios(config);
+			...props,
+		});
 	};
 }
