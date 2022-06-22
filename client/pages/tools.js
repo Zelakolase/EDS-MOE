@@ -172,7 +172,7 @@ function DownloadDocumentComponent() {
 
 			link.target = "_blank";
 			link.download = `${code}.${response.headers["content-type"]}`;
-			link.href = URL.createObjectURL(response.data);
+			link.href = response.data;
 
 			document.body.appendChild(link);
 			link.click();
