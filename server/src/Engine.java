@@ -120,8 +120,6 @@ public class Engine extends Server {
 				 */
 				String ser = headers.get("path").replaceFirst("/api.", "");
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
-				log.i("Received "+new String(((byte[])Elshanta.get("body"))));
-				log.i("API Request at "+ser);
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
@@ -145,7 +143,6 @@ public class Engine extends Server {
 						put("code",HTTPCode.BAD_REQUEST);
 						put("mime","text/html");
 					}};
-					log.e("PPP");
 					e.printStackTrace();
 				}
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
@@ -153,7 +150,6 @@ public class Engine extends Server {
 					docs = (SparkDB) res.get("docs");
 					IO.write("./conf/docs.db", aes.encrypt(docs.toString()), false);
 				}
-				log.i("Response : "+res.get("body").getClass().getName().contains("byte") != null ?new String((byte[]) res.get("body")) : (String) res.get("body"));
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
@@ -196,7 +192,6 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			log.e("EEE");
 			e.printStackTrace();
 			return new HashMap<>() {
 				{
