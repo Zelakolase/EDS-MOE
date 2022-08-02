@@ -33,15 +33,12 @@ export default function AuthProvider({ children }) {
 		}
 	});
 
-	async function signin({ user, pass }) {
+	async function signin(form) {
 		try {
 			const response = await request(
 				"post",
 				AUTH["LOGIN"]
-			)({
-				user,
-				pass,
-			});
+			)(form);
 
 			const data = response.data;
 			if (data?.status === "failed") throw data?.msg;

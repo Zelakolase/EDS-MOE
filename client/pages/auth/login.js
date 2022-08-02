@@ -25,7 +25,7 @@ import {
 	AiOutlineEyeInvisible,
 } from "react-icons/ai";
 
-import { BsKey } from "react-icons/bs";
+import { BsKey, BsShieldLock } from "react-icons/bs";
 import { BiLogIn } from "react-icons/bi";
 
 function generatingRandomPassword() {
@@ -45,7 +45,7 @@ export default function Login() {
 	const router = useRouter();
 	const btnRef = useRef(null);
 
-	const [form, setForm] = useState({ user: "", pass: "" });
+	const [form, setForm] = useState({ user: "", pass: "" ,otp:""});
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [isPassFieldVisiable, setIsPassFieldVisiable] = useState(false);
@@ -164,9 +164,25 @@ export default function Login() {
 					/>
 				</Box>
 			</Stack>
+			<Stack w="full" spacing={1}>
+				<HStack align="end">
+					<BsShieldLock size="1.3em" />
+
+					<FormLabel htmlFor="otp" fontSize={13}>
+						OTP
+					</FormLabel>
+				</HStack>
+				<Input
+					placeholder="OTP"
+					id="otp"
+					variant={"filled"}
+					value={form.otp}
+					onChange={e => setForm({ ...form, otp: e.target.value })}
+				/>
+			</Stack>
 			<Button
 				ref={btnRef}
-				isDisabled={!form.pass || !form.user}
+				isDisabled={!form.pass || !form.user || !form.otp}
 				onClick={signInHandler}
 				rightIcon={<BiLogIn size="1.4em" />}
 				isLoading={isLoading}>
