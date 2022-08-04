@@ -8,7 +8,10 @@ import lib.AES;
 import lib.FileToAL;
 import lib.IO;
 import lib.SparkDB;
+import lib.TOTP;
 import lib.log;
+import lib.TOTP.Secret;
+import lib.TOTP.Secret.Size;
 
 public class main {
 	/**
@@ -66,6 +69,7 @@ public class main {
 				add("full_name");
 				add("user");
 				add("pass");
+				add("otp");
 			}});
 			System.out.print("Enter the number of verifiers: ");
 			int Num = Integer.parseInt(s.nextLine());
@@ -75,10 +79,13 @@ public class main {
 				System.out.print("For verifier " + (i + 1) + " -> Enter the username: ");
 				String user = s.nextLine();
 				String pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
+				byte[] RANDOTP = Secret.generate(Size.LARGE);
+				System.out.println("Scan QR Code using Google Authenticator: "+TOTP.getQRUrl(user, "EDS", Secret.toBase32(RANDOTP)));
 				Verifiers.add(new HashMap<String, String>() {{
 					put("full_name", full);
 					put("user",user);
 					put("pass",pass);
+					put("otp", Secret.toBase32(RANDOTP));
 				}});
 			}
 			// 2. School Name

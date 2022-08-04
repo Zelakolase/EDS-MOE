@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import lib.AES;
@@ -48,7 +49,7 @@ public class Engine extends Server {
 	/**
 	 * Static Files data. Key: Supposed Relative path, Value: Byte raw data of the file
 	 */
-	static Map<String, byte[]> WWWData = new HashMap<>();
+	static Map<String, byte[]> WWWData = new ConcurrentHashMap<>();
 	/**
 	 * Files relative paths
 	 */
@@ -143,7 +144,6 @@ public class Engine extends Server {
 						put("code",HTTPCode.BAD_REQUEST);
 						put("mime","text/html");
 					}};
-					e.printStackTrace();
 				}
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if (res.containsKey("docs")) {
@@ -192,7 +192,6 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return new HashMap<>() {
 				{
 					put("content", "Server error".getBytes());

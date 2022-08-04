@@ -6,12 +6,13 @@ import java.util.Map;
 import lib.JSON;
 import lib.RandomGenerator;
 import lib.SparkDB;
-import lib.log;
+import lib.TOTP;
+import lib.TOTP.Secret;
 
 public class login {
 	/**
 	 * Login functionality for verifiers
-	 * Request : {"user" : "a" , "pass" : "b"}<br>
+	 * Request : {"user" : "a" , "pass" : "b", "otp": "c"}<br>
 	 * Response : {"session_id" : "c" , "first_name" : "d"} or {"status" : "failed" , "msg" : "e"}
 	 * @param BODY Request Body
 	 * @param users UsersDB
@@ -19,13 +20,17 @@ public class login {
 	 */
 	public Map<String, Object> run(byte[] BODY, SparkDB users, Map<String, String> SESSION_IDS) throws Exception {
 			Map<String, Object> out = new HashMap<>();
-			log.i("body raw : "+new String(BODY));
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (users.Mapper.get("user").contains(in.get("user"))
 					&& users.get(new HashMap<String, String>() {{
 						put("user",in.get("user"));
 					}},"pass",1).get(0)
-					.equals(in.get("pass"))) {
+					.equals(in.get("pass"))
+					&&
+					new TOTP().validate(Secret.fromBase32(users.get(new HashMap<>() {{
+						put("user", in.get("user"));
+					}}, "otp",1).get(0)), in.get("otp"))
+					) {
 				String random = RandomGenerator.getSaltString(50, 0); // Session ID
 				SESSION_IDS.put(random, users.get(new HashMap<String, String>(){{
 					put("user",in.get("user"));
