@@ -29,39 +29,39 @@ public class Engine extends Server {
 	/**
 	 * Server Encryption Key
 	 */
-	static String ENCRYPTION_KEY;
+	static volatile String ENCRYPTION_KEY;
 	/**
 	 * MIMEs
 	 */
-	static SparkDB MIME = new SparkDB();
+	static volatile SparkDB MIME = new SparkDB();
 	/**
 	 * Session IDs, maximum entries are 100. Key: ID, Value: Username
 	 */
-	static Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
+	static volatile Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
 	/**
 	 * Users DB
 	 */
-	static SparkDB users = new SparkDB();
+	static volatile SparkDB users = new SparkDB();
 	/**
 	 * DocsDB for redirection
 	 */
-	static SparkDB docs = new SparkDB();
+	static volatile SparkDB docs = new SparkDB();
 	/**
 	 * Static Files data. Key: Supposed Relative path, Value: Byte raw data of the file
 	 */
-	static Map<String, byte[]> WWWData = new ConcurrentHashMap<>();
+	static volatile Map<String, byte[]> WWWData = new ConcurrentHashMap<>();
 	/**
 	 * Files relative paths
 	 */
-	static ArrayList<String> WWWFiles = new ArrayList<>();
+	static volatile ArrayList<String> WWWFiles = new ArrayList<>();
 	/**
 	 * School name
 	 */
-	static String SCHOOL = "";
+	static volatile String SCHOOL = "";
 	/**
 	 * AES Object
 	 */
-	static AES aes;
+	static volatile AES aes;
 	/**
 	 * Engine calling constructor
 	 * @param ENC Server Encryption Key
