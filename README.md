@@ -1,16 +1,16 @@
 # EDS-MOE
-(E)electronic (D)ocument (S)ystem 
+(E)electronic (D)ocument (S)ystem ver2.2
 
-## Progress
-- [x] API documentation
-- [x] Security check for API
-- [x] Frontend publish
-- [x] Backend publish
-- [x] Source code review and security check for backend (24 Apr. 2022)
-- [x] compile to native image (exe + elf)
+## Technologies used
+- Java native (Backend)
+- Javascript (next.js) (Frontend)
 
-## Universal principles to be applied in frontend, backend, and android
-- [Keep it simple stupid](http://principles-wiki.net/principles:keep_it_simple_stupid)
-- [You're not gonna need it](http://c2.com/xp/YouArentGonnaNeedIt.html)
-- [Separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns)
-- [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle)
+## Intellectual Property Rights
+Deposit no. is 4123, deposited in ITIDA.GOV.EG.
+
+## Details
+- The max. number of documents can be inserted is 10mil. with FIFO system
+- The system doesn't allow update or delete queries
+- EDS uses TOTP
+- EDS uses AES256/CBC/PKCS5 crypt algorithm
+- 'prod/' is a folder for latest production
