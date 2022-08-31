@@ -25,10 +25,10 @@ import lib.log;
  */
 public abstract class Server {
 	int port = 80; // Port Number
-	int MaxConcurrentRequests = 200; // Max requests to process at a time
-	private int CurrentConcurrentRequests = 0; // Current Concurrent Requests
-	boolean GZip = true; // GZip compression? (default true)
-	int MAX_REQ_SIZE = 100000; // Max bytes to read in kb. (default 100MB)
+	volatile int MaxConcurrentRequests = 200; // Max requests to process at a time
+	private volatile int CurrentConcurrentRequests = 0; // Current Concurrent Requests
+	volatile boolean GZip = true; // GZip compression? (default true)
+	volatile int MAX_REQ_SIZE = 100000; // Max bytes to read in kb. (default 100MB)
 	int backlog = 50; // Max requests to wait for processing, default is 5000MB
 	String WWWDir = "www";
 	String AddedResponseHeaders = ""; // Custom Response headers
@@ -83,19 +83,19 @@ public abstract class Server {
 			int req_num = 0;
 			while (true) {
 				/*
-				 * Max 5,000 retries (1ms delay between each) for every request to process if
+				 * Max 10 retries (1ms delay between each) for every request to process if
 				 * MaxConcurrentReqs is reached
 				 */
 				int tries = 0; // current tries
-				inner: while (tries < 5001) {
+				inner: while (tries < 10) {
 					if (tries > 0)
 						Thread.sleep(1);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
 						Socket S = SS.accept();
 						S.setKeepAlive(false);
 						S.setTcpNoDelay(true);
-						S.setReceiveBufferSize(64000);
-						S.setSendBufferSize(64000);
+						S.setReceiveBufferSize(65536);
+						S.setSendBufferSize(65536);
 						S.setSoTimeout(60000);
 						executor.execute(new Engine(S, S.getRemoteSocketAddress(), req_num));
 						CurrentConcurrentRequests++;
@@ -148,14 +148,14 @@ public abstract class Server {
 		public void run() {
 			try {
 				if(req_num == Integer.MAX_VALUE - 1) req_num = 0;
-				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),16384);
-				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),16384);
+				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),65536);
+				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),65536);
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
 				List<byte[]> ALm = ArraySplit.split(Request, new byte[] { 13, 10, 13, 10 }); // split by /r/n/r/n
 				/*
 				 * Dynamic Mode
 				 */
-				final HashMap<String, byte[]> Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1000) - Request.length);
+				final HashMap<String, byte[]> Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1024) - Request.length);
 				boolean cache = false;
 				if(! new String(Reply.get("mime")).equals("application/json")) cache = true;
 				if(Reply.containsKey("extension")) AddedResponseHeaders += "extension: "+new String(Reply.get("extension"))+"\r\n";

@@ -82,10 +82,10 @@ public class Engine extends Server {
 			docs.readFromString(aes.decrypt(new String(IO.read("./conf/docs.db"))));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
 			SCHOOL = aes.decrypt(new String(IO.read("./conf/info.txt")));
-			this.setMaximumConcurrentRequests(1000);
-			this.setMaximumRequestSizeInKB(50000); // 50MB
+			this.setMaximumConcurrentRequests(5000);
+			this.setMaximumRequestSizeInKB(10000); // 10MB
 			this.setGZip(false);
-			this.setBacklog(10000);
+			this.setBacklog(50000);
 			for(String file : WWWFiles) {
 				if(new File("./www/"+file).isFile()) WWWData.put("/"+file, aes.decrypt(IO.read("./www/"+file)));
 			}
