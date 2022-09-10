@@ -5,6 +5,7 @@ import java.util.Map;
 
 import lib.JSON;
 import lib.RandomGenerator;
+import lib.SHA;
 import lib.SparkDB;
 import lib.TOTP;
 import lib.TOTP.Secret;
@@ -21,26 +22,28 @@ public class login {
 	public Map<String, Object> run(byte[] BODY, SparkDB users, Map<String, String> SESSION_IDS) throws Exception {
 			Map<String, Object> out = new HashMap<>();
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
-			if (users.Mapper.get("user").contains(in.get("user"))
+			String SHAedUsername = SHA.gen(in.get("user"));
+			String SHAedPassword = SHA.gen(in.get("pass"));
+			if (users.Mapper.get("user").contains(SHA.gen(in.get("user")))
 					&& users.get(new HashMap<String, String>() {{
-						put("user",in.get("user"));
+						put("user",SHAedUsername);
 					}},"pass",1).get(0)
-					.equals(in.get("pass"))
+					.equals(SHAedPassword)
 					&&
 					new TOTP().validate(Secret.fromBase32(users.get(new HashMap<>() {{
-						put("user", in.get("user"));
+						put("user", SHAedUsername);
 					}}, "otp",1).get(0)), in.get("otp"))
 					) {
 				String random = RandomGenerator.getSaltString(50, 0); // Session ID
 				SESSION_IDS.put(random, users.get(new HashMap<String, String>(){{
-					put("user",in.get("user"));
+					put("user", SHAedUsername);
 				}},"full_name",1).get(0));
 				out.put("body", JSON.HMQ(new HashMap<String, String>() {
 					{
 						put("session_id", random);
 						put("first_name", users.get(new HashMap<String, String>() {{
-							put("user",in.get("user"));
-						}}, "full_name",0).get(0));
+							put("user", SHAedUsername);
+						}}, "full_name",1).get(0));
 					}
 				}));
 			} else {

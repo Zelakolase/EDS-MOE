@@ -99,10 +99,10 @@ public class Engine extends Server {
 				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 				String ip = socket.getLocalAddress().getHostAddress();
 				log.s("Server is running, Device local IP Address: " + ip);
-			}
+					}
 			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 

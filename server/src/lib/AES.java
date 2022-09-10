@@ -25,7 +25,7 @@ public class AES {
 		try {
 			MessageDigest sha = null;
 			key = myKey.getBytes("UTF-8");
-			sha = MessageDigest.getInstance("SHA-256");
+			sha = MessageDigest.getInstance("SHA3-512");
 			key = sha.digest(key);
 			key = Arrays.copyOf(key, 32);
 			secretKey = new SecretKeySpec(key, "AES");

@@ -1,6 +1,0 @@
- Version info: 'GraalVM 22.2.0 Java 17 EE'
- Java version info: '17.0.4+11-LTS-jvmci-22.2-b05'
- C compiler: gcc (unknown, x86_64, 10.2.1)
- Garbage collector: G1 GC
-
-use 'sudo'

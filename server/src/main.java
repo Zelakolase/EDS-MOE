@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import lib.AES;
+import lib.EntropyCalc;
 import lib.FileToAL;
 import lib.IO;
+import lib.SHA;
 import lib.SparkDB;
 import lib.TOTP;
 import lib.log;
@@ -18,6 +20,8 @@ public class main {
 	 * Entry point for the application
 	 */
 	public static void main(String[] args) throws Exception {
+		System.setProperty("jdk.tls.ephemeralDHKeySize", "2048"); // Mitigation against LOGJAM TLS Attack
+		System.setProperty("jdk.tls.rejectClientInitiatedRenegotiation", "true"); // Mitigation against Client Renegotiation Attack
 		AES aes;
 		Console console = System.console();
 		Scanner s = new Scanner(System.in);
@@ -36,7 +40,7 @@ public class main {
 		boolean DocsDB = new File("./conf/docs.db").exists(); // Docs Mapping for DocDB
 		boolean DocDBFolder = new File("./conf/doc").exists(); // DocDB Folder folder
 		boolean DocDB = true;
-		for(int i = 0;i<1000;i++) {
+		for(int i = 0;i<1000;i++) { // Check every doc table
 			DocDB = DocDB && new File("./conf/doc/"+String.format("%03d", i)+".db").exists();
 		}
 		boolean InfoDB = new File("./conf/info.txt").exists(); // School name
@@ -51,12 +55,20 @@ public class main {
 			String k = new String(console.readPassword("Enter the server key: "));
 			aes = new AES(k);
 			boolean key = !aes.decrypt(new String(IO.read("./conf/server.key"))).equals("ERR.ERR.ERR");
+			boolean config = args.length > 0; // check if the user wants to go config mode, next line same comment.
+			config = config ? config && args[0].equals("config") : false;
 			if (key) {
 				log.s("Encryption key is correct");
-				Engine server = new Engine(k);
-				server.run();
+				if(!config) {
+					Engine server = new Engine(k);
+					server.run();
+				}
+				else {
+					ConfigMode.main(aes, k);
+				}
 			} else {
 				log.e("Encryption key is not correct");
+				System.exit(1);
 			}
 		}
 		/**
@@ -74,17 +86,40 @@ public class main {
 			System.out.print("Enter the number of verifiers: ");
 			int Num = Integer.parseInt(s.nextLine());
 			for (int i = 0; i < Num; i++) {
-				System.out.print("For verifier " + (i + 1) + " -> Enter the fullname: ");
-				String full = s.nextLine();
-				System.out.print("For verifier " + (i + 1) + " -> Enter the username: ");
-				String user = s.nextLine();
-				String pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
+				double tempEntropy = -1;
+				String user = "", full = "";
+				boolean isSimilar = true;
+				while(isSimilar) {
+				full = console.readLine("For verifier " + (i + 1) + " -> Enter the fullname: ");
+				if(! Verifiers.getColumn("full_name").contains(full)) isSimilar = false;
+				else log.e("The full name already exists");
+				}
+				isSimilar = true;
+				while(isSimilar) {
+				user = console.readLine("For verifier " + (i + 1) + " -> Enter the username: ");
+				if(! Verifiers.getColumn("user").contains(SHA.gen(user))) isSimilar = false;
+				else log.e("The user name already exists");
+			}
+				String pass = "";
+				boolean EntropyTestPass = false;
+				while(!EntropyTestPass) {
+					pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
+					tempEntropy = EntropyCalc.calculate(pass);
+					if(tempEntropy < 55) {
+						log.e("Weak password, The length of the password should be higher than 9 alphanumeric characters with digits");
+					}else {
+						EntropyTestPass = true;
+					}
+				}
 				byte[] RANDOTP = Secret.generate(Size.LARGE);
-				System.out.println("Scan QR Code using Google Authenticator: "+TOTP.getQRUrl(user, "EDS", Secret.toBase32(RANDOTP)));
+				final String FUser = user;
+				final String FFull = full;
+				System.out.println("Scan QR Code using Google Authenticator: "+TOTP.getQRUrl(FUser, "EDS", Secret.toBase32(RANDOTP)));
+				final String FPass = pass;
 				Verifiers.add(new HashMap<String, String>() {{
-					put("full_name", full);
-					put("user",user);
-					put("pass",pass);
+					put("full_name", FFull);
+					put("user",SHA.gen(FUser));
+					put("pass",SHA.gen(FPass));
 					put("otp", Secret.toBase32(RANDOTP));
 				}});
 			}

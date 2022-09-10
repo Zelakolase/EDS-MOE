@@ -163,7 +163,7 @@ public final class TOTP {
 		 * @see Base32
 		 */
 		public static final String toBase32(byte[] secret) {
-			return new String(new Base32().encode(secret));
+			return new String(Base32.encode(secret));
 		}
 		
 		/**
@@ -174,7 +174,7 @@ public final class TOTP {
 		 * @see Base32
 		 */
 		public static final byte[] fromBase32(String base32) {
-			return new Base32().decode(base32);
+			return Base32.decode(base32);
 		}
 		
 		public static final String toHex(byte[] secret) {
