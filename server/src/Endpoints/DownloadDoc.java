@@ -30,7 +30,7 @@ public class DownloadDoc {
 				}}, "path", 1).get(0);
 				res = aes.decrypt(IO.read(path));
 				String[] pathSplit = path.split("\\.");
-				out.put("mime", pathSplit[pathSplit.length - 1].getBytes());
+				out.put("mime", pathSplit[pathSplit.length - 1].toLowerCase().getBytes());
 			} else {
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{

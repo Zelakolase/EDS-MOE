@@ -139,7 +139,6 @@ public class Engine extends Server {
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
-					e.printStackTrace();
 					res = new HashMap<>() {{
 						put("body", "API Internal Error".getBytes());
 						put("code",HTTPCode.BAD_REQUEST);
