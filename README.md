@@ -1,5 +1,5 @@
 # EDS-MOE
-(E)electronic (D)ocument (S)ystem ver2.2
+(E)electronic (D)ocument (S)ystem ver3.0
 
 ## Technologies used
 - Java native (Backend)
