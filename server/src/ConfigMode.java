@@ -31,12 +31,13 @@ public class ConfigMode {
                 else log.e("The user name already exists");
                 }
                 String pass = "";
-                double tempEntropy = -1;
-                while(tempEntropy == -1 || tempEntropy >= 55.0) {
+                boolean EntropyTestPass = false;
+                while(!EntropyTestPass) {
                     pass = new String(console.readPassword("Enter the verifier's password: "));
-                    tempEntropy = EntropyCalc.calculate(pass);
-                    if(tempEntropy < 55) {
+                    if(EntropyCalc.calculate(pass) < 55.0) {
                         log.e("Weak password, The length of the password should be higher than 9 alphanumeric characters with digits\n");
+                    }else {
+                        EntropyTestPass = true;
                     }
                 }
                 byte[] RANDOTP = Secret.generate(Size.LARGE);
@@ -65,22 +66,11 @@ public class ConfigMode {
                             put("user", user);
                         }}, 1);
                         log.s("Deleted the verifier!");
+                    }else {
+                        log.e("The password is incorrect");
                     }
                 }else {
                     log.e("The username doesn't exist");
-                }
-            }
-            else if(cmd.equals("deletedoc")) {
-                String code = console.readLine("Enter the document number in 123-456-789 format or 123456789 format: ");
-                SparkDB db = new SparkDB();
-			    db.readFromFile("./conf/doc/"+code.substring(0, 3)+".db", Key); // read ./conf/doc/000.db
-                if(db.getColumn("code").contains(code)) {
-                    db.delete(new HashMap<String, String>() {{
-                        put("code", code);
-                    }}, 1);
-                    log.s("Done!");
-                }else {
-                    log.e("The document code doesn't exist");
                 }
             }
             else if(cmd.equals("edituser")) {

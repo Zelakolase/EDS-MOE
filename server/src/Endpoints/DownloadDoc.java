@@ -38,6 +38,7 @@ public class DownloadDoc {
 						put("msg", "Public code isn't found");
 					}
 				}).getBytes();
+				out.put("mime", "application/json".getBytes());
 			}
 			out.put("body", res);
 			return out;

@@ -41,7 +41,7 @@ public class DataDoc {
 				if(db.getColumn("path").get(targetModifyIndex).equals("0") && db.getColumn("sha").get(targetModifyIndex).equals("0")) {
 				db.modify(targetModifyIndex, new HashMap<String, String>() {{
 					put("path", path);
-					put("sha", Arrays.toString(MessageDigest.getInstance("SHA-256").digest(BODY)));
+					put("sha", Arrays.toString(MessageDigest.getInstance("SHA3-512").digest(BODY)));
 				}});
 				IO.write("./conf/doc/"+code.substring(0,3)+".db", aes.encrypt(db.toString()), false);
 				final String FCode = code;

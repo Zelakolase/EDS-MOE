@@ -22,7 +22,11 @@ Deposit no. is 4123, deposited in ITIDA.GOV.EG.
 - BUF_SIZE for RCV and SNT is 64KB
 - SO_TIMEOUT is 60sec
 
-## TODO
-- [ ] Config terminal mode for :<br>
-						1. CRUD in './conf/users.db'
-						2. Update school name
+## Version 3.0 changelog
+- Replaced SHA256 with SHA3-512
+- Usernames and passwords will be hashed in storage
+- configuration mode for Adding/Deleting/Changing passwords of users
+- Fixed LOGJAM TLS Vulnerability
+- Fixed Client Initiated Renegotiation TLS Vulnerability
+- Bug Fixes
+- Server key and user passwords should have an entropy 'e' where "e >= 55"

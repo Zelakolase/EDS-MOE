@@ -25,7 +25,7 @@ public class VerifyDoc {
 			final String tempcode = code;
 			boolean compare = db.get(new HashMap<String, String>() {{
 				put("code",tempcode);
-			}},"sha",1).get(0).equals(Arrays.toString(MessageDigest.getInstance("SHA-256").digest(BODY)));
+			}},"sha",1).get(0).equals(Arrays.toString(MessageDigest.getInstance("SHA3-512").digest(BODY)));
 			String msg = compare ? "The file is identical with the verify code"
 					: "The file isn't identical with the verify code";
 			res = JSON.HMQ(new HashMap<String, String>() {

@@ -108,18 +108,20 @@ public class API {
 		else if (in.equals("DownloadDoc")) {
 				Map<String, byte[]> temp = new DownloadDoc().run(BODY, ENCRYPTION_KEY, aes);
 			res.put("body", temp.get("body"));
-			mime = MIME.get(new HashMap<String, String>() {
-				{
-					put("extension", new String(temp.get("mime")));
-				}
-			}, "mime", 1).get(0);
-			res.put("extension", new String(temp.get("mime")).getBytes());
+			if(! new String((byte[]) temp.get("mime")).equals("application/json")) {
+				mime = MIME.get(new HashMap<String, String>() {
+					{
+						put("extension", new String(temp.get("mime")));
+					}
+				}, "mime", 1).get(0);
+				res.put("extension", new String(temp.get("mime")).getBytes());
+			}
 			res.put("code", code.getBytes());
 		} else if (in.equals("generate")) {
-			res.put("body", new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs, aes).getBytes()); // generate verification code
+			res.put("body", (new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs, aes)).getBytes()); // generate verification code
 			res.put("code", code.getBytes());
 		} else if (in.equals("VerifyDoc")) {
-			res.put("body", new VerifyDoc().run(BODY, PCode, ENCRYPTION_KEY).getBytes()); // verify a document
+			res.put("body", (new VerifyDoc().run(BODY, PCode, ENCRYPTION_KEY)).getBytes()); // verify a document
 			res.put("code", code.getBytes());
 		} else if (in.equals("logout")) {
 			Map<String, Object> temp = new logout().run(BODY, users, SESSION_IDS);
@@ -139,7 +141,7 @@ public class API {
 			code = HTTPCode.BAD_REQUEST;
 			res.put("code", code.getBytes());
 		}
-		if (res.get("body").equals("error")) code = HTTPCode.INTERNAL_SERVER_ERROR;
+		if (new String((byte[]) res.get("body")).equals("error")) code = HTTPCode.INTERNAL_SERVER_ERROR;
 		if (Elshanta_temp.containsKey("session_ids")) res.put("session_ids", SESSION_IDS);
 		if (Elshanta_temp.containsKey("docs_db")) res.put("docs", docs);
 		res.put("mime", mime.getBytes());
