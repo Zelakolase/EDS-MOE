@@ -7,6 +7,7 @@
 
 ## Intellectual Property Rights
 Deposit no. is 4123, deposited in ITIDA.GOV.EG.
+غير مسموح بنشر أو توزيع أو تعديل نظام ادارة المستندات دون موافقة كتابية من المودع، طبقًا لقانون جمهورية مصر العربية رقم 82 لسنة 2002.
 
 ## Details
 - The max. number of documents can be inserted is 10mil. with FIFO system
