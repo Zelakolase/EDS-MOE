@@ -168,3 +168,17 @@ Response body :
 ```jsonc
 { "name": "x" }
 ```
+
+### **Documents table: /api.table**
+
+Request is GET
+
+Response body :
+
+```jsonc
+{
+	"0": "{"DocName":"A" , "Verifier":"B", "Writer":"C"}" ,
+	"1" : "{"DocName":"A" , "Verifier":"B", "Writer":"C"}", 
+	...
+}
+```

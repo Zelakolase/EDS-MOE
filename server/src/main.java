@@ -86,7 +86,6 @@ public class main {
 			System.out.print("Enter the number of verifiers: ");
 			int Num = Integer.parseInt(s.nextLine());
 			for (int i = 0; i < Num; i++) {
-				double tempEntropy = -1;
 				String user = "", full = "";
 				boolean isSimilar = true;
 				while(isSimilar) {
@@ -101,16 +100,6 @@ public class main {
 				else log.e("The user name already exists");
 			}
 				String pass = "";
-				boolean EntropyTestPass = false;
-				while(!EntropyTestPass) {
-					pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
-					tempEntropy = EntropyCalc.calculate(pass);
-					if(tempEntropy < 55) {
-						log.e("Weak password, The length of the password should be higher than 9 alphanumeric characters with digits");
-					}else {
-						EntropyTestPass = true;
-					}
-				}
 				byte[] RANDOTP = Secret.generate(Size.LARGE);
 				final String FUser = user;
 				final String FFull = full;
