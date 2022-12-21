@@ -77,6 +77,16 @@ public class generate {
 				HashMap<String, String> temp = new HashMap<>();
 				temp.put("code", PCode);
 				res = JSON.HMQ(temp);
+				// g. write to Table.db
+				SparkDB T = new SparkDB();
+				T.readFromFile("./conf/Table.db", ENCRYPTION_KEY);
+				T.add(new HashMap<String, String>() {{
+					put("DocName", in.get("doc_name"));
+					put("Verifier", SESSION_IDS.get(in.get("session_id")));
+					put("Writer", in.get("writer"));
+					put("DocNum", PFCode);
+				}});
+				IO.write("./conf/Table.db", aes.encrypt(T.toString()), false);
 			} else {
 				new JSON();
 				res = JSON.HMQ(new HashMap<String, String>() {

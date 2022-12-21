@@ -4,6 +4,7 @@ import java.util.*;
 
 import lib.JSON;
 import lib.SparkDB;
+import lib.log;
 
 public class Table {
     /**
@@ -18,19 +19,15 @@ public class Table {
      * @param Key  Encryption Key
      * @param BODY Request Body
      */
-    public String run(byte[] BODY, Map<String, String> SESSION_IDS, SparkDB docs) throws Exception {
+    public String run(String cookies, Map<String, String> SESSION_IDS, String ENC) throws Exception {
         String res = "error";
-
-        HashMap<String, String> in = JSON.QHM(new String(BODY));
-        if (SESSION_IDS.containsKey(in.get("session_id"))) {
+        String session_id = cookies.split("session_id=")[1];
+        if (SESSION_IDS.containsKey(session_id)) {
             HashMap<String, String> MainTable = new HashMap<>(); // K=0,1,2 V={"DocName":"A" , "Verifier":"B", "Writer":"C"}
-            for(int i = 0;i < docs.num_queries;i++) {
-                HashMap<String, String> ROW = docs.get(i);
-                MainTable.put(String.valueOf(i), JSON.HMQ( new HashMap<>() {{
-                    put("DocName", ROW.get("doc_name"));
-                    put("Verifier", ROW.get("verifier"));
-                    put("Writer", ROW.get("writer"));
-                }}));
+            SparkDB T = new SparkDB();
+            T.readFromFile("./conf/Table.db", ENC);
+            for(int i = 0;i < T.num_queries;i++) {
+                MainTable.put(String.valueOf(i), JSON.HMQ(T.get(i)));
             }
             res = JSON.HMQ(MainTable);
         } else {

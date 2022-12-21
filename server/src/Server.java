@@ -97,7 +97,7 @@ public abstract class Server {
 						S.setReceiveBufferSize(65536);
 						S.setSendBufferSize(65536);
 						S.setSoTimeout(60000);
-						executor.execute(new Engine(S, S.getRemoteSocketAddress(), req_num));
+						executor.execute(new Engine(S, S.getRemoteSocketAddress()));
 						CurrentConcurrentRequests++;
 						if(req_num >= Integer.MAX_VALUE) req_num = 0;
 						else req_num++;
@@ -137,17 +137,14 @@ public abstract class Server {
 		// The main request processor
 		Socket S;
 		SocketAddress SA;
-		int req_num;
-		Engine(Socket in, SocketAddress SA, int req_num) {
+		Engine(Socket in, SocketAddress SA) {
 			S = in;
 			this.SA = SA;
-			this.req_num = req_num;
 		}
 
 		@Override
 		public void run() {
 			try {
-				if(req_num == Integer.MAX_VALUE - 1) req_num = 0;
 				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),65536);
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),65536);
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
@@ -179,6 +176,7 @@ public abstract class Server {
 	 * @param dOS DataOutputStream for the connection
 	 * @param max_size Maximum request size in bytes.
 	 * @return The request body, MIME type, Response code.
+	 * @throws Exception
 	 */
-	abstract HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream dIS, BufferedOutputStream dOS, int max_size);
+	abstract HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream dIS, BufferedOutputStream dOS, int max_size) throws Exception;
 }

@@ -16,7 +16,10 @@ public class HeaderToHashmap {
 		String[] lines = req.split("\r\n");
 		String[] fir_data = lines[0].split(" ");
 		data.put("method", fir_data[0]);
-		data.put("path", PathFilter.filter(fir_data[1]));
+		if(fir_data.length>1) data.put("path", PathFilter.filter(fir_data[1]));
+		else { 
+			data.put("path", "error");
+		}
 		for (int i = 1; i < lines.length; i++) {
 			String[] temp = lines[i].split(": ");
 			data.put(temp[0], temp[1]);

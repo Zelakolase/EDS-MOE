@@ -1,6 +1,8 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -108,9 +110,10 @@ public class Engine extends Server {
 
 	/**
 	 * Dynamic Engine Entry point
+	 * @throws Exception
 	 */
 	@Override
-	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size) {
+	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size) throws Exception {
 		try {
 			HashMap<String, String> headers = HeaderToHashmap.convert(new String(aLm.get(0))); // headers
 			HashMap<String, byte[]> response = new HashMap<>(); // content, mime, code
@@ -125,7 +128,7 @@ public class Engine extends Server {
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
 				Elshanta.put("aes", aes);
-				if (ser.equals("login") || ser.equals("logout") || ser.equals("DataDoc")) {
+				if (ser.equals("login") || ser.equals("logout") || ser.equals("DataDoc") || ser.equals("Table")) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
@@ -134,15 +137,20 @@ public class Engine extends Server {
 				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
 				if (headers.containsKey("code")) Elshanta.put("code", headers.get("code"));
 				if (headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
+				if(headers.containsKey("Cookie")) Elshanta.put("Cookie", headers.get("Cookie"));
 				if (headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res;
 				try {
 				res = new API().redirector(Elshanta); // Elshanta reply
 				}catch(Exception e) {
+					StringWriter sw = new StringWriter();
+PrintWriter pw = new PrintWriter(sw);
+e.printStackTrace(pw);
+
 					res = new HashMap<>() {{
-						put("body", "API Internal Error".getBytes());
+						put("body", ("Error. Please send the following text to the administrator: "+aes.encrypt(sw.toString())).getBytes());
 						put("code",HTTPCode.BAD_REQUEST);
-						put("mime","text/html");
+						put("mime","text/html".getBytes());
 					}};
 				}
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
@@ -192,9 +200,12 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
 			return new HashMap<>() {
 				{
-					put("content", "Server error".getBytes());
+					put("content", ("Error. Please send the following text to the administrator: "+aes.encrypt(sw.toString())).getBytes());
 					put("code", HTTPCode.SERVICE_UNAVAILABLE.getBytes());
 					put("mime", "text/html".getBytes());
 				}

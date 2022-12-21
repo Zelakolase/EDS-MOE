@@ -99,7 +99,7 @@ public class main {
 				if(! Verifiers.getColumn("user").contains(SHA.gen(user))) isSimilar = false;
 				else log.e("The user name already exists");
 			}
-				String pass = "";
+				String pass = new String(console.readPassword("For verifier " + (i + 1) + " -> Enter the password: "));
 				byte[] RANDOTP = Secret.generate(Size.LARGE);
 				final String FUser = user;
 				final String FFull = full;
@@ -183,6 +183,20 @@ public class main {
 								, false);
 					}
 				}
+				// i. Table DB
+				new File("./conf/Table.db").createNewFile();
+				SparkDB T = new SparkDB();
+				T.create(new ArrayList<String>() {{
+					add("DocName"); add("Verifier"); add("Writer"); add("DocNum");
+				}});
+				T.add(new HashMap<String, String>() {{
+					put("DocName", "0");
+					put("Verifier", "0");
+					put("DocNum", "0");
+					put("Writer", "0");
+				}});
+				IO.write("./conf/Table.db", aes.encrypt(T.toString()), false);
+				log.s("Created Admin database for document viewing");
 			log.s("You may relaunch the server!");
 		}
 		s.close();

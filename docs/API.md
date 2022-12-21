@@ -169,7 +169,7 @@ Response body :
 { "name": "x" }
 ```
 
-### **Documents table: /api.table**
+### **Documents table: /api.Table**
 
 Request is GET
 
@@ -177,8 +177,8 @@ Response body :
 
 ```jsonc
 {
-	"0": "{"DocName":"A" , "Verifier":"B", "Writer":"C"}" ,
-	"1" : "{"DocName":"A" , "Verifier":"B", "Writer":"C"}", 
+	"0": "{"DocName":"A" , "Verifier":"B", "Writer":"C", "DocNum":"D"}" ,
+	"1" : "{"DocName":"A" , "Verifier":"B", "Writer":"C", "DocNum":"D"}", 
 	...
 }
 ```

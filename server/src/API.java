@@ -4,6 +4,7 @@ import java.util.Map;
 import Endpoints.DataDoc;
 import Endpoints.DownloadDoc;
 import Endpoints.SearchDoc;
+import Endpoints.Table;
 import Endpoints.VerifyDoc;
 import Endpoints.about;
 import Endpoints.generate;
@@ -125,13 +126,17 @@ public class API {
 			res.put("code", code.getBytes());
 		} else if (in.equals("logout")) {
 			Map<String, Object> temp = new logout().run(BODY, users, SESSION_IDS);
-			res.put("body", ((String) temp.get("body")).getBytes()); // verify a document
+			res.put("body", ((String) temp.get("body")).getBytes());
 			res.put("code", code.getBytes());
 			SESSION_IDS = (Map<String, String>) temp.get("SID");
 		} else if (in.equals("DataDoc")) {
 			res.put("body", new DataDoc().run(BODY, session_id, PCode, extension, SESSION_IDS, ENCRYPTION_KEY, aes).getBytes()); // SAD S.2
 			res.put("code", code.getBytes());
-		} else {
+		}else if(in.equals("Table")) {
+			res.put("body", (new Table().run((String) Elshanta_temp.get("Cookie"), SESSION_IDS, ENCRYPTION_KEY)).getBytes());
+			res.put("code", code.getBytes());
+		}
+		 else {
 			res.put("body", JSON.HMQ(new HashMap<String, String>() {
 				{
 					put("status", "failed");
