@@ -7,6 +7,7 @@
 
 ## Intellectual Property Rights
 Deposit no. is 4123, deposited in ITIDA.GOV.EG.
+غير مسموح بنشر أو توزيع أو تعديل نظام ادارة المستندات دون موافقة كتابية من المودع، طبقًا لقانون جمهورية مصر العربية رقم 82 لسنة 2002.
 
 ## Details
 - The max. number of documents can be inserted is 10mil. with FIFO system
@@ -30,3 +31,9 @@ Deposit no. is 4123, deposited in ITIDA.GOV.EG.
 - Fixed Client Initiated Renegotiation TLS Vulnerability
 - Bug Fixes
 - Server key and user passwords should have an entropy 'e' where "e >= 55"
+
+## Authors (and Contact E-mails)
+- Morad Abdelrasheed Mokhtar Ali Gill (Zelakolase@tuta.io)
+- Mohammed Emad Mohamed Ahmed Elsawy (hulxxv@gmail.com)
+- Mustafa Anwar Hamza Selim (manwar.hamza@gmail.com)
+- Andrew Roshdy Morad Yousef (andrewroshdydodo28@gmail.com)
