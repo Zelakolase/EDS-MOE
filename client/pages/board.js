@@ -41,9 +41,9 @@ export default function Board() {
 				TABLE
 			)({ session_id: sessionID });
 
-			setData(Object.values(JSON.parse(response.data)));
+			setData(Object.values(JSON.parse(JSON.stringify(response.data))));
 		} catch (err) {
-			console.eirror(err);
+			console.error(err);
 			toast({
 				title: "Get data failed.",
 				description: err.toString(),

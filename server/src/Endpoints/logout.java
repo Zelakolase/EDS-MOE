@@ -7,14 +7,6 @@ import lib.JSON;
 import lib.SparkDB;
 
 public class logout {
-	/**
-	 * Log out as a verifier
-	 * Request : {"session_id" : "a" , "pass" : "b"}<br>
-	 * Response : {"status" : "success/failed"}
-	 * @param BODY Request Body
-	 * @param users UsersDB
-	 * @param SESSION_IDS Session IDs list
-	 */
 	public Map<String, Object> run(byte[] BODY, SparkDB users, Map<String, String> SESSION_IDS) throws Exception{
 		Map<String, Object> out = new HashMap<>();
 			HashMap<String, String> in = JSON.QHM(new String(BODY));

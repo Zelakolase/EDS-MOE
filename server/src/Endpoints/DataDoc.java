@@ -13,18 +13,6 @@ import lib.RandomGenerator;
 import lib.SparkDB;
 
 public class DataDoc {
-	/**
-	 * Puts raw data to disk, and completes document insertion
-	 * Request: Body: Raw file data - Headers: 'session_id' and 'extension' and 'code'<br>
-	 * Response : {"status" : "success/failed"}. if status is failed, added -> {"msg","a"}
-	 * @param BODY Request Body
-	 * @param session_id Session ID grabbed from headers
-	 * @param code Document Code grabbed from headers
-	 * @param extension Extension for input file grabbed from headers
-	 * @param sESSION_IDS Session IDs list
-	 * @param ENCRYPTION_KEY Server Encryption Key
-	 * @param aes AES Object
-	 */
 	public String run(byte[] BODY, String session_id, String code, String extension, Map<String, String> sESSION_IDS, String ENCRYPTION_KEY, AES aes) throws Exception {
 		String res = "error";
 			if (sESSION_IDS.containsKey(session_id)) {

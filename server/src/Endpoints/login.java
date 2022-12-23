@@ -11,14 +11,6 @@ import lib.TOTP;
 import lib.TOTP.Secret;
 
 public class login {
-	/**
-	 * Login functionality for verifiers
-	 * Request : {"user" : "a" , "pass" : "b", "otp": "c"}<br>
-	 * Response : {"session_id" : "c" , "first_name" : "d"} or {"status" : "failed" , "msg" : "e"}
-	 * @param BODY Request Body
-	 * @param users UsersDB
-	 * @param SESSION_IDS Session IDs list
-	 */
 	public Map<String, Object> run(byte[] BODY, SparkDB users, Map<String, String> SESSION_IDS) throws Exception {
 			Map<String, Object> out = new HashMap<>();
 			HashMap<String, String> in = JSON.QHM(new String(BODY));

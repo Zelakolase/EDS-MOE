@@ -23,8 +23,11 @@ import lib.MemMonitor;
 import lib.PostRequestMerge;
 import lib.SparkDB;
 import lib.log;
+
 /**
- * The Web Engine. Responsible for starting the web server and redirecting requests to either Static file processing or API processing.
+ * The Web Engine. Responsible for starting the web server and redirecting
+ * requests to either Static file processing or API processing.
+ * 
  * @author morad
  */
 public class Engine extends Server {
@@ -39,7 +42,8 @@ public class Engine extends Server {
 	/**
 	 * Session IDs, maximum entries are 100. Key: ID, Value: Username
 	 */
-	static volatile Map<String, String> SESSION_IDS = Collections.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
+	static volatile Map<String, String> SESSION_IDS = Collections
+			.synchronizedMap(new MaxSizeHashMap<String, String>(100)); // id, username
 	/**
 	 * Users DB
 	 */
@@ -49,7 +53,8 @@ public class Engine extends Server {
 	 */
 	static volatile SparkDB docs = new SparkDB();
 	/**
-	 * Static Files data. Key: Supposed Relative path, Value: Byte raw data of the file
+	 * Static Files data. Key: Supposed Relative path, Value: Byte raw data of the
+	 * file
 	 */
 	static volatile Map<String, byte[]> WWWData = new ConcurrentHashMap<>();
 	/**
@@ -64,14 +69,17 @@ public class Engine extends Server {
 	 * AES Object
 	 */
 	static volatile AES aes;
+
 	/**
 	 * Engine calling constructor
+	 * 
 	 * @param ENC Server Encryption Key
 	 */
 	Engine(String ENC) {
 		ENCRYPTION_KEY = ENC;
 		aes = new AES(ENCRYPTION_KEY);
 	}
+
 	/**
 	 * Web Server Starter
 	 */
@@ -88,20 +96,22 @@ public class Engine extends Server {
 			this.setMaximumRequestSizeInKB(10000); // 10MB
 			this.setGZip(false);
 			this.setBacklog(50000);
-			for(String file : WWWFiles) {
-				if(new File("./www/"+file).isFile()) WWWData.put("/"+file, aes.decrypt(IO.read("./www/"+file)));
+			for (String file : WWWFiles) {
+				if (new File("./www/" + file).isFile())
+					WWWData.put("/" + file, aes.decrypt(IO.read("./www/" + file)));
 			}
-			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + "X-Frame-Options: DENY\r\n"
-					+ "X-Content-Type-Options: nosniff\r\nAccess-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\nAccess-Control-Allow-Headers: *\r\n";
-					/**
-					 * Get the local IP address of the preferred network interface, Google DNS
-					 * reachability won't affect the function. From StackOverflow.
-					 */
-					try (final DatagramSocket socket = new DatagramSocket()) {
+			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + 
+			"X-Frame-Options: DENY\r\n" + 
+			"X-Content-Type-Options: nosniff\r\n" + 
+			"Access-Control-Allow-Origin: *\r\n" + 
+			"Access-Control-Allow-Methods: *\r\n" + 
+			"Access-Control-Allow-Headers: *\r\n" + 
+			"Access-Control-Allow-Credentials: true\r\n";
+							try (final DatagramSocket socket = new DatagramSocket()) {
 				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 				String ip = socket.getLocalAddress().getHostAddress();
 				log.s("Server is running, Device local IP Address: " + ip);
-					}
+			}
 			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,10 +120,12 @@ public class Engine extends Server {
 
 	/**
 	 * Dynamic Engine Entry point
+	 * 
 	 * @throws Exception
 	 */
 	@Override
-	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size) throws Exception {
+	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size)
+			throws Exception {
 		try {
 			HashMap<String, String> headers = HeaderToHashmap.convert(new String(aLm.get(0))); // headers
 			HashMap<String, byte[]> response = new HashMap<>(); // content, mime, code
@@ -128,30 +140,32 @@ public class Engine extends Server {
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
 				Elshanta.put("aes", aes);
-				if (ser.equals("login") || ser.equals("logout") || ser.equals("DataDoc") || ser.equals("Table")) {
+				if (Stream.of("login", "logout", "DataDoc", "table").anyMatch(ser::equals)) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
-				if(ser.equals("name")) Elshanta.put("name", SCHOOL);
+				if (ser.equals("name")) Elshanta.put("name", SCHOOL);
 				if (ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", SESSION_IDS);
 				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
 				if (headers.containsKey("code")) Elshanta.put("code", headers.get("code"));
 				if (headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
-				if(headers.containsKey("Cookie")) Elshanta.put("Cookie", headers.get("Cookie"));
+				if (headers.containsKey("Cookie")) Elshanta.put("Cookie", headers.get("Cookie"));
 				if (headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
 				HashMap<String, Object> res;
 				try {
-				res = new API().redirector(Elshanta); // Elshanta reply
-				}catch(Exception e) {
+					res = new API().redirector(Elshanta); // Elshanta reply
+				} catch (Exception e) {
 					StringWriter sw = new StringWriter();
-PrintWriter pw = new PrintWriter(sw);
-e.printStackTrace(pw);
-
-					res = new HashMap<>() {{
-						put("body", ("Error. Please send the following text to the administrator: "+aes.encrypt(sw.toString())).getBytes());
-						put("code",HTTPCode.BAD_REQUEST);
-						put("mime","text/html".getBytes());
-					}};
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					res = new HashMap<>() {
+						{
+							put("body", ("Error. Please send the following text to the administrator: "
+									+ aes.encrypt(sw.toString())).getBytes());
+							put("code", HTTPCode.BAD_REQUEST);
+							put("mime", "text/html".getBytes());
+						}
+					};
 				}
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
 				if (res.containsKey("docs")) {
@@ -161,41 +175,42 @@ e.printStackTrace(pw);
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
-				if(res.containsKey("extension")) response.put("extension", (byte[]) res.get("extension"));
+				if (res.containsKey("extension")) response.put("extension", (byte[]) res.get("extension"));
 			} else {
 				/**
 				 * Static file request detected
 				 */
 				String path = "";
 				try {
-				path = headers.get("path");
-				if (path.equals("/login") || path.equals("/about") || path.equals("/support") || path.equals("/tools")
-						|| path.equals("/operation"))
-					path += ".html";
-				if(WWWData.containsKey(path)) {
-					response.put("content", WWWData.get(path));
-					response.put("code", HTTPCode.OK.getBytes());
-					String[] pathSplit = path.split("\\.");
-					try {
-						response.put("mime",
-								MIME.get(new HashMap<String, String>() {{
-									put("extension", pathSplit[pathSplit.length - 1]);
-								}}, "mime", 1).get(0).getBytes()
-								);
-					}catch(Exception e) {
+					path = headers.get("path");
+					if (Stream.of("/login", "/support", "/tools", "/operation", "/index", "/submit", "/board", "/about").anyMatch(path::equals)) path += ".html";
+					if (WWWData.containsKey(path)) {
+						response.put("content", WWWData.get(path));
+						response.put("code", HTTPCode.OK.getBytes());
+						String[] pathSplit = path.split("\\.");
+						try {
+							response.put("mime",
+									MIME.get(new HashMap<String, String>() {
+										{
+											put("extension", pathSplit[pathSplit.length - 1]);
+										}
+									}, "mime", 1).get(0).getBytes());
+						} catch (Exception e) {
+							response.put("mime", "text/html".getBytes());
+						}
+					} else {
+						response.put("content", "Unauthorized".getBytes());
+						response.put("code", HTTPCode.UNAUTHORIZED.getBytes());
 						response.put("mime", "text/html".getBytes());
 					}
-				}else {
-					response.put("content","Unauthorized".getBytes());
-					response.put("code", HTTPCode.UNAUTHORIZED.getBytes());
-					response.put("mime", "text/html".getBytes());
-				}
-				}catch(Exception e) {
-					response = new HashMap<>() {{
-						put("content","Internal Server Error".getBytes());
-						put("code",HTTPCode.INTERNAL_SERVER_ERROR.getBytes());
-						put("mime","text/html".getBytes());
-					}};
+				} catch (Exception e) {
+					response = new HashMap<>() {
+						{
+							put("content", "Internal Server Error".getBytes());
+							put("code", HTTPCode.INTERNAL_SERVER_ERROR.getBytes());
+							put("mime", "text/html".getBytes());
+						}
+					};
 				}
 			}
 			return response;
@@ -205,7 +220,8 @@ e.printStackTrace(pw);
 			e.printStackTrace(pw);
 			return new HashMap<>() {
 				{
-					put("content", ("Error. Please send the following text to the administrator: "+aes.encrypt(sw.toString())).getBytes());
+					put("content", ("Error. Please send the following text to the administrator: "
+							+ aes.encrypt(sw.toString())).getBytes());
 					put("code", HTTPCode.SERVICE_UNAVAILABLE.getBytes());
 					put("mime", "text/html".getBytes());
 				}

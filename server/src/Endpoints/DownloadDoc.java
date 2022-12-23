@@ -9,14 +9,7 @@ import lib.JSON;
 import lib.SparkDB;
 
 public class DownloadDoc {
-	/**
-	 * Download a Document
-	 * Request : {"code" : "a"}<br>
-	 * Response : Raw data with header 'extension' or {"status" : "failed" , "msg" : "b"}
-	 * @param BODY Request Body
-	 * @param ENCRYPTION_KEY Encryption Key
-	 * @param aes AES Object
-	 */
+
 	public Map<String, byte[]> run(byte[] BODY, String ENCRYPTION_KEY, AES aes) throws Exception {
 		Map<String, byte[]> out = new HashMap<>();
 			byte[] res = {};

@@ -4,32 +4,21 @@ import java.util.*;
 
 import lib.JSON;
 import lib.SparkDB;
-import lib.log;
 
 public class Table {
-    /**
-     * Search for a document using the document code
-     * Request :GET <br>
-     * Response : {
-     * "0": "{"DocName":"A" , "Verifier":"B", "Writer":"C"}" ,
-     * "1" : "{"DocName":"A" , "Verifier":"B", "Writer":"C"}",
-     * ...
-     * }
-     * 
-     * @param Key  Encryption Key
-     * @param BODY Request Body
-     */
     public String run(String cookies, Map<String, String> SESSION_IDS, String ENC) throws Exception {
         String res = "error";
         String session_id = cookies.split("session_id=")[1];
         if (SESSION_IDS.containsKey(session_id)) {
-            HashMap<String, String> MainTable = new HashMap<>(); // K=0,1,2 V={"DocName":"A" , "Verifier":"B", "Writer":"C"}
             SparkDB T = new SparkDB();
             T.readFromFile("./conf/Table.db", ENC);
+            String out = "{";
             for(int i = 0;i < T.num_queries;i++) {
-                MainTable.put(String.valueOf(i), JSON.HMQ(T.get(i)));
+                out += "\""+i+"\":"+ JSON.HMQ(T.get(i));
+                if(i+1 < T.num_queries) out+=",";
             }
-            res = JSON.HMQ(MainTable);
+            out+="}";
+            res = out;
         } else {
             res = JSON.HMQ(new HashMap<String, String>() {
                 {

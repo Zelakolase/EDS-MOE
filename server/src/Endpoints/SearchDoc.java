@@ -6,13 +6,6 @@ import lib.JSON;
 import lib.SparkDB;
 
 public class SearchDoc {
-	/**
-	 * Search for a document using the document code
-	 * Request : {"code" : "a"}<br>
-	 * Response : {"status" : "failed" , "msg" : "b"} or {"document_name" : "c" , "verifier" : "d" , "writer" : "e" , "date_of_publication" : "f"}
-	 * @param Key Encryption Key
-	 * @param BODY Request Body
-	 */
 	public String run(byte[] BODY, String Key) throws Exception {
 			String res = "error";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));

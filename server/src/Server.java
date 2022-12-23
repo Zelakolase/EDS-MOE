@@ -156,14 +156,17 @@ public abstract class Server {
 				boolean cache = false;
 				if(! new String(Reply.get("mime")).equals("application/json")) cache = true;
 				if(Reply.containsKey("extension")) AddedResponseHeaders += "extension: "+new String(Reply.get("extension"))+"\r\n";
-				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")),
-						GZip, AddedResponseHeaders, cache);
+				Network.write(DOS, Reply.get("content"), 
+				new String(Reply.get("mime")), 
+				new String(Reply.get("code")),
+				GZip, 
+				AddedResponseHeaders, 
+				cache);
 				S.close();
 			} catch (Exception e) {
 
 			} finally {
 				CurrentConcurrentRequests--;
-				AddedResponseHeaders = "";
 			}
 			this.interrupt();
 		}

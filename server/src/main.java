@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import lib.AES;
-import lib.EntropyCalc;
 import lib.FileToAL;
 import lib.IO;
 import lib.SHA;
@@ -22,18 +21,14 @@ public class main {
 	public static void main(String[] args) throws Exception {
 		System.setProperty("jdk.tls.ephemeralDHKeySize", "2048"); // Mitigation against LOGJAM TLS Attack
 		System.setProperty("jdk.tls.rejectClientInitiatedRenegotiation", "true"); // Mitigation against Client Renegotiation Attack
+
 		AES aes;
 		Console console = System.console();
 		Scanner s = new Scanner(System.in);
+
 		// Stage 1
 		ArrayList<String> FrontendFiles = FileToAL.convert("WWWFiles.db"); // List of all frontend files after './www/'
-		for (String frontendFile : FrontendFiles) {
-			if (!new File("./www/" + frontendFile).exists()) {
-				log.e("File " + frontendFile + " doesn't exist");
-				System.exit(1);
-			}
-		}
-		log.s("Frontend Files Check - Done");
+		FFC(FrontendFiles);
 		// Stage 2
 		boolean ServerKey = new File("./conf/server.key").exists(); // Server Enc/Dec Key
 		boolean UserDB = new File("./conf/users.db").exists(); // Users DB
@@ -47,10 +42,11 @@ public class main {
 		boolean Queries = new File("./conf/queries.txt").exists(); // Number of queries
 		boolean Doc = new File("./conf/doc.txt").exists(); // Number of documents
 		boolean Docs = new File("./docs/").exists(); // Documents folder
+		boolean Table = new File("./conf/table.db").exists(); // Table DB
 		/**
 		 * If Server is not new
 		 */
-		if (ServerKey && UserDB && DocsDB && InfoDB && Queries && Docs && DocDBFolder && Doc) {
+		if (ServerKey && UserDB && DocsDB && InfoDB && Queries && Docs && DocDBFolder && Doc && Table) {
 			// Good to go
 			String k = new String(console.readPassword("Enter the server key: "));
 			aes = new AES(k);
@@ -59,13 +55,8 @@ public class main {
 			config = config ? config && args[0].equals("config") : false;
 			if (key) {
 				log.s("Encryption key is correct");
-				if(!config) {
-					Engine server = new Engine(k);
-					server.run();
-				}
-				else {
-					ConfigMode.main(aes, k);
-				}
+				if(!config) new Engine(k).run();
+				else ConfigMode.main(aes, k);
 			} else {
 				log.e("Encryption key is not correct");
 				System.exit(1);
@@ -85,6 +76,7 @@ public class main {
 			}});
 			System.out.print("Enter the number of verifiers: ");
 			int Num = Integer.parseInt(s.nextLine());
+
 			for (int i = 0; i < Num; i++) {
 				String user = "", full = "";
 				boolean isSimilar = true;
@@ -93,7 +85,7 @@ public class main {
 				if(! Verifiers.getColumn("full_name").contains(full)) isSimilar = false;
 				else log.e("The full name already exists");
 				}
-				isSimilar = true;
+				
 				while(isSimilar) {
 				user = console.readLine("For verifier " + (i + 1) + " -> Enter the username: ");
 				if(! Verifiers.getColumn("user").contains(SHA.gen(user))) isSimilar = false;
@@ -200,5 +192,15 @@ public class main {
 			log.s("You may relaunch the server!");
 		}
 		s.close();
+	}
+	public static void FFC(ArrayList<String> frontendFiles) throws Exception{
+		for (String frontendFile : frontendFiles) {
+			if (!new File("./www/" + frontendFile).exists()) {
+				log.e("File " + frontendFile + " doesn't exist");
+				System.exit(1);
+			}
+		}
+		log.s("Frontend Files Check - Done");
+
 	}
 	}

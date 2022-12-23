@@ -16,16 +16,6 @@ import lib.RandomGenerator;
 import lib.SparkDB;
 
 public class generate {
-	/**
-	 * Generates public code
-	 * Request : {"session_id" : "a" , "doc_name" : "b" , "writer" : "c"}<br>
-	 * Response : {"code" : "d"} or {"status" : "failed" , "msg" : "e"}
-	 * @param BODY Request Body
-	 * @param SESSION_IDS Session IDs list
-	 * @param ENCRYPTION_KEY Encryption Key
-	 * @param docs DocsDB
-	 * @param aes AES Object
-	 */
 	public String run(byte[] BODY, Map<String, String> SESSION_IDS, String ENCRYPTION_KEY, SparkDB docs, AES aes) throws Exception {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
@@ -37,9 +27,7 @@ public class generate {
 				}});
 				targetIndex = new Random().nextInt(smallests.size());
 				// b. if size == 10k, sort with min_query. get minimum and target index
-				if(docs.get(targetIndex).get("size").equals("10000")) {
-					targetIndex = docs.getColumn("min_query").indexOf(Collections.min(docs.getColumn("min_query")));
-				}
+				if(docs.get(targetIndex).get("size").equals("10000")) targetIndex = docs.getColumn("min_query").indexOf(Collections.min(docs.getColumn("min_query")));
 				// c. go to prefix.db, if size == 10k, delete row age minimum. min_query in docs is next age after deleted
 				SparkDB db = new SparkDB();
 				db.readFromFile("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", ENCRYPTION_KEY);

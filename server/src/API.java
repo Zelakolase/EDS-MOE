@@ -132,7 +132,7 @@ public class API {
 		} else if (in.equals("DataDoc")) {
 			res.put("body", new DataDoc().run(BODY, session_id, PCode, extension, SESSION_IDS, ENCRYPTION_KEY, aes).getBytes()); // SAD S.2
 			res.put("code", code.getBytes());
-		}else if(in.equals("Table")) {
+		}else if(in.equals("table")) {
 			res.put("body", (new Table().run((String) Elshanta_temp.get("Cookie"), SESSION_IDS, ENCRYPTION_KEY)).getBytes());
 			res.put("code", code.getBytes());
 		}
