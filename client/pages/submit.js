@@ -36,9 +36,9 @@ import { BiHomeAlt } from "react-icons/bi";
 import { HiOutlineDocumentAdd } from "react-icons/hi";
 import { SUBMIT } from "@API/endpoints";
 
-const OperaionContext = createContext();
+const OperationContext = createContext();
 
-const useOperation = () => useContext(OperaionContext);
+const useOperation = () => useContext(OperationContext);
 
 export default function Operation() {
 	const { isAuth, username, sessionID } = useAuth();
@@ -169,7 +169,7 @@ export default function Operation() {
 	});
 
 	return (
-		<OperaionContext.Provider
+		<OperationContext.Provider
 			value={{
 				generateDoc,
 				generatedDocResult,
@@ -249,7 +249,7 @@ export default function Operation() {
 				</HStack>
 			</Stack>
 			<FinishAlert disclosure={disclosure} />
-		</OperaionContext.Provider>
+		</OperationContext.Provider>
 	);
 }
 
