@@ -24,6 +24,7 @@ import {
 	useToast,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+
 export default function Board() {
 	const { isAuth, username, sessionID } = useAuth();
 	const router = useRouter();
@@ -55,8 +56,10 @@ export default function Board() {
 		setLoading(false);
 	}, []);
 
-	if (!isAuth) router.replace("/");
-
+	useEffect(() => {
+		if (!isAuth) router.replace("/auth/login");
+	});
+    
 	if (loading)
 		return (
 			<Stack h="full" align={"center"} justify="center">
