@@ -54,6 +54,15 @@ public class Network {
 			} else {
 				dOS.write(("Content-Type: " + ContentType + "\r\n").getBytes());
 			}
+			dOS.write((
+				"X-XSS-Protection: 1; mode=block\r\n" + 
+				"X-Frame-Options: DENY\r\n" + 
+				"X-Content-Type-Options: nosniff\r\n" + 
+				"Access-Control-Allow-Origin: *\r\n" + 
+				"Access-Control-Allow-Methods: *\r\n" + 
+				"Access-Control-Allow-Headers: *\r\n" + 
+				"Access-Control-Allow-Credentials: true\r\n"
+			).getBytes());
 			dOS.write(("Content-Length: " + ResponseData.length + "\r\n\r\n").getBytes());
 			dOS.write(ResponseData);
 			dOS.flush();

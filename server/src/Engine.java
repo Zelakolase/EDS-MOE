@@ -100,14 +100,7 @@ public class Engine extends Server {
 				if (new File("./www/" + file).isFile())
 					WWWData.put("/" + file, aes.decrypt(IO.read("./www/" + file)));
 			}
-			this.AddedResponseHeaders = "X-XSS-Protection: 1; mode=block\r\n" + 
-			"X-Frame-Options: DENY\r\n" + 
-			"X-Content-Type-Options: nosniff\r\n" + 
-			"Access-Control-Allow-Origin: *\r\n" + 
-			"Access-Control-Allow-Methods: *\r\n" + 
-			"Access-Control-Allow-Headers: *\r\n" + 
-			"Access-Control-Allow-Credentials: true\r\n";
-							try (final DatagramSocket socket = new DatagramSocket()) {
+			try (final DatagramSocket socket = new DatagramSocket()) {
 				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 				String ip = socket.getLocalAddress().getHostAddress();
 				log.s("Server is running, Device local IP Address: " + ip);

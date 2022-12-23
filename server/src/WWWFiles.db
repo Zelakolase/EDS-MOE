@@ -1,6 +1,10 @@
 404.html
 _next
 _next/static
+_next/static/zE096Ey4f1jRq8rgvJp6R
+_next/static/zE096Ey4f1jRq8rgvJp6R/_ssgManifest.js
+_next/static/zE096Ey4f1jRq8rgvJp6R/_buildManifest.js
+_next/static/zE096Ey4f1jRq8rgvJp6R/_middlewareManifest.js
 _next/static/ylCnCQrCPbgIz6h2U4-GP
 _next/static/ylCnCQrCPbgIz6h2U4-GP/_ssgManifest.js
 _next/static/ylCnCQrCPbgIz6h2U4-GP/_buildManifest.js
@@ -16,6 +20,7 @@ _next/static/chunks/pages/about-342d9287be32e49d.js
 _next/static/chunks/pages/_error-8022dacb1937fc7a.js
 _next/static/chunks/pages/_app-62d8f4fceaeff2c2.js
 _next/static/chunks/pages/index-8828593112cdb95a.js
+_next/static/chunks/pages/board-a74e0de607ee5e22.js
 _next/static/chunks/pages/board-83de9e87156e2839.js
 _next/static/chunks/pages/_app-666905041d1f3a6d.js
 _next/static/chunks/pages/auth

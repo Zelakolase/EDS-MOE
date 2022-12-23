@@ -42,7 +42,7 @@ public class main {
 		boolean Queries = new File("./conf/queries.txt").exists(); // Number of queries
 		boolean Doc = new File("./conf/doc.txt").exists(); // Number of documents
 		boolean Docs = new File("./docs/").exists(); // Documents folder
-		boolean Table = new File("./conf/table.db").exists(); // Table DB
+		boolean Table = new File("./conf/Table.db").exists(); // Table DB
 		/**
 		 * If Server is not new
 		 */
@@ -85,7 +85,7 @@ public class main {
 				if(! Verifiers.getColumn("full_name").contains(full)) isSimilar = false;
 				else log.e("The full name already exists");
 				}
-				
+				isSimilar = true;
 				while(isSimilar) {
 				user = console.readLine("For verifier " + (i + 1) + " -> Enter the username: ");
 				if(! Verifiers.getColumn("user").contains(SHA.gen(user))) isSimilar = false;

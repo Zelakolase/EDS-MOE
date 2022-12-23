@@ -167,6 +167,7 @@ public abstract class Server {
 
 			} finally {
 				CurrentConcurrentRequests--;
+				AddedResponseHeaders = "";
 			}
 			this.interrupt();
 		}
