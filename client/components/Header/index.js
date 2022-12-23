@@ -30,6 +30,7 @@ import { MdSupportAgent } from "react-icons/md";
 import { BiHomeAlt, BiInfoCircle, BiMoon } from "react-icons/bi";
 import { BsSun } from "react-icons/bs";
 import { AiOutlineTool } from "react-icons/ai";
+import { TbTable } from "react-icons/tb";
 import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 import { useState } from "react";
 
@@ -55,10 +56,16 @@ export function Header() {
 			visible: true,
 		},
 		{
-			label: "about",
-			path: "/about",
-			icon: <BiInfoCircle size="1.4em" />,
-			visible: true,
+			label: "Board",
+			path: "/board",
+			icon: <TbTable size="1.4em" />,
+			visible: isAuth,
+		},
+		{
+			label: "Submit a document",
+			path: "/submit",
+			icon: <HiOutlineDocumentDuplicate size="1.4em" />,
+			visible: isAuth,
 		},
 		{
 			label: "support",
@@ -67,10 +74,10 @@ export function Header() {
 			visible: true,
 		},
 		{
-			label: "Submit a document",
-			path: "/submit",
-			icon: <HiOutlineDocumentDuplicate size="1.4em" />,
-			visible: isAuth,
+			label: "about",
+			path: "/about",
+			icon: <BiInfoCircle size="1.4em" />,
+			visible: true,
 		},
 	];
 	useEffect(async () => {

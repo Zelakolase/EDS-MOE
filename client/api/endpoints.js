@@ -18,5 +18,5 @@ const INFO = {
 	NAME: "name",
 	ABOUT: "about",
 };
-
-export { AUTH, DOCUMENT, SUBMIT, INFO };
+const TABLE = "table";
+export { AUTH, DOCUMENT, SUBMIT, INFO, TABLE };
