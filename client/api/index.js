@@ -18,6 +18,7 @@ export function request(method, route) {
 			data,
 			method,
 			headers: { ...DefaultHeaders, ...headers },
+			withCredentials:true,
 			...props,
 		});
 	};
