@@ -41,9 +41,9 @@ export default function Board() {
 				TABLE
 			)({ session_id: sessionID });
 
-			setData(Object.values(response.data));
+			setData(Object.values(JSON.parse(response.data)));
 		} catch (err) {
-			console.error(err);
+			console.eirror(err);
 			toast({
 				title: "Get data failed.",
 				description: err.toString(),
@@ -59,7 +59,7 @@ export default function Board() {
 	useEffect(() => {
 		if (!isAuth) router.replace("/auth/login");
 	});
-    
+
 	if (loading)
 		return (
 			<Stack h="full" align={"center"} justify="center">
