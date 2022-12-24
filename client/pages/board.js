@@ -41,7 +41,7 @@ export default function Board() {
 				TABLE
 			)({ session_id: sessionID });
 
-			setData(Object.values(JSON.parse(JSON.stringify(response.data))));
+			setData(Object.values(response.data));
 		} catch (err) {
 			console.error(err);
 			toast({
