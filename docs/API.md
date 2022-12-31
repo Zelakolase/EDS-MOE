@@ -4,15 +4,15 @@
 
 - x, y, z, a, b, c are placeholders.
 - SAD means _Submit A Document_
-- All reqs are **POST** unless explicitly determined such as _about_
+- All reqs are **POST** unless explicitly determined such as _about_ and _table_
 
 ---
 
-### **Login : /api.login** Server: Done , Client : Done
+### **Login : /api.login**
 
 Request body
 
-```jsonc
+```javascript
 { "user": "x", "pass": "y" }
 ```
 
@@ -20,27 +20,27 @@ Request body
 
 Response body
 
-```jsonc
+```javascript
 { "status": "failed", "msg": "b" } // if login failed
 ```
 
-```jsonc
+```javascript
 { "session_id": "a", "first_name": "c" } // if login success
 ```
 
 ---
 
-### _Logout : /api.logout_ Server: Done, Client : -
+### **Logout : /api.logout**
 
 Request body :
 
-```jsonc
+```javascript
 { "session_id": "a", "pass": "b" }
 ```
 
 Response body :
 
-```jsonc
+```javascript
 { "status": "c" }
 ```
 
@@ -48,17 +48,17 @@ Where 'c' is either `failed` or `success`
 
 ---
 
-### **Download a document : /api.DownloadDoc** Server : Done , Client : -
+### **Download a document : /api.DownloadDoc**
 
 Request body :
 
-```jsonc
+```javascript
 { "code": "x" }
 ```
 
 Response body :
 
-```jsonc
+```javascript
 { "status": "failed", "msg": "y" } // if there’s error
 ```
 
@@ -66,7 +66,7 @@ Response body :
 
 ---
 
-### **Verify a document : /api.VerifyDoc** Server : Done , Client : Done
+### **Verify a document : /api.VerifyDoc**
 
 Request body :
 
@@ -74,23 +74,23 @@ File in request body with 'code' as header
 
 Response body :
 
-```jsonc
+```javascript
 { "msg": "x" }
 ```
 
 ---
 
-### **Search for a document : /api.SearchDoc** Server : Done , Client : Done
+### **Search for a document : /api.SearchDoc**
 
 Request body :
 
-```jsonc
+```javascript
 { "code": "x" }
 ```
 
 Response body :
 
-```jsonc
+```javascript
 {
 	"document_name": "a",
 	"verifier": "b",
@@ -99,29 +99,29 @@ Response body :
 }
 ```
 
-```jsonc
+```javascript
 { "status": "failed", "msg": "y" }
 ```
 
 ---
 
-### **About : /api.about** Server : Done , Client : Done
+### **About : /api.about**
 
 No request as it’s GET
 
 Response body :
 
-```jsonc
+```javascript
 { "document_num": "a", "query_num" : "b"}
 ```
 
 ---
 
-### **Generate code (SAD S.1) : /api.generate** Server : Done , Client : -
+### **Generate code (SAD S.1) : /api.generate**
 
 Request Body :
 
-```jsonc
+```javascript
 {
 	"doc_name": "x",
 	"writer": "z",
@@ -131,11 +131,11 @@ Request Body :
 
 Response body :
 
-```jsonc
+```javascript
 { "code": "b" }
 ```
 
-```jsonc
+```javascript
 { "status": "failed", "msg": "c" } // if failed
 ```
 
@@ -143,42 +143,52 @@ Response body :
 
 ---
 
-### **SAD S.2 : /api.DataDoc** Server : Done , Client : -
+### **SAD S.2 : /api.DataDoc**
 
 Request body is request body with 'code', 'extension', 'session_id' as headers
 
 Response body :
 
-```jsonc
+```javascript
 { "status": "success"}
 ```
 
-```jsonc
+```javascript
 { "status": "failed", "msg": "z" } // if failed
 ```
 
 - Redirect to SAD S.3 with info in placeholders
 
-### **School name : /api.name** Server : Done , Client : Done
+### **School name : /api.name**
 
 Request is GET
 
 Response body :
 
-```jsonc
+```javascript
 { "name": "x" }
 ```
 
-### **Documents table: /api.Table**
+### **Documents table: /api.table**
 
 Request is GET
 
 Response body :
 
-```jsonc
+```javascript
 {
-	"0": "{"DocName":"A" , "Verifier":"B", "Writer":"C", "DocNum":"D"}" ,
-	"1" : "{"DocName":"A" , "Verifier":"B", "Writer":"C", "DocNum":"D"}", 
+	"0": {
+		"Document name":"A" , 
+		"Verifier":"B", 
+		"Writer":"C", 
+		"Document number":"D"
+		} ,
+	"1" : {
+		"Document name":"A" , 
+		"Verifier":"B", 
+		"Writer":"C", 
+		"Document number":"D"
+		}, 
 	...
 }
 ```

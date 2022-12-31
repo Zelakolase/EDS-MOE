@@ -297,7 +297,6 @@ function VerifyDocumentComponent() {
 							<Input
 								w="full"
 								type={"file"}
-								accept=".pdf"
 								left={0}
 								onChange={async e => {
 									let __file__ = e.target.files[0];

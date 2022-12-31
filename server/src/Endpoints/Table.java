@@ -12,12 +12,16 @@ public class Table {
         if (SESSION_IDS.containsKey(session_id)) {
             SparkDB T = new SparkDB();
             T.readFromFile("./conf/Table.db", ENC);
+            T.delete(new HashMap<String, String>() {{
+                put("DocNum", "0");
+            }});
             String out = "{";
             for(int i = 0;i < T.num_queries;i++) {
                 out += "\""+i+"\":"+ JSON.HMQ(T.get(i));
                 if(i+1 < T.num_queries) out+=",";
             }
             out+="}";
+            out = out.replaceAll("DocNum", "Document number").replaceAll("DocName", "Document name");
             res = out;
         } else {
             res = JSON.HMQ(new HashMap<String, String>() {

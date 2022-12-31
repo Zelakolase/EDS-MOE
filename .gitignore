@@ -38,4 +38,3 @@ yarn-error.log*
 
 # another
 /prod/
-/server/src/Test.java

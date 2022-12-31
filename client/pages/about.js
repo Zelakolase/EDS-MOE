@@ -71,7 +71,7 @@ export default function About() {
 					on our system. And <span>{count["queries"] ?? "many"}</span>{" "}
 					quer
 					{count["queries"] > 1 || count["queries"] === null
-						? "ires"
+						? "ies"
 						: "y"}{" "}
 					processed.
 				</Text>
