@@ -81,6 +81,7 @@ To move your data in another system, just copy data/ folder in server/src/ and p
     - **SparkDB.java** : CSV to in-memory structure, see the [main project](https://github.com/NaDeSys/SparkDB) for more information.
     - **TOTP.java** : Handles Time-based One Time Passwords generation and validation algorithms.
     - **URIDecode.java** : Decodes URI (HTML) format.
+    - **CommandPrompt.java** : An abstract Command Prompt Object.
 - **API.java** : The intermediate point that maps API requests from the main HTTPS instance to individual API Classes.
 - **Engine.java** : The main HTTPS Instance, called by main application instance 'main.java'.
 - **main.java** : The main Application instance, configures the server if it is first-time run, or calls the HTTPS Instance 'Engine.java' if the inserted Server Key is correct.
