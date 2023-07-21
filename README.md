@@ -8,6 +8,7 @@ A highly secure and simple document management system, written in Java. Every do
   - [Technologies used](#technologies-used)
   - [Legal Information](#legal-information)
   - [Security Measures](#security-measures)
+  - [Backup and Restore](#backup-and-restore)
   - [Class List](#class-list)
   - [Author Information](#author-information)
 
@@ -42,6 +43,9 @@ This software is an intellectual property in all of the WIPO member states (Egyp
 4. SO_Timeout is limited to 60 seconds.
 5. We implemented Time-based One time passwords for verifiers' authentication.
 6. The maximum number of documents that can exist in the system at any given time is 10 Million documents with FIFO insertion system.
+
+## Backup and Restore
+To move your data in another system, just copy data/ folder in server/src/ and paste the folder in server/src/ of the new system. Note that older versions (< 4.0) would need to group conf/ and docs/ into a new folder data/ to migrate to version (>= 4.0).
 
 ## Class List
 - www/
