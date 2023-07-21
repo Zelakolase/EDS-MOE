@@ -1,42 +1,92 @@
-# EDS-MOE
-(E)electronic (D)ocument (S)ystem ver3.2. A fast and secure document management system to replace government seals!
+# Electronic Document System
+A highly secure and simple document management system, written in Java. Every document is unmodifiable, and issued a 9-digit code.
+
+- [Electronic Document System](#electronic-document-system)
+  - [Use cases](#use-cases)
+  - [Example Usage](#example-usage)
+  - [Build and Run](#build-and-run)
+  - [Technologies used](#technologies-used)
+  - [Legal Information](#legal-information)
+  - [Security Measures](#security-measures)
+  - [Class List](#class-list)
+  - [Author Information](#author-information)
+
+
+## Use cases
+1. Replace the official government seal with a 9-digit code acting as a digital signature.
+2. Store documents and share them in a highly secured system across a network.
+3. Integrating EDS API in a larger high-security system for document archival and secure storage.
+
+## Example Usage
+1. A verifier inserts a document through a 2-step process in 'Submit A document' tab.
+2. The system generates a 9-digit code for the inserted document and displays it to the verifier.
+3. Any member of the public can download the document, view information about who wrote it and the date of publication, or compare it with another file using the 9-digit code.
+4. The verifier can access the list of documents and their 9-digit codes later in the 'Board' tab.
+
+## Build and Run
+The main instance of the application is `main.java`.
+- In order to run it in linux systems: `$ javac main.java && sudo java main`
+- In order to run it in windows systems: `> javac -encoding iso8859_1 main.java && java main`
 
 ## Technologies used
-- Java native (Backend)
-- Javascript (next.js) (Frontend)
+- Backend: Java Native
+- Frontend: NextJS
 
-## Intellectual Property Rights
-Deposit no. is 4123, deposited in ITIDA.GOV.EG.
+## Legal Information
+This software is an intellectual property in all of the WIPO member states (Egypt Deposit number: 4123). The repository inherits all of its legal statements from the Egyptian Intellectual Property Protection Law No. 82 of 2002.
 
-## Features
-- Time-based One time password for verifiers' accounts
-- A configuration mode for changing passwords, adding or deleting verifiers into the system
-- Download, Verify, and search for any document using a numeric 9 digit code for every document
-- Verifiers' credentials is encrypted by AES256/CBC/PKCS5 algorithm and hashed with SHA3-512
-- All files (including front-end files) are encrypted to limit Physical attacks
-- From-scratch solutions to evade any web pentesting tools, we do **not** use Apache, nginx, or SQL-based solutions
+## Security Measures
+1. We do not use common architecture (eg. Apache, nginx, SQL-based solutions). Instead, we built the backend from scratch. This means that EDS will not be hit by any CVE attack.
+2. Verifiers' credentials are encrypted by AES256/CBC/PKCS5 algorithm and hashed with SHA3-512.
+3. All databases, users' credentials, configurations, and Frontend files are encrypted to limit the impact of physical attacks.
+4. SO_Timeout is limited to 60 seconds.
+5. We implemented Time-based One time passwords for verifiers' authentication.
+6. The maximum number of documents that can exist in the system at any given time is 10 Million documents with FIFO insertion system.
 
-## Details
-- The max. number of documents can be inserted is 10mil. with FIFO system
-- The system doesn't allow update or delete queries
-- EDS uses TOTP
-- EDS uses AES256/CBC/PKCS5 crypt algorithm
-- 'prod/' is a folder for latest production (is not in repository)
-- Max Request size is 10MB
-- Max concurrent requests is 5000
-- Max backlog is 50000
-- Max session IDs is 100 with FIFO system
-- If max conc. requests is reached, retry 10 times with 1ms delay to process the query.
-- BUF_SIZE for RCV and SNT is 64KB
-- SO_TIMEOUT is 60sec
+## Class List
+- www/
+    - Content is generated using GitHub Actions.
+- Endpoints/
+    - **about.java** : Handles 'api.about' response.
+    - **DataDoc.java** : Handles 'api.DataDoc' response.
+    - **DownloadDoc.java** : Handles 'api.DownloadDoc' response.
+    - **generate.java** : Handles 'api.generate' response.
+    - **login.java** : Handles 'api.login' response.
+    - **logout.java** : Handles 'api.logout' response.
+    - **name.java** : Handles 'api.name' response.
+    - **SearchDoc.java** : Handles 'api.SearchDoc' response.
+    - **Table.java** : Handles 'api.table' response.
+    - **VerifyDoc.java** : Handles 'api.VerifyDoc' response.
+- lib/
+    - **AES.java** : AES256/CBC/PKCS5 Encryption and Decryption Class.
+    - **ArraySplit.java** : Splits a byte array based on a specific byte sequence as a delimiter.
+    - **EntropyCalc.java** : Calculation of entropy for a given passphrase.
+    - **FileToAL.java** : Converts a file content to an arraylist of lines based on '\n' delimiter, used for 'WWWFiles.db'.
+    - **HeaderToHashmap.java** : Converts the HTTP(S) Headers to a HashMap structure.
+    - **HTTPCode.java** : An interface of String values to map HTTP(S) statuses to their corresponding header with the status code.
+    - **IO.java** : Reads and Writes data to Disk.
+    - **JSON.java** : Converts JSON String to a HashMap structure, and vice versa.
+    - **log.java** : Prints different log statements with colors.
+    - **MaxSizeHashMap.java** : A HashMap with a fixed size where it deletes the eldest entry if the HashMap is full.
+    - **MemMonitor.java** : A thread object that calls Garbage Collection every 50ms if the memory usage went above 1GB.
+    - **Network.java** : Handles GZIP Compression, read from TCP socket and write HTTP(S) responses to TCP socket.
+    - **PathFilter.java** : Provides LFI Protection and handles different path typos.
+    - **PostRequestMerge.java** : Reads the whole HTTPS POST request beyond TLS record limitation (16kb).
+    - **RandomGenerator.java** : Generates Random String values.
+    - **SHA.java** : SHA3-512 UTF8 Hashing Class.
+    - **SparkDB.java** : CSV to in-memory structure, see the [main project](https://github.com/NaDeSys/SparkDB) for more information.
+    - **TOTP.java** : Handles Time-based One Time Passwords generation and validation algorithms.
+    - **URIDecode.java** : Decodes URI (HTML) format.
+- **API.java** : The intermediate point that maps API requests from the main HTTPS instance to individual API Classes.
+- **Engine.java** : The main HTTPS Instance, called by main application instance 'main.java'.
+- **main.java** : The main Application instance, configures the server if it is first-time run, or calls the HTTPS Instance 'Engine.java' if the inserted Server Key is correct.
+- **Server.java** : TCP HTTPS Handler Class, used by main HTTPS Instance 'Engine.java'.
+- **mime.db** : A list of MIME types and their corresponding file extensions.
+- **WWWFiles.db** : A white-list of files in www/ to access via HTTPS protocol.
+- **ConfigMode.java** : The configuration mode instance, called by main application instance 'main.java' if the user requested the configuration mode.
 
-## Authors (and Contact E-mails)
+## Author Information
 - Morad Abdelrasheed Mokhtar Ali Gill (Zelakolase@tuta.io)
 - Mohammed Emad Mohamed Ahmed Elsawy (hulxxv@gmail.com)
 - Mustafa Anwar Hamza Selim (manwar.hamza@gmail.com)
 - Andrew Roshdy Morad Yousef (andrewroshdydodo28@gmail.com)
-
-## How you can support us?
-- You can write about us, for more information about this project, please contact (Zelakolase@tuta.io).
-- Star this project.
-- Actively implement this project in your workplace!
