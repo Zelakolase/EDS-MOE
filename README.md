@@ -67,7 +67,8 @@ To move your data in another system, just copy data/ folder in server/src/ and p
     - **EntropyCalc.java** : Calculation of entropy for a given passphrase.
     - **FileToAL.java** : Converts a file content to an arraylist of lines based on '\n' delimiter, used for 'WWWFiles.db'.
     - **HeaderToHashmap.java** : Converts the HTTP(S) Headers to a HashMap structure.
-    - **HTTPCode.java** : An interface of String values to map HTTP(S) statuses to their corresponding header with the status code.
+    - **HTTPCode.java** : An enum of String values to map HTTP(S) statuses to their corresponding header with the status code.
+    - **FilePaths.java** : An enum of all configuration and database directories.
     - **IO.java** : Reads and Writes data to Disk.
     - **JSON.java** : Converts JSON String to a HashMap structure, and vice versa.
     - **log.java** : Prints different log statements with colors.
