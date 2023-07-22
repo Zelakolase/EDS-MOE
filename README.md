@@ -10,6 +10,7 @@ A highly secure and simple document management system, written in Java. Every do
   - [Security Measures](#security-measures)
   - [Backup and Restore](#backup-and-restore)
   - [Class List](#class-list)
+  - [Configuration and Database Directory List](#configuration-and-database-directory-list)
   - [Author Information](#author-information)
 
 
@@ -90,6 +91,25 @@ To move your data in another system, just copy data/ folder in server/src/ and p
 - **mime.db** : A list of MIME types and their corresponding file extensions.
 - **WWWFiles.db** : A white-list of files in www/ to access via HTTPS protocol.
 - **ConfigMode.java** : The configuration mode instance, called by main application instance 'main.java' if the user requested the configuration mode.
+
+## Configuration and Database Directory List
+- data/
+  - conf/
+    - users.db : Contains Usernames, Full names, Passwords, and OTPs for all verifiers.
+    - server.key : Contains self-encrypted server key.
+    - keystore.jks : The TLS Self-signed certificate for HTTPS Protocol.
+    - info.txt : School name.
+    - docs.db : Main Database Shard List.
+    - queries.txt : Query Counter.
+    - doc.txt : Document Counter.
+    - Table.db : List of all Documents with Writer, Document Number, Verifier.
+    - doc/
+      - 000.db : Metadata of all documents with document number with 000 as prefix.
+      - 001.db : Metadata of all documents with document number with 001 as prefix.
+      - ...
+      - 999.db : Metadata of all documents with document number with 999 as prefix.
+  - docs/
+    - Contains all uploaded encrypted documents.
 
 ## Author Information
 - Morad Abdelrasheed Mokhtar Ali Gill (Zelakolase@tuta.io)
