@@ -10,9 +10,9 @@ import java.util.HashMap;
  */
 public abstract class CommandPrompt {
     /* Key: Command, Value: Explanation/Usage */
-    HashMap<String, String> helpCommands = new HashMap<>();
+    public HashMap<String, String> helpCommands = new HashMap<>();
     /* The List of available developer-defined commands */
-    ArrayList<String> availableCommands = new ArrayList<>();
+    public ArrayList<String> availableCommands = new ArrayList<>();
 
     /**
      * Main instance
