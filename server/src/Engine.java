@@ -166,7 +166,7 @@ public class Engine extends Server {
 					IO.write("./conf/docs.db", aes.encrypt(docs.toString()), false);
 				}
 				response.put("content", (byte[]) res.get("body"));
-				response.put("code", HTTPCode.OK.getBytes());
+				response.put("code", HTTPCode.OK.getValue().getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
 				if (res.containsKey("extension")) response.put("extension", (byte[]) res.get("extension"));
 			} else {
@@ -179,7 +179,7 @@ public class Engine extends Server {
 					if (Stream.of("/login", "/support", "/tools", "/operation", "/index", "/submit", "/board", "/about").anyMatch(path::equals)) path += ".html";
 					if (WWWData.containsKey(path)) {
 						response.put("content", WWWData.get(path));
-						response.put("code", HTTPCode.OK.getBytes());
+						response.put("code", HTTPCode.OK.getValue().getBytes());
 						String[] pathSplit = path.split("\\.");
 						try {
 							response.put("mime",
@@ -193,14 +193,14 @@ public class Engine extends Server {
 						}
 					} else {
 						response.put("content", "Unauthorized".getBytes());
-						response.put("code", HTTPCode.UNAUTHORIZED.getBytes());
+						response.put("code", HTTPCode.UNAUTHORIZED.getValue().getBytes());
 						response.put("mime", "text/html".getBytes());
 					}
 				} catch (Exception e) {
 					response = new HashMap<>() {
 						{
 							put("content", "Internal Server Error".getBytes());
-							put("code", HTTPCode.INTERNAL_SERVER_ERROR.getBytes());
+							put("code", HTTPCode.INTERNAL_SERVER_ERROR.getValue().getBytes());
 							put("mime", "text/html".getBytes());
 						}
 					};
@@ -215,7 +215,7 @@ public class Engine extends Server {
 				{
 					put("content", ("Error. Please send the following text to the administrator: "
 							+ aes.encrypt(sw.toString())).getBytes());
-					put("code", HTTPCode.SERVICE_UNAVAILABLE.getBytes());
+					put("code", HTTPCode.SERVICE_UNAVAILABLE.getValue().getBytes());
 					put("mime", "text/html".getBytes());
 				}
 			};

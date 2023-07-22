@@ -59,7 +59,7 @@ public class API {
 	 * @return response body and MIME type and additional headers if necessary
 	 */
 	public HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) throws Exception {
-		String code = HTTPCode.OK; // Default HTTP Code
+		String code = HTTPCode.OK.getValue(); // Default HTTP Code
 		String PCode = "", session_id = "";
 		String extension = "";
 		byte[] BODY = null; // HTTPS Body
@@ -143,10 +143,10 @@ public class API {
 					put("msg", "API request isn't understood");
 				}
 			}).getBytes());
-			code = HTTPCode.BAD_REQUEST;
+			code = HTTPCode.BAD_REQUEST.getValue();
 			res.put("code", code.getBytes());
 		}
-		if (new String((byte[]) res.get("body")).equals("error")) code = HTTPCode.INTERNAL_SERVER_ERROR;
+		if (new String((byte[]) res.get("body")).equals("error")) code = HTTPCode.INTERNAL_SERVER_ERROR.getValue();
 		if (Elshanta_temp.containsKey("session_ids")) res.put("session_ids", SESSION_IDS);
 		if (Elshanta_temp.containsKey("docs_db")) res.put("docs", docs);
 		res.put("mime", mime.getBytes());
