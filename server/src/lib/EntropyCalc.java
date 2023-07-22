@@ -10,6 +10,7 @@ public class EntropyCalc {
         if(containsLowerCase(passphrase)) P += 26;
         if(containsUpperCase(passphrase)) P += 26;
         if(containsNumber(passphrase)) P += 10;
+        if(containsSpecialCharacter(passphrase)) P += 32;
         entropy = Math.log(power(P, L)) / Math.log(2);
         return entropy;
     }
@@ -24,19 +25,19 @@ public class EntropyCalc {
     private static boolean containsNumber(String value) {
         return contains(value, Character::isDigit);
     }
+
+    private static boolean containsSpecialCharacter(String value) {
+        return contains(value, i-> !Character.isLetter(i) && !Character.isDigit(i) && !Character.isWhitespace(i));
+    }
     
     private static boolean contains(String value, IntPredicate predicate) {
         return value.chars().anyMatch(predicate);
     }
-    public static long power(int x, int n) { // x ^ n
-        long pow = 1L;
-         while (n > 0) {
-            if ((n & 1) == 1) {
-                pow *= x;
-            }
-            n = n >> 1;
-            x = x * x;
-        }
-        return pow;
+    private static double power(double x, long n) {
+        if( n < 0 ) return power( (1 / x), -n);
+        else if ( n == 0) return 1.0; 
+        else if( n == 1) return x;
+        else if( n % 2 == 0) return power(x * x, n / 2);
+        else return x * power( x * x, n / 2);
     }
 }
