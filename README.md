@@ -1,5 +1,5 @@
 # Electronic Document System
-A highly secure and simple document management system, written in Java. Every document is unmodifiable, and issued a 9-digit code.
+A highly secure and simple document management system, written in Java. Every document is unmodifiable, and issued a 9-digit code. If you want to know more about the API, please head to `docs/API.md`
 
 - [Electronic Document System](#electronic-document-system)
   - [Use cases](#use-cases)
