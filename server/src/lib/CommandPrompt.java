@@ -21,6 +21,12 @@ public abstract class CommandPrompt {
     public void run(String alias) {
         Console C = System.console();
 
+        availableCommands.add("exit");
+        availableCommands.add("help");
+
+        helpCommands.put("exit", "Exit the main mode/instance");
+        helpCommands.put("help", "Display help page");
+
         cmdLoop : while(true) {
             String cmd = new String(C.readLine(alias + "> "));
             /* Help Screen */
