@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 /**
  * HashMap with Maximum size. When it reaches the maximum size, it deletes the eldest entry.
- * @author morad
+ * @author Morad A.
  * @param <K> Key
  * @param <V> Value
  */
