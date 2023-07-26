@@ -9,7 +9,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 /**
  * AES Encryption/Decryption Library
- * @author morad
+ * @author Morad A.
  */
 public class AES {
 	private static SecretKeySpec secretKey;
