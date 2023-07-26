@@ -8,6 +8,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
+
+/**
+ * Time-based One Time Password Generation and Validation
+ * @author Morad A.
+ */
 public final class TOTP {
 	public static class Secret {
 		public static class Base32 {
