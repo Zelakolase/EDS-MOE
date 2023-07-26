@@ -42,10 +42,11 @@ public class login {
 				out.put("body", JSON.HMQ(new HashMap<String, String>() {
 					{
 						put("status", "failed");
-						put("msg", "Username or password isn't correct");
+						put("msg", "Username or password or OTP isn't correct");
 					}
 				}));
 			}
+
 			out.put("SID", SESSION_IDS);
 			return out;
 	}
