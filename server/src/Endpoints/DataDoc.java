@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lib.AES;
+import lib.FilePaths;
 import lib.IO;
 import lib.JSON;
 import lib.RandomGenerator;
@@ -16,12 +17,12 @@ public class DataDoc {
 	public String run(byte[] BODY, String session_id, String code, String extension, Map<String, String> sESSION_IDS, String ENCRYPTION_KEY, AES aes) throws Exception {
 		String res = "error";
 			if (sESSION_IDS.containsKey(session_id)) {
-				String path = "./docs/" + RandomGenerator.getSaltString(20, 0) + "." + extension; // ./docs/aakF5igjdfigjdo.pdf
+				String path = FilePaths.ShardDirectory.getValue() + RandomGenerator.getSaltString(20, 0) + "." + extension; // ./docs/aakF5igjdfigjdo.pdf
 				new File(path).createNewFile();
 				IO.write(path, aes.encrypt(BODY), false);
 				SparkDB db = new SparkDB();
 				code = code.replaceAll("-", "");
-				db.readFromFile("./conf/doc/"+code.substring(0,3)+".db", ENCRYPTION_KEY);
+				db.readFromFile(FilePaths.ShardDirectory.getValue()+code.substring(0,3)+".db", ENCRYPTION_KEY);
 				final String tempC = code;
 				int targetModifyIndex = db.getIDs(new HashMap<String, String>() {{
 					put("code",tempC);
@@ -31,7 +32,7 @@ public class DataDoc {
 					put("path", path);
 					put("sha", Arrays.toString(MessageDigest.getInstance("SHA3-512").digest(BODY)));
 				}});
-				IO.write("./conf/doc/"+code.substring(0,3)+".db", aes.encrypt(db.toString()), false);
+				IO.write(FilePaths.ShardDirectory.getValue()+code.substring(0,3)+".db", aes.encrypt(db.toString()), false);
 				final String FCode = code;
 				res = JSON.HMQ(new HashMap<String, String>() {
 					{
