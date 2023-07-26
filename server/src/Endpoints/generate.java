@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Random;
 
 import lib.AES;
+import lib.FilePaths;
 import lib.IO;
 import lib.JSON;
 import lib.RandomGenerator;
 import lib.SparkDB;
 
 public class generate {
-	public String run(byte[] BODY, Map<String, String> SESSION_IDS, String ENCRYPTION_KEY, SparkDB docs, AES aes) throws Exception {
+	public String run(byte[] BODY, Map<String, String> SESSION_IDS, String ENCRYPTION_KEY, SparkDB docs, AES aes, SparkDB Metadata) throws Exception {
 			String res = "";
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			if (SESSION_IDS.containsKey(in.get("session_id"))) {
@@ -30,7 +31,7 @@ public class generate {
 				if(docs.get(targetIndex).get("size").equals("10000")) targetIndex = docs.getColumn("min_query").indexOf(Collections.min(docs.getColumn("min_query")));
 				// c. go to prefix.db, if size == 10k, delete row age minimum. min_query in docs is next age after deleted
 				SparkDB db = new SparkDB();
-				db.readFromFile("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", ENCRYPTION_KEY);
+				db.readFromFile(FilePaths.ShardDirectory.getValue() + docs.getColumn("prefix").get(targetIndex)+".db", ENCRYPTION_KEY);
 				if(db.size() == 10000) {
 					new File(db.getColumn("path").get(0)).delete();
 					db.delete(0);
@@ -53,12 +54,15 @@ public class generate {
 					put("writer", in.get("writer"));
 					put("date", timeStamp);
 					put("sha", "0");
-					put("age", new String(aes.decrypt(IO.read("./conf/doc.txt"))));
+					put("age", Metadata.get(0).get("numQueries"));
 				}});
-				// e. increase doc.txt by 1
-				IO.write("./conf/doc.txt", aes.encrypt(String.valueOf(Integer.valueOf(new String(aes.decrypt(IO.read("./conf/doc.txt"))))+1)), false);
+				// e. increase numDocs by 1
+				long docNumber = Long.valueOf(Metadata.get(0).get("numDocs"));
+				Metadata.modify(0, new HashMap<>() {{
+					put("numDocs", String.valueOf(docNumber + 1));
+				}});
 				// f. write changes to disk. 000.db and docs change
-				IO.write("./conf/doc/"+docs.getColumn("prefix").get(targetIndex)+".db", aes.encrypt(db.toString()), false);
+				IO.write(FilePaths.ShardDirectory.getValue() +docs.getColumn("prefix").get(targetIndex)+".db", aes.encrypt(db.toString()), false);
 				docs.modify(targetIndex, new HashMap<String, String>() {{
 					put("size", String.valueOf(db.size()));
 				}});
@@ -67,14 +71,14 @@ public class generate {
 				res = JSON.HMQ(temp);
 				// g. write to Table.db
 				SparkDB T = new SparkDB();
-				T.readFromFile("./conf/Table.db", ENCRYPTION_KEY);
+				T.readFromFile(FilePaths.ConfigurationDirectory.getValue() + "Table.db", ENCRYPTION_KEY);
 				T.add(new HashMap<String, String>() {{
 					put("DocName", in.get("doc_name"));
 					put("Verifier", SESSION_IDS.get(in.get("session_id")));
 					put("Writer", in.get("writer"));
 					put("DocNum", PFCode);
 				}});
-				IO.write("./conf/Table.db", aes.encrypt(T.toString()), false);
+				IO.write(FilePaths.ConfigurationDirectory.getValue() + "Table.db", aes.encrypt(T.toString()), false);
 			} else {
 				new JSON();
 				res = JSON.HMQ(new HashMap<String, String>() {
