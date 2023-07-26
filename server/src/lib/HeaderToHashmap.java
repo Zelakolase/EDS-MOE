@@ -3,7 +3,7 @@ package lib;
 import java.util.HashMap;
 /**
  * The name says it all
- * @author morad
+ * @author Morad A.
  */
 public class HeaderToHashmap {
 	/**
