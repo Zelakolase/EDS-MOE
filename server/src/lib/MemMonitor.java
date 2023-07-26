@@ -8,11 +8,11 @@ public class MemMonitor extends Thread {
 	public void run() {
 		while (true) {
 			double usage = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000.0;
-			if (usage >= 1024.0) {
+			if (usage >= 2048.0) {
 				System.gc();
 			}
 			try {
-				Thread.sleep(50);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
