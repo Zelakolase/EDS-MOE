@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 /**
  * Merges requests if it's an upload process and wrongly split with '\r\n'.
- * @author morad
+ * @author Morad A.
  */
 public class PostRequestMerge {
 	public static byte[] merge(List<byte[]> aLm, BufferedInputStream dIS, HashMap<String, String> headers, int max_bytes)
