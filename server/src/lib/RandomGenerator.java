@@ -3,8 +3,7 @@ package lib;
 import java.util.Random;
 /**
  * Generates random strings
- * @author morad
- *
+ * @author Morad A.
  */
 public class RandomGenerator {
 	/**
@@ -12,12 +11,9 @@ public class RandomGenerator {
 	 */
 	public static String getSaltString(int num, int mode) {
 		String SALTCHARS = "";
-		if (mode == 0)
-			SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890qwertyuiopasdfghjklzxcvbnm";
-		if (mode == 1)
-			SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-		if (mode == 2)
-			SALTCHARS = "1234567890";
+		if (mode == 0) SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890qwertyuiopasdfghjklzxcvbnm";
+		if (mode == 1) SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		if (mode == 2) SALTCHARS = "1234567890";
 		StringBuilder salt = new StringBuilder();
 		Random rnd = new Random();
 		while (salt.length() < num) { // length of the random string.
