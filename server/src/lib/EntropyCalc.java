@@ -2,6 +2,10 @@ package lib;
 
 import java.util.function.IntPredicate;
 
+/**
+ * Calculation of Passphrase Entropy
+ * @Morad A.
+ */
 public class EntropyCalc {
     public static double calculate(String passphrase) {
         double entropy = 0;
@@ -33,6 +37,13 @@ public class EntropyCalc {
     private static boolean contains(String value, IntPredicate predicate) {
         return value.chars().anyMatch(predicate);
     }
+
+    /**
+     * Square and multiply algorithm to compute x^n
+     * @param x Base
+     * @param n Power
+     * @return Result of x^n
+     */
     private static double power(double x, long n) {
         if( n < 0 ) return power( (1 / x), -n);
         else if ( n == 0) return 1.0; 
