@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import lib.AES;
+import lib.FilePaths;
 import lib.FileToAL;
 import lib.HTTPCode;
 import lib.HeaderToHashmap;
@@ -21,6 +22,7 @@ import lib.IO;
 import lib.MaxSizeHashMap;
 import lib.MemMonitor;
 import lib.PostRequestMerge;
+import lib.SHA;
 import lib.SparkDB;
 import lib.log;
 
@@ -62,9 +64,9 @@ public class Engine extends Server {
 	 */
 	static volatile ArrayList<String> WWWFiles = new ArrayList<>();
 	/**
-	 * School name
+	 * Server Metadata DB
 	 */
-	static volatile String SCHOOL = "";
+	static volatile SparkDB Metadata = new SparkDB();
 	/**
 	 * AES Object
 	 */
@@ -85,27 +87,30 @@ public class Engine extends Server {
 	 */
 	public void run() {
 		try {
+			/* Start Memory Monitor Thread */
 			MemMonitor MM = new MemMonitor();
 			MM.start();
+			/* Read all databases */
 			MIME.readFromFile("mime.db");
-			users.readFromString(aes.decrypt(new String(IO.read("./conf/users.db"))));
-			docs.readFromString(aes.decrypt(new String(IO.read("./conf/docs.db"))));
+			users.readFromString(aes.decrypt(new String(IO.read(FilePaths.ConfigurationDirectory.getValue() + "users.db"))));
+			docs.readFromString(aes.decrypt(new String(IO.read(FilePaths.ConfigurationDirectory.getValue() + "docs.db"))));
 			WWWFiles = FileToAL.convert("WWWFiles.db");
-			SCHOOL = aes.decrypt(new String(IO.read("./conf/info.txt")));
-			this.setMaximumConcurrentRequests(5000);
+			Metadata.readFromString(aes.decrypt(new String(IO.read(FilePaths.ConfigurationDirectory.getValue() + "metadata.db"))));
+			/* TCP Settings */
 			this.setMaximumRequestSizeInKB(10000); // 10MB
 			this.setGZip(false);
 			this.setBacklog(50000);
+			/* Decrypt and Load WWW Files */
 			for (String file : WWWFiles) {
-				if (new File("./www/" + file).isFile())
-					WWWData.put("/" + file, aes.decrypt(IO.read("./www/" + file)));
+				if (new File("./www/" + file).isFile()) WWWData.put("/" + file, aes.decrypt(IO.read("./www/" + file)));
 			}
+			/* Start Server */
 			try (final DatagramSocket socket = new DatagramSocket()) {
 				socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
 				String ip = socket.getLocalAddress().getHostAddress();
 				log.s("Server is running, Device local IP Address: " + ip);
 			}
-			this.HTTPSStart(443, "./keystore.jks", "SWSTest");
+			this.HTTPSStart(443, FilePaths.ConfigurationDirectory.getValue() + "keystore.jks", SHA.gen(ENCRYPTION_KEY).substring(0, 10));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -113,10 +118,12 @@ public class Engine extends Server {
 
 	/**
 	 * Dynamic Engine Entry point
-	 * 
+	 * @param aLm Request split by '\r\n'
+	 * @param max_size Maximum request size in bytes.
 	 * @throws Exception
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	HashMap<String, byte[]> main(List<byte[]> aLm, BufferedInputStream DIS, BufferedOutputStream DOS, int max_size)
 			throws Exception {
 		try {
@@ -127,25 +134,37 @@ public class Engine extends Server {
 				/**
 				 * API request detected
 				 */
+
+				/* Retrieve API Endpoint */
 				String ser = headers.get("path").replaceFirst("/api.", "");
+
+				/* Verify a complete request body */
 				Elshanta.put("body", PostRequestMerge.merge(aLm, DIS, headers, max_size));
 				Elshanta.put("api", ser);
 				Elshanta.put("encryption_key", ENCRYPTION_KEY);
 				Elshanta.put("mime", MIME);
 				Elshanta.put("aes", aes);
+
+				/* Pass in 'Elshanta' the required arguments */
 				if (Stream.of("login", "logout", "DataDoc", "table").anyMatch(ser::equals)) {
 					Elshanta.put("session_ids", SESSION_IDS);
 					Elshanta.put("users_db", users);
 				}
-				if (ser.equals("name")) Elshanta.put("name", SCHOOL);
+				Elshanta.put("metadata", Metadata);
 				if (ser.equals("generate") || ser.equals("doc")) Elshanta.put("session_ids", SESSION_IDS);
-				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals)) Elshanta.put("docs_db", docs);
+				if (Stream.of("about", "SearchDoc", "DownloadDoc", "generate", "VerifyDoc", "DataDoc").anyMatch(ser::equals))
+					Elshanta.put("docs_db", docs);
+
+				/* If custom specified headers exist, pass them on */
 				if (headers.containsKey("code")) Elshanta.put("code", headers.get("code"));
 				if (headers.containsKey("session_id")) Elshanta.put("session_id", headers.get("session_id"));
 				if (headers.containsKey("Cookie")) Elshanta.put("Cookie", headers.get("Cookie"));
 				if (headers.containsKey("extension")) Elshanta.put("extension", headers.get("extension"));
+
+				/* Initialize Response */
 				HashMap<String, Object> res;
 				try {
+					/* Get the response */
 					res = new API().redirector(Elshanta); // Elshanta reply
 				} catch (Exception e) {
 					StringWriter sw = new StringWriter();
@@ -160,14 +179,27 @@ public class Engine extends Server {
 						}
 					};
 				}
+
+				/* If there is an update for Session IDs, do it */
 				if (res.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) res.get("session_ids");
+				/* If there is an update for document shard list, do it */
+				boolean docsUpdated = false;
 				if (res.containsKey("docs")) {
 					docs = (SparkDB) res.get("docs");
-					IO.write("./conf/docs.db", aes.encrypt(docs.toString()), false);
+					docsUpdated = true;
 				}
+				/* If there is an update for Metadata, do it */
+				if(res.containsKey("metadata")) Metadata = (SparkDB) res.get("metadata");
+
+				/* Retrieve Response */
 				response.put("content", (byte[]) res.get("body"));
 				response.put("code", HTTPCode.OK.getValue().getBytes());
 				response.put("mime", (byte[]) res.get("mime"));
+
+				/* Start writeSyncThread */
+				writeSyncThread wST = new writeSyncThread(docsUpdated);
+				wST.start();
+
 				if (res.containsKey("extension")) response.put("extension", (byte[]) res.get("extension"));
 			} else {
 				/**
@@ -176,11 +208,15 @@ public class Engine extends Server {
 				String path = "";
 				try {
 					path = headers.get("path");
-					if (Stream.of("/login", "/support", "/tools", "/operation", "/index", "/submit", "/board", "/about").anyMatch(path::equals)) path += ".html";
+					/* If any of the specified Strings is equal to path */
+					if (Stream.of("/login", "/support", "/tools", "/operation", "/index", "/submit", "/board", "/about")
+							.anyMatch(path::equals))
+						path += ".html";
 					if (WWWData.containsKey(path)) {
 						response.put("content", WWWData.get(path));
 						response.put("code", HTTPCode.OK.getValue().getBytes());
 						String[] pathSplit = path.split("\\.");
+						/* Try to grab MIME from mime.db */
 						try {
 							response.put("mime",
 									MIME.get(new HashMap<String, String>() {
@@ -189,18 +225,25 @@ public class Engine extends Server {
 										}
 									}, "mime", 1).get(0).getBytes());
 						} catch (Exception e) {
+							/* If mime.db does not have the extension, default it to text/html */
 							response.put("mime", "text/html".getBytes());
 						}
 					} else {
+						/* If the user tried to access unspecified path */
 						response.put("content", "Unauthorized".getBytes());
 						response.put("code", HTTPCode.UNAUTHORIZED.getValue().getBytes());
 						response.put("mime", "text/html".getBytes());
 					}
 				} catch (Exception e) {
-					response = new HashMap<>() {
+					/* If error happened, print encrypted error message */
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					return new HashMap<>() {
 						{
-							put("content", "Internal Server Error".getBytes());
-							put("code", HTTPCode.INTERNAL_SERVER_ERROR.getValue().getBytes());
+							put("content", ("Error. Please send the following text to the administrator: "
+									+ aes.encrypt(sw.toString())).getBytes());
+							put("code", HTTPCode.SERVICE_UNAVAILABLE.getValue().getBytes());
 							put("mime", "text/html".getBytes());
 						}
 					};
@@ -208,6 +251,7 @@ public class Engine extends Server {
 			}
 			return response;
 		} catch (Exception e) {
+			/* If error happened, print encrypted error message */
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
@@ -219,7 +263,27 @@ public class Engine extends Server {
 					put("mime", "text/html".getBytes());
 				}
 			};
+		}
+	}
 
+
+	public static class writeSyncThread extends Thread {
+		public boolean docsUpdated = false;
+
+		public writeSyncThread(boolean docsUpdated) {
+			this.docsUpdated = docsUpdated;
+		}
+
+		@Override
+		public void run() {
+			try {
+			/* Update Metadata */
+			IO.write(FilePaths.ConfigurationDirectory.getValue() + "metadata.db", aes.encrypt(Metadata.toString()), false);
+			/* Update Docs DB */
+			if(docsUpdated) IO.write(FilePaths.ConfigurationDirectory.getValue() + "docs.db", aes.encrypt(docs.toString()), false);
+			}catch(Exception e) {
+				// Shhhh....
+			}
 		}
 	}
 }
