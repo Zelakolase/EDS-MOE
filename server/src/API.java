@@ -13,7 +13,6 @@ import Endpoints.logout;
 import Endpoints.name;
 import lib.AES;
 import lib.HTTPCode;
-import lib.IO;
 import lib.JSON;
 import lib.SparkDB;
 /**
@@ -42,9 +41,9 @@ public class API {
 	 */
 	String mime = "application/json";
 	/**
-	 * School name
+	 * Metadata DB
 	 */
-	String school = "";
+	SparkDB Metadata = new SparkDB();
 	/**
 	 * MIMEs
 	 */
@@ -58,44 +57,48 @@ public class API {
 	 * @param Elshanta_temp Inputs, may vary in amount and type
 	 * @return response body and MIME type and additional headers if necessary
 	 */
+	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> redirector(HashMap<String, Object> Elshanta_temp) throws Exception {
 		String code = HTTPCode.OK.getValue(); // Default HTTP Code
 		String PCode = "", session_id = "";
 		String extension = "";
 		byte[] BODY = null; // HTTPS Body
 		HashMap<String, Object> res = new HashMap<>();
-		// School Name
-		if(Elshanta_temp.containsKey("name")) school = (String) Elshanta_temp.get("name");
+		// Server Metadata
+		Metadata = (SparkDB) Elshanta_temp.getOrDefault("metadata", Metadata);
 		// Encryption Key
 		ENCRYPTION_KEY = (String) Elshanta_temp.get("encryption_key");
 		// Request Body
-		if (Elshanta_temp.containsKey("body")) BODY = (byte[]) Elshanta_temp.get("body");
+		BODY = (byte[]) Elshanta_temp.getOrDefault("body", BODY);
 		// Session IDs
-		if (Elshanta_temp.containsKey("session_ids")) SESSION_IDS = (Map<String, String>) Elshanta_temp.get("session_ids");
+		SESSION_IDS = (Map<String, String>) Elshanta_temp.getOrDefault("session_ids", SESSION_IDS);
 		// Verifiers DB
-		if (Elshanta_temp.containsKey("users_db")) users = (SparkDB) Elshanta_temp.get("users_db");
+		users = (SparkDB) Elshanta_temp.getOrDefault("users_db", users);
 		// Document Code from headers
-		if (Elshanta_temp.containsKey("code")) PCode = (String) Elshanta_temp.get("code");
+		PCode = (String) Elshanta_temp.getOrDefault("code", PCode);
 		// Session ID from headers
-		if (Elshanta_temp.containsKey("session_id")) session_id = (String) Elshanta_temp.get("session_id");
+		session_id = (String) Elshanta_temp.getOrDefault("session_id", session_id);
 		// Extension from headers. eg. pdf/txt/mp4
-		if (Elshanta_temp.containsKey("extension")) extension = (String) Elshanta_temp.get("extension");
+		extension = (String) Elshanta_temp.getOrDefault("extension", extension);
 		// Docs DB
-		if (Elshanta_temp.containsKey("docs_db")) docs = (SparkDB) Elshanta_temp.get("docs_db");
+		docs = (SparkDB) Elshanta_temp.getOrDefault("docs_db", docs);
 		// MIMEs
 		MIME = (SparkDB) Elshanta_temp.get("mime");
 		// AES Obj
 		aes = (AES) Elshanta_temp.get("aes");
 		// We processed one query, write it down.
-					IO.write("./conf/queries.txt",
-							aes.encrypt(String.valueOf(Integer.parseInt(aes.decrypt(new String(IO.read("./conf/queries.txt")))) + 1)),
-							false);
+		long queries = Long.valueOf(Metadata.get(0).get("numQueries"));
+		Metadata.modify(0, new HashMap<>() {{
+			put("numQueries", String.valueOf(queries + 1));
+		}});
+
+		/* API Mapping to calsses */
 		String in = (String) Elshanta_temp.get("api");
 		if (in.equals("name")) {
-			res.put("body", new name().run(ENCRYPTION_KEY, school).getBytes());
+			res.put("body", new name().run(ENCRYPTION_KEY, Metadata).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("about")) {
-			res.put("body", new about().run(ENCRYPTION_KEY, docs, aes).getBytes());
+			res.put("body", new about().run(ENCRYPTION_KEY, Metadata, aes).getBytes());
 			res.put("code", code.getBytes());
 		} else if (in.equals("login")) {
 			Map<String, Object> login = new login().run(BODY,users, SESSION_IDS);
@@ -119,7 +122,7 @@ public class API {
 			}
 			res.put("code", code.getBytes());
 		} else if (in.equals("generate")) {
-			res.put("body", (new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs, aes)).getBytes()); // generate verification code
+			res.put("body", (new generate().run(BODY, SESSION_IDS, ENCRYPTION_KEY, docs, aes, Metadata)).getBytes()); // generate verification code
 			res.put("code", code.getBytes());
 		} else if (in.equals("VerifyDoc")) {
 			res.put("body", (new VerifyDoc().run(BODY, PCode, ENCRYPTION_KEY)).getBytes()); // verify a document
@@ -136,7 +139,7 @@ public class API {
 			res.put("body", (new Table().run((String) Elshanta_temp.get("Cookie"), SESSION_IDS, ENCRYPTION_KEY)).getBytes());
 			res.put("code", code.getBytes());
 		}
-		 else {
+		else {
 			res.put("body", JSON.HMQ(new HashMap<String, String>() {
 				{
 					put("status", "failed");
@@ -146,9 +149,12 @@ public class API {
 			code = HTTPCode.BAD_REQUEST.getValue();
 			res.put("code", code.getBytes());
 		}
+
+		/* Prepare Response */
 		if (new String((byte[]) res.get("body")).equals("error")) code = HTTPCode.INTERNAL_SERVER_ERROR.getValue();
 		if (Elshanta_temp.containsKey("session_ids")) res.put("session_ids", SESSION_IDS);
 		if (Elshanta_temp.containsKey("docs_db")) res.put("docs", docs);
+		if (Elshanta_temp.containsKey("metadata")) res.put("metadata", Metadata);
 		res.put("mime", mime.getBytes());
 		return res;
 	}
