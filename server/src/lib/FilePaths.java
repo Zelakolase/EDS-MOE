@@ -7,7 +7,8 @@ package lib;
 public enum FilePaths {
     ParentDirectory("./data/"),
     ConfigurationDirectory("./data/conf/"),
-    DocumentsDirectory("./data/docs/");
+    DocumentsDirectory("./data/docs/"),
+    ShardDirectory("./data/doc/");
 
     private final String value;
 
