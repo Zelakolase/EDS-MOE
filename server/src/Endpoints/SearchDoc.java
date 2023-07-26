@@ -2,6 +2,7 @@ package Endpoints;
 
 import java.util.HashMap;
 
+import lib.FilePaths;
 import lib.JSON;
 import lib.SparkDB;
 
@@ -11,7 +12,7 @@ public class SearchDoc {
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			String PublicCode = in.get("code").replaceAll("-", ""); // 123-456-789 --> 123456789
 			SparkDB db = new SparkDB();
-			db.readFromFile("./conf/doc/"+PublicCode.substring(0, 3)+".db", Key); // read ./conf/doc/000.db
+			db.readFromFile(FilePaths.ShardDirectory.getValue() + PublicCode.substring(0, 3)+".db", Key); // read ./conf/doc/000.db
 			if(db.getColumn("code").contains(PublicCode)) {
 				// The document code is present
 				int targetRowIndex = db.getIDs(new HashMap<String, String>() {{
