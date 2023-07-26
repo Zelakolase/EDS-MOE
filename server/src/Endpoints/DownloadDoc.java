@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lib.AES;
+import lib.FilePaths;
 import lib.IO;
 import lib.JSON;
 import lib.SparkDB;
@@ -16,7 +17,7 @@ public class DownloadDoc {
 			HashMap<String, String> in = JSON.QHM(new String(BODY));
 			in.put("code", in.get("code").replaceAll("-", ""));
 			SparkDB docs = new SparkDB();
-			docs.readFromFile("./conf/doc/"+in.get("code").substring(0, 3)+".db", ENCRYPTION_KEY);
+			docs.readFromFile(FilePaths.ShardDirectory.getValue()+in.get("code").substring(0, 3)+".db", ENCRYPTION_KEY);
 			if (docs.getColumn("code").contains(in.get("code"))) {
 				String path = docs.get(new HashMap<String, String>() {{
 					put("code", in.get("code"));
