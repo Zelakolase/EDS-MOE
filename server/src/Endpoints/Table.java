@@ -2,6 +2,7 @@ package Endpoints;
 
 import java.util.*;
 
+import lib.FilePaths;
 import lib.JSON;
 import lib.SparkDB;
 
@@ -11,7 +12,7 @@ public class Table {
         String session_id = cookies.split("session_id=")[1];
         if (SESSION_IDS.containsKey(session_id)) {
             SparkDB T = new SparkDB();
-            T.readFromFile("./conf/Table.db", ENC);
+            T.readFromFile(FilePaths.ConfigurationDirectory.getValue() + "Table.db", ENC);
             T.delete(new HashMap<String, String>() {{
                 put("DocNum", "0");
             }});
