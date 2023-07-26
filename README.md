@@ -11,6 +11,8 @@ A highly secure and simple document management system, written in Java. Every do
   - [Backup and Restore](#backup-and-restore)
   - [Class List](#class-list)
   - [Configuration and Database Directory List](#configuration-and-database-directory-list)
+  - [Command Prompt Help](#command-prompt-help)
+  - [Database Columns](#database-columns)
   - [Author Information](#author-information)
 
 
@@ -26,9 +28,9 @@ A highly secure and simple document management system, written in Java. Every do
 4. The verifier can access the list of documents and their 9-digit codes later in the 'Board' tab.
 
 ## Build and Run
-The main instance of the application is `main.java`.
-- In order to run it in linux systems: `$ javac main.java && sudo java main`
-- In order to run it in windows systems: `> javac -encoding iso8859_1 main.java && java main`
+The main instance of the application is `APp.java`.
+- In order to run it in linux systems: `$ javac App.java && sudo java App`
+- In order to run it in windows systems: `> javac -encoding iso8859_1 App.java && java App`
 
 ## Technologies used
 - Backend: Java Native
@@ -74,7 +76,7 @@ To move your data in another system, just copy data/ folder in server/src/ and p
     - **JSON.java** : Converts JSON String to a HashMap structure, and vice versa.
     - **log.java** : Prints different log statements with colors.
     - **MaxSizeHashMap.java** : A HashMap with a fixed size where it deletes the eldest entry if the HashMap is full.
-    - **MemMonitor.java** : A thread object that calls Garbage Collection every 50ms if the memory usage went above 1GB.
+    - **MemMonitor.java** : A thread object that calls Garbage Collection every 100ms if the memory usage went above 2GB.
     - **Network.java** : Handles GZIP Compression, read from TCP socket and write HTTP(S) responses to TCP socket.
     - **PathFilter.java** : Provides LFI Protection and handles different path typos.
     - **PostRequestMerge.java** : Reads the whole HTTPS POST request beyond TLS record limitation (16kb).
@@ -84,32 +86,63 @@ To move your data in another system, just copy data/ folder in server/src/ and p
     - **TOTP.java** : Handles Time-based One Time Passwords generation and validation algorithms.
     - **URIDecode.java** : Decodes URI (HTML) format.
     - **CommandPrompt.java** : An abstract Command Prompt Object.
+    - **CommandExecutor.java** : Executes System commands.
 - **API.java** : The intermediate point that maps API requests from the main HTTPS instance to individual API Classes.
 - **Engine.java** : The main HTTPS Instance, called by main application instance 'main.java'.
-- **main.java** : The main Application instance, configures the server if it is first-time run, or calls the HTTPS Instance 'Engine.java' if the inserted Server Key is correct.
+- **App.java** : The main Application instance, configures the server if it is first-time run, or calls the HTTPS Instance 'Engine.java' if the inserted Server Key is correct.
 - **Server.java** : TCP HTTPS Handler Class, used by main HTTPS Instance 'Engine.java'.
 - **mime.db** : A list of MIME types and their corresponding file extensions.
 - **WWWFiles.db** : A white-list of files in www/ to access via HTTPS protocol.
 - **ConfigMode.java** : The configuration mode instance, called by main application instance 'main.java' if the user requested the configuration mode.
 
 ## Configuration and Database Directory List
-- data/
-  - conf/
-    - users.db : Contains Usernames, Full names, Passwords, and OTPs for all verifiers.
-    - server.key : Contains self-encrypted server key.
-    - keystore.jks : The TLS Self-signed certificate for HTTPS Protocol.
-    - info.txt : School name.
-    - docs.db : Main Database Shard List.
-    - queries.txt : Query Counter.
-    - doc.txt : Document Counter.
-    - Table.db : List of all Documents with Writer, Document Number, Verifier.
-    - doc/
-      - 000.db : Metadata of all documents with document number with 000 as prefix.
-      - 001.db : Metadata of all documents with document number with 001 as prefix.
+- **data/**
+  - **conf/**
+    - **users.db** : Contains Usernames, Full names, Passwords, and OTPs for all verifiers.
+    - **server.key** : Contains self-encrypted server key.
+    - **keystore.jks** : The TLS Self-signed certificate for HTTPS Protocol.
+    - **docs.db** : Main Database Shard List.
+    - **metadata.db** : School name, Number of Queries, Number of Documents
+    - **Table.db** : List of all Documents with Writer, Document Number, Verifier.
+    - **doc/**
+      - **000.db** : Metadata of all documents with document number with 000 as prefix.
+      - **001.db** : Metadata of all documents with document number with 001 as prefix.
       - ...
-      - 999.db : Metadata of all documents with document number with 999 as prefix.
-  - docs/
+      - **999.db** : Metadata of all documents with document number with 999 as prefix.
+  - **docs/**
     - Contains all uploaded encrypted documents.
+
+## Command Prompt Help
+After Running 'App.java', a command prompt will appear. Running 'help' command will display available commands, and 'exit' will exit the current command prompt instance.
+
+## Database Columns
+- **Metadata.db**:
+  - **entityName**: The name of the entity using the system.
+  - **numQueries**: Number of queries processed.
+  - **numDocs**: Number of documents on the system.
+- **users.db**:
+  - **full_name**: The full name of the verifier user.
+  - **user**: The username of the verifier user, hashed with SHA3-512, used in login.
+  - **pass**: The password of the verifier user, hashed with SHA3-512, used in login.
+  - **otp**: The OTP Secret key of the verifier user, used in login.
+- **Table.db** (used for 'Board' feature for the verifier):
+  - **DocName**: The name of the document.
+  - **Verifier**: The full name of the verifier of the document.
+  - **Writer**: The name of the document author.
+  - **DocNum**: The document serial number (consists of 9 digits).
+- **docs.db** (Shards List):
+  - **prefix**: The document code prefix (000 till 999).
+  - **size**: The number of documents with the specified prefix.
+  - **min_query**: The age of the earliest document present.
+- **000.db/001.db/../999.db** (Database Shard):
+  - **code**: The document code.
+  - **path**: The path of the encrypted document.
+  - **doc_name**: The document name.
+  - **verifier**: The full name of the verifier of the document.
+  - **writer**: The name of the document author.
+  - **sha**: The SHA3-512 Checksum of the file.
+  - **age**: The age of the document.
+  - **date**: The document date of insertion.
 
 ## Author Information
 - Morad Abdelrasheed Mokhtar Ali Gill (Zelakolase@tuta.io)
