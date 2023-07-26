@@ -10,7 +10,7 @@ public class ConfigMode {
     private AES Paes;
     static String userDBDirectory = FilePaths.ConfigurationDirectory.getValue() + "users.db";
 
-    public void main(AES aes) throws Exception {
+    public void main(AES aes) {
         this.Paes = aes;
 
         CommandPrompt CP = new CommandPrompt() {
@@ -65,6 +65,11 @@ public class ConfigMode {
         boolean EntropyTestPass = false;
         while (!EntropyTestPass) {
             pass = new String(console.readPassword("Enter the verifier's password: "));
+            String tempPass = new String(console.readPassword("Confirm the verifier's password: "));
+				if(! tempPass.equals(pass)) {
+					System.out.println("Passwords do not match!");
+					continue;
+				}
             if (EntropyCalc.calculate(pass) < 50.0) log.e("Weak password, Try typing a more sophisticated password.\n");
             else EntropyTestPass = true;
         }
@@ -126,7 +131,7 @@ public class ConfigMode {
         /* If passed, delete the user row */
         users.delete(new HashMap<String, String>() {
             {
-                put("user", user);
+                put("user", SHA.gen(user));
             }
         }, 1);
 
@@ -174,15 +179,27 @@ public class ConfigMode {
         }
 
         /* Retrieve new password */
-        String newPassword = new String(console.readPassword("Enter the new password: "));
+        String newPassword = "";
+        boolean EntropyTestPass = false;
+        while (!EntropyTestPass) {
+            newPassword = new String(console.readPassword("Enter the verifier's password: "));
+            String tempPass = new String(console.readPassword("Confirm the verifier's password: "));
+				if(! tempPass.equals(newPassword)) {
+					System.out.println("Passwords do not match!");
+					continue;
+				}
+            if (EntropyCalc.calculate(newPassword) < 50.0) log.e("Weak password, Try typing a more sophisticated password.\n");
+            else EntropyTestPass = true;
+        }
         /* Modify passwords */
+        final String fNewPassword = newPassword;
         users.modify(new HashMap<String, String>() {
             {
-                put("user", username);
+                put("user", SHA.gen(username));
             }
         }, new HashMap<String, String>() {
             {
-                put("pass", SHA.gen(newPassword));
+                put("pass", SHA.gen(fNewPassword));
             }
         });
         /* Update user DB */
