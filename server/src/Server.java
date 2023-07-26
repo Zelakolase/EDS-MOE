@@ -2,6 +2,7 @@
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -17,6 +18,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
 import lib.ArraySplit;
+import lib.HTTPCode;
 import lib.Network;
 import lib.log;
 /**
@@ -25,13 +27,14 @@ import lib.log;
  */
 public abstract class Server {
 	int port = 80; // Port Number
-	volatile int MaxConcurrentRequests = 200; // Max requests to process at a time
+	/* MaxConcurrentRequests is limited to available processors to avoid context switching */
+	volatile int MaxConcurrentRequests = Runtime.getRuntime().availableProcessors(); // Max requests to process at a time
 	private volatile int CurrentConcurrentRequests = 0; // Current Concurrent Requests
 	volatile boolean GZip = true; // GZip compression? (default true)
 	volatile int MAX_REQ_SIZE = 100000; // Max bytes to read in kb. (default 100MB)
 	int backlog = 50; // Max requests to wait for processing, default is 5000MB
 	String WWWDir = "www";
-	String AddedResponseHeaders = ""; // Custom Response headers
+	
 	/**
 	 * Set Maximum Concurrent Requests/Threads
 	 * @param in Number of max. threads/requests
@@ -80,16 +83,14 @@ public abstract class Server {
 			ServerSocket SS = getSSLContext(Path.of(KeyStorePath), keyStorePassword, TLSVersion, KeyStoreType,
 					KeyManagerFactoryType).getServerSocketFactory().createServerSocket(port, backlog);
 			Arrays.fill(keyStorePassword, '0');
-			int req_num = 0;
 			while (true) {
 				/*
-				 * Max 10 retries (1ms delay between each) for every request to process if
+				 * Max 10 retries (0.5ms delay between each) for every request to process if
 				 * MaxConcurrentReqs is reached
 				 */
 				int tries = 0; // current tries
 				inner: while (tries < 10) {
-					if (tries > 0)
-						Thread.sleep(1);
+					if (tries > 0) Thread.sleep(0,500000);
 					if (CurrentConcurrentRequests <= MaxConcurrentRequests) {
 						Socket S = SS.accept();
 						S.setKeepAlive(false);
@@ -99,16 +100,26 @@ public abstract class Server {
 						S.setSoTimeout(60000);
 						executor.execute(new Engine(S, S.getRemoteSocketAddress()));
 						CurrentConcurrentRequests++;
-						if(req_num >= Integer.MAX_VALUE) req_num = 0;
-						else req_num++;
 						break inner;
 					} else {
 						tries++;
 					}
 				}
+
+				if(tries == 10) {
+					Socket S = SS.accept();
+					try {
+						Network.write(new BufferedOutputStream(S.getOutputStream(),65536),
+							"The server is busy, please try again.".getBytes(), 
+							"text/html", 
+							HTTPCode.INTERNAL_SERVER_ERROR.getValue(), GZip, "", false);
+					} catch (IOException e1) {
+						// Shhhh....
+					}
+				}
 			}
 		} catch (Exception e) {
-
+			// Shhhh....
 		} finally {
 			executor.shutdownNow();
 		}
@@ -145,6 +156,7 @@ public abstract class Server {
 		@Override
 		public void run() {
 			try {
+				String AddedResponseHeaders = "";
 				BufferedInputStream DIS = new BufferedInputStream(S.getInputStream(),65536);
 				BufferedOutputStream DOS = new BufferedOutputStream(S.getOutputStream(),65536);
 				byte[] Request = Network.read(DIS, MAX_REQ_SIZE).toByteArray();
@@ -154,20 +166,22 @@ public abstract class Server {
 				 */
 				final HashMap<String, byte[]> Reply = main(ALm, DIS, DOS, (MAX_REQ_SIZE * 1024) - Request.length);
 				boolean cache = false;
+				/* Enable Client Caching if it is a static file */
 				if(! new String(Reply.get("mime")).equals("application/json")) cache = true;
 				if(Reply.containsKey("extension")) AddedResponseHeaders += "extension: "+new String(Reply.get("extension"))+"\r\n";
-				Network.write(DOS, Reply.get("content"), 
-				new String(Reply.get("mime")), 
-				new String(Reply.get("code")),
-				GZip, 
-				AddedResponseHeaders, 
-				cache);
+				Network.write(DOS, Reply.get("content"), new String(Reply.get("mime")), new String(Reply.get("code")), GZip,  AddedResponseHeaders, cache);
 				S.close();
 			} catch (Exception e) {
-
+				try {
+					Network.write(new BufferedOutputStream(S.getOutputStream(),65536),
+						"We did not understand your request, please try again.".getBytes(), 
+						"text/html", 
+						HTTPCode.INTERNAL_SERVER_ERROR.getValue(), GZip, "", false);
+				} catch (IOException e1) {
+					// Shhhh....
+				}
 			} finally {
 				CurrentConcurrentRequests--;
-				AddedResponseHeaders = "";
 			}
 			this.interrupt();
 		}
