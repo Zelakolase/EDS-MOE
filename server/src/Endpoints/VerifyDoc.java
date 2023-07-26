@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import lib.FilePaths;
 import lib.JSON;
 import lib.SparkDB;
 
@@ -12,7 +13,7 @@ public class VerifyDoc {
 		String res = "error";
 		code = code.replaceAll("-", "");
 		SparkDB db = new SparkDB();
-		db.readFromFile("./conf/doc/"+code.substring(0,3)+".db", Key);
+		db.readFromFile(FilePaths.ShardDirectory.getValue()+code.substring(0,3)+".db", Key);
 		if(db.getColumn("code").contains(code)) {
 			final String tempcode = code;
 			boolean compare = db.get(new HashMap<String, String>() {{
