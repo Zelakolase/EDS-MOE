@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 /**
  * See {@link #split(byte[], byte[])}
- * @author morad
+ * @author GILL
  */
 public class ArraySplit {
 	/**

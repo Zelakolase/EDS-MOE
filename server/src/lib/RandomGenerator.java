@@ -3,7 +3,7 @@ package lib;
 import java.util.Random;
 /**
  * Generates random strings
- * @author Morad A.
+ * @author GILL A.
  */
 public class RandomGenerator {
 	/**

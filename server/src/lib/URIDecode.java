@@ -3,7 +3,7 @@ package lib;
 import java.nio.charset.StandardCharsets;
 /**
  * URI Decoder, duh?
- * @author morad
+ * @author GILL
  */
 public class URIDecode {
 	/**

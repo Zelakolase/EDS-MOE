@@ -2,7 +2,7 @@ package lib;
 
 /**
  * This enum has all of data paths to be used.
- * @author Morad A.
+ * @author GILL A.
  */
 public enum FilePaths {
     ParentDirectory("./data/"),

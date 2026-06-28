@@ -23,7 +23,7 @@ import lib.Network;
 import lib.log;
 /**
  * Core Web Server Class
- * @author morad
+ * @author GILL
  */
 public abstract class Server {
 	int port = 80; // Port Number
@@ -142,7 +142,7 @@ public abstract class Server {
 	}
 	/**
 	 * The first entry point for ANY request.
-	 * @author morad
+	 * @author GILL
 	 */
 	public class Engine extends Thread {
 		// The main request processor

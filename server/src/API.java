@@ -17,7 +17,7 @@ import lib.JSON;
 import lib.SparkDB;
 /**
  * API Entry Point
- * @author morad
+ * @author GILL
  */
 public class API {
 	/**

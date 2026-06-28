@@ -9,7 +9,7 @@ import lib.SparkDB;
 
 /**
  * Class for API Endpoint '/api.about'
- * @author Morad A.
+ * @author GILL A.
  */
 public class about {
 	public String run(String Key, SparkDB metadata, AES aes) throws Exception {

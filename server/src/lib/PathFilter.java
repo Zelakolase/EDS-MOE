@@ -1,7 +1,7 @@
 package lib;
 /**
  * HTTP Path filter to prevent LFI
- * @author Morad A.
+ * @author GILL A.
  */
 public class PathFilter {
 	public static String filter(String path) {

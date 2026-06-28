@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 /**
  * Disk IO Operations
- * @author Morad A.
+ * @author GILL A.
  */
 public class IO {
 	/**

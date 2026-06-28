@@ -9,7 +9,7 @@ fetch("https://zsdp.govt.hu:5000/api.login", {
     "Referer": "http://localhost:3000/",
     "Referrer-Policy": "strict-origin-when-cross-origin"
   },
-  "body": "{\"user\":\"morad\",\"pass\":\"morad\"}",
+  "body": "{\"user\":\"GILL\",\"pass\":\"GILL\"}",
   "method": "POST"
 }).then(r => console.log(r))
 

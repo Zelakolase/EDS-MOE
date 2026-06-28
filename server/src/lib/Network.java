@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.zip.GZIPOutputStream;
 /**
  * Network IO Functions
- * @author Morad A.
+ * @author GILL A.
  */
 public class Network {
 	public static String FixedHeaders = "X-XSS-Protection: 1; mode=block\r\n" + 
