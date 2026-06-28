@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 /**
  * Fancy logger
- * @author GILL A.
+ * @author REDACTED A.
  */
 public class log {
 	private static boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");

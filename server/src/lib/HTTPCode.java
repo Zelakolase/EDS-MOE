@@ -2,7 +2,7 @@ package lib;
 
 /**
  * HTTP Code headers
- * @author GILL A.
+ * @author REDACTED A.
  */
 public enum HTTPCode {
     OK("HTTP/1.1 200 OK"),

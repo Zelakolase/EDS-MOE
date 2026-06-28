@@ -4,7 +4,7 @@ import java.util.function.IntPredicate;
 
 /**
  * Calculation of Passphrase Entropy
- * @GILL A.
+ * @REDACTED A.
  */
 public class EntropyCalc {
     public static double calculate(String passphrase) {

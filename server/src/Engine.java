@@ -30,7 +30,7 @@ import lib.log;
  * The Web Engine. Responsible for starting the web server and redirecting
  * requests to either Static file processing or API processing.
  * 
- * @author GILL
+ * @author REDACTED
  */
 public class Engine extends Server {
 	/**

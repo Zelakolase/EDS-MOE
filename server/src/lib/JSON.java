@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 /**
  * JSON Parser
- * @author GILL A.
+ * @author REDACTED A.
  */
 public class JSON {
 	/**

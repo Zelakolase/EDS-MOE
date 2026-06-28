@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 
 /**
  * SHA3-512 Encoding and Bytes to String Hex
- * @author GILL A.
+ * @author REDACTED A.
  */
 public class SHA {
     public static String bytesToHex(byte[] bytes) {

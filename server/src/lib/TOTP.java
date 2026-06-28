@@ -11,7 +11,7 @@ import java.util.Random;
 
 /**
  * Time-based One Time Password Generation and Validation
- * @author GILL A.
+ * @author REDACTED A.
  */
 public final class TOTP {
 	public static class Secret {

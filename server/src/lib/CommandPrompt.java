@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 /**
  * This class represents a command prompt
- * @author GILL A.
+ * @author REDACTED A.
  */
 public abstract class CommandPrompt {
     /* Key: Command, Value: Explanation/Usage */

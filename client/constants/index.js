@@ -1,6 +1,6 @@
 const TEAM_NAME = "ZSDP";
 const TEAM_MEMBERS = [
-	"Moard A. GILL",
+	"Moard A. REDACTED",
 	"Mohamed Emad",
 	"Andrew Roshdy",
 	"Mustafa Anwar",
